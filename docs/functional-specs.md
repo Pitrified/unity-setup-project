@@ -1,322 +1,209 @@
 # Project Functional & Technical Specification - v0.2
 
+> **Status:** Source of truth. Any feature not here is out of scope.
+> **Audience:** Humans + AI agents. Read before generating any code.
+
+---
+
 ## 1. Overview
 
 A 3D mobile game where the player controls a ship navigating a sea environment.
-This version focuses on delivering a **minimal, stable, and extensible vertical slice**.
+This version delivers a **minimal, stable, extensible vertical slice**.
 
-The project prioritizes:
+Priorities (in order):
 
-- Fast iteration
-- Clean architecture
-- AI-assisted development
-- Mobile performance (mid-range devices like Pixel 7)
+1. Stable framerate on mid-range Android
+2. Clean, AI-legible architecture
+3. Fast iteration loop
+4. Visual polish (lowest)
 
 ---
 
 ## 2. Core Technical Decisions (Locked)
 
-### Engine & Rendering
+| Concern        | Decision                                  | Rationale                              |
+| -------------- | ----------------------------------------- | -------------------------------------- |
+| Engine         | **Unity 6 LTS** (6000.0.x)                | Current LTS, 2-year support window     |
+| Render         | **URP**                                   | Best mobile perf/quality tradeoff      |
+| Scripting      | **C# / .NET Standard 2.1**                | Default Unity 6 setting                |
+| Backend        | **IL2CPP**, ARM64 only                    | Required for Play Store, best perf     |
+| Input          | **Unity Input System** (`com.unity.inputsystem`) | Future-proof, abstraction-friendly |
+| Movement       | **Kinematic / arcade**                    | Deterministic, no physics instability  |
+| Water          | **Custom URP shader (stylized)**          | Avoid simulation cost                  |
+| Camera         | **Third-person chase**                    | Mobile-friendly, no free look          |
+| Orientation    | **Landscape only (locked)**               | Single layout to design for            |
+| Scenes         | **Multi-scene additive + persistent root** | Clean lifetime separation             |
+| Save           | **JSON file in `Application.persistentDataPath`** | Inspectable, portable           |
+| Build trigger  | **Local script (manual)**                 | No CI in v0.2                          |
 
-- Unity Version: **Latest LTS**
-- Render Pipeline: **URP (Universal Render Pipeline)**
-
-Rationale:
-
-- Stability + long-term support
-- Best mobile performance tradeoff
-
----
-
-### Input System
-
-- **Unity Input System (new)**
-
-Rationale:
-
-- Future-proof
-- Mobile-friendly
-- Supports abstraction layer
-
----
-
-### Movement Model
-
-- **Kinematic / Arcade movement**
-
-Rationale:
-
-- Full control over gameplay feel
-- Avoids physics instability
-- Easier iteration
-
----
-
-### Water Strategy
-
-- **Custom lightweight shader (stylized, non-physical)**
-
-Rationale:
-
-- Avoid heavy simulation
-- Maintain performance
-- Full control over visuals
-
----
-
-### Camera System
-
-- **Third-person chase camera**
-
-Constraints:
-
-- Smooth follow
-- Limited player control
-- Mobile-friendly
-
----
-
-### Orientation
-
-- **Landscape only (locked)**
-
----
-
-### Scene Architecture
-
-- **Multi-scene setup with persistent root**
-
-Structure:
-
-- Boot Scene
-- Persistent Scene (GameManager, systems)
-- Menu Scene
-- Game Scene (loaded additively)
-
----
-
-### Save System (v0.1)
-
-- Minimal persistence:
-  - Last player position
-  - Last session state
-
----
-
-### Build Strategy
-
-- Scripted builds
-- Manual trigger
-- No CI/CD (yet)
+Anything not listed here is **not decided**; do not introduce silent defaults.
 
 ---
 
 ## 3. Target Platform Constraints
 
-Target device: **mid-range Android (e.g. Pixel 7)**
+**Reference device:** Pixel 7-class (mid-range Android, 2022+).
 
-Constraints:
+**Build requirements (Google Play, 2026):**
 
-- Stable framerate > visual fidelity
-- Limited draw calls
-- No heavy shaders or physics
-- Memory-conscious asset usage
+- `targetSdkVersion` ≥ 35 (Android 15)
+- 64-bit (ARM64) required; ARMv7 disabled
+- AAB (Android App Bundle) only - APK rejected for new releases
+
+**Performance budgets:** see [performance-budget.md](performance-budget.md).
 
 ---
 
 ## 4. Application Lifecycle
 
-Flow:
-
 ```
 App Launch
-  ↓
-Boot Scene
-  ↓
-Loading Screen
-  ↓
-Main Menu
-  ↓
-Game Scene
-  ↓
-Pause / Resume
-  ↓
-Back to Menu
+  → Boot Scene (init systems, load Persistent additively)
+  → Loading Screen
+  → Menu Scene
+  → Game Scene (additive load over Persistent)
+  → Pause / Resume
+  → Back to Menu (unload Game)
+  → Quit
 ```
 
-Ownership:
+Ownership rules:
 
-- Central **GameManager** controls state transitions
-- No scene should own global logic
-
----
-
-## 5. Scene Structure
-
-### Boot Scene
-
-- Initializes core systems
-- Loads persistent scene
+- A central [GameManager](systems/game-manager.md) owns all state transitions.
+- No scene file owns global state.
+- Scenes are **passive**: they expose entry points, GameManager wires them.
 
 ---
 
-### Persistent Scene
+## 5. Scene Inventory
 
-Contains:
-
-- GameManager
-- Input Manager
-- Save System
-- Audio Manager
-
-Must survive scene loads.
+| Scene        | Loaded as | Lifetime              | Contents (high level)                  |
+| ------------ | --------- | --------------------- | -------------------------------------- |
+| `Boot`       | Single    | First frame only      | `GameBootstrap` only                   |
+| `Persistent` | Additive  | Whole session         | GameManager, Input, Save, Audio, UIRoot |
+| `Menu`       | Single    | While in menu         | Main menu UI                           |
+| `Game`       | Additive  | While playing         | Ship, sea, island, GameCamera          |
 
 ---
 
-### Menu Scene
+## 6. Game Systems (v0.2)
 
-- Main menu UI
-- Navigation entry point
+Each system has a dedicated spec under [systems/](systems/).
 
----
-
-### Game Scene
-
-Contains:
-
-- Ship (player)
-- Sea surface
-- Island (static)
-
----
-
-## 6. Game Systems
-
-### 6.1 Player Controller
-
-- Kinematic movement
-- Forward thrust + steering
-- No physics-based buoyancy
+| System                                            | Purpose                                |
+| ------------------------------------------------- | -------------------------------------- |
+| [game-bootstrap](systems/game-bootstrap.md)       | Entry point, loads Persistent          |
+| [game-manager](systems/game-manager.md)           | State machine, scene coordination      |
+| [scene-loader](systems/scene-loader.md)           | Async additive load/unload             |
+| [input-manager](systems/input-manager.md)         | Input abstraction                      |
+| [ship-controller](systems/ship-controller.md)     | Kinematic player movement              |
+| [camera-controller](systems/camera-controller.md) | Third-person chase camera              |
+| [save-system](systems/save-system.md)             | JSON persistence                       |
+| [audio-manager](systems/audio-manager.md)         | Music + SFX channels                   |
+| [ui-system](systems/ui-system.md)                 | UI Toolkit roots, safe area, scaling   |
+| [logging](systems/logging.md)                     | Central log + debug overlay            |
 
 ---
 
-### 6.2 Camera System
+## 7. Controls (v0.2)
 
-- Follows ship with offset
-- Smooth interpolation
-- No free rotation (initially)
+| Action     | Touch                              | Editor (keyboard)        |
+| ---------- | ---------------------------------- | ------------------------ |
+| Throttle   | Right-side virtual stick (Y axis)  | `W` / `S`                |
+| Steering   | Right-side virtual stick (X axis)  | `A` / `D`                |
+| Pause      | Top-left button                    | `Esc`                    |
 
----
-
-### 6.3 Water System
-
-- Simple plane mesh
-- Shader-based animation
-- No real interaction with ship
+Single virtual stick is sufficient for v0.2; no twin-stick.
 
 ---
 
-### 6.4 Game State System
+## 8. UI Surfaces (v0.2)
 
-States:
-
-- Menu
-- Playing
-- Paused
-
-Managed centrally.
+- Loading screen (cancel-safe, deterministic min duration 0.5 s to avoid flash)
+- Main menu: **Play**, **Continue** (if save exists), **Quit**
+- Pause overlay: **Resume**, **Return to menu**
+- Built with **UI Toolkit** (preferred) or **uGUI** if blockers arise.
+- Must respect **safe area** (notches, gesture bars).
 
 ---
 
-### 6.5 Pause System
+## 9. Persistence (v0.1 schema)
 
-- Freeze gameplay
-- Show pause UI
-- Options:
-  - Resume
-  - Return to menu
+Stored as `save.json` in `Application.persistentDataPath`:
 
----
+```json
+{
+  "version": 1,
+  "ship": { "x": 0.0, "y": 0.0, "z": 0.0, "yawDeg": 0.0 },
+  "lastSavedUtc": "2026-04-28T12:00:00Z"
+}
+```
 
-## 7. UI System
+Rules:
 
-Initial UI:
-
-- Loading screen
-- Main menu
-- Pause menu
-
-Constraints:
-
-- Mobile-safe layout
-- Resolution-independent
+- Atomic write: write to `save.json.tmp`, then rename.
+- On unreadable/corrupt file: rename to `save.json.bak`, start fresh, log warning.
+- `version` field is mandatory; mismatched versions trigger reset (no migration in v0.2).
 
 ---
 
-## 8. Persistence
+## 10. Error Handling & Fallbacks
 
-Stored locally:
+| Failure                       | Behavior                                |
+| ----------------------------- | --------------------------------------- |
+| Scene load fails              | Log error → return to Menu              |
+| Save file corrupt             | Backup + reset (see §9)                 |
+| Missing component reference   | Log error, system stays in safe state   |
+| Input device disconnected     | Use neutral input until reconnected     |
 
-- Last position
-- Last state
-
-No:
-
-- Inventory
-- World state
-- Cloud sync
+Never swallow exceptions silently. Never crash in normal flow.
 
 ---
 
-## 9. Error Handling & Fallbacks
+## 11. Logging & Debugging
 
-Must handle:
+- Central `Log` utility wrapping `UnityEngine.Debug` with category tags.
+- Stripped to warnings/errors in Release builds.
+- Debug overlay (toggle via 3-finger tap or `F1`):
+  - FPS, frame time, draw calls
+  - Current GameManager state
+  - Buttons: reset player, reload scene, skip loading
 
-- Scene load failure → return to menu
-- Missing references → safe defaults
-
-No hard crashes in normal flow.
-
----
-
-## 10. Logging & Debugging
-
-- Central logging utility
-- Debug shortcuts:
-  - Reset player position
-  - Skip loading
-  - Reload scene
-
-Optional debug UI overlay.
+See [systems/logging.md](systems/logging.md).
 
 ---
 
-## 11. Definition of Demo-Ready
+## 12. Definition of Demo-Ready
 
-The build is considered ready when:
+The build is demo-ready when **all** of these hold:
 
-- App launches without errors
-- Menu → Game → Menu works
-- Ship is controllable
-- Island is reachable
-- Pause works
-- No crashes in normal usage
-
----
-
-## 12. Milestones
-
-1. Project setup complete
-2. First local build running
-3. Core architecture implemented
-4. Minimal game world playable
-5. Private alpha published
+- [ ] Cold start to Menu < 5 s on Pixel 7
+- [ ] Menu → Game → Menu loop works repeatedly without leaks
+- [ ] Ship is controllable via touch
+- [ ] Island is reachable
+- [ ] Pause → Resume works
+- [ ] Pause → Menu unloads Game cleanly
+- [ ] Quit + relaunch + Continue restores last position
+- [ ] No errors or warnings in logcat under normal play
+- [ ] Sustained ≥ 30 FPS for 5 minutes of play (see [performance-budget.md](performance-budget.md))
 
 ---
 
-## 13. Out of Scope for v0.2
+## 13. Milestones
 
-- Multiplayer
-- Combat
-- Realistic water physics
-- Economy/progression
+1. **M0** - Repo + Unity project + LFS configured, opens cleanly
+2. **M1** - Bootstrap → Menu → empty Game loop runs in editor
+3. **M2** - Ship moves, camera follows, water visible
+4. **M3** - Save/load works across sessions
+5. **M4** - First Android device build runs
+6. **M5** - Internal Testing track on Play Console with ≥1 external tester
+
+---
+
+## 14. Out of Scope for v0.2
+
+Multiplayer · Combat · Realistic water physics · Economy/progression · Cloud
+save · IAP · Ads · Analytics · Localization · Accessibility settings · Controller
+support · Tablets/foldables special layouts.
+
+These are **not** "later"; they are **not allowed to leak** into v0.2 code.

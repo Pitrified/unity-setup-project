@@ -2,64 +2,72 @@
 
 ## Overview
 
-Implements a **third-person chase camera** following the ship.
+Third-person chase camera. Follows the ship from a fixed offset with smoothing.
 
 ---
 
 ## Responsibilities
 
-* Follow player ship
-* Maintain offset and rotation
-* Smooth movement
+- Follow target Transform
+- Maintain a configurable offset in target-local space
+- Smooth position and rotation
+- Optional look-at on the target
 
 ---
 
 ## Ownership & Lifetime
 
-* Exists in Game Scene
-* References ShipController
+- Component on the Game scene's `MainCamera` GameObject.
+- Created/destroyed with the Game scene.
 
 ---
 
-## Core Data
+## Tunable data (serialized)
 
-* Target (ship transform)
-* Offset vector
-* Follow speed
-* Rotation smoothing
+- `Vector3 LocalOffset` (default `(0, 3, -6)`)
+- `float PositionLerp` (per-second, e.g. `5`)
+- `float RotationLerp` (per-second, e.g. `5`)
+- `bool LookAtTarget` (default `true`)
 
----
-
-## Behavior
-
-* Position = target + offset
-* Smooth interpolation
-* Optional look-at target
+Overridable via a `SO_CameraTuning` ScriptableObject in `Assets/Settings/`.
 
 ---
 
-## Public Interface
+## Public interface
 
-* `SetTarget(Transform)`
-* `ResetCamera()`
+```
+void SetTarget(Transform target)
+void SnapToTarget()              // teleport, used after scene load
+```
+
+---
+
+## Update rules
+
+- Runs in `LateUpdate` (after ship moves).
+- Interpolation uses `1 - Mathf.Exp(-k * dt)` for framerate-independent smoothing.
+- Caches `transform` once.
 
 ---
 
 ## Interactions
 
 ### Uses
+- Target `Transform` (typically ShipController's transform)
 
-* ShipController (position reference)
-
----
-
-### Used By
-
-* None (pure follower)
+### Used by
+- (Nothing - pure consumer)
 
 ---
 
 ## Constraints
 
-* No input handling (v0.1)
-* No collision handling (v0.1)
+- No input handling.
+- No collision avoidance (v0.2).
+- No camera shake / FX in v0.2.
+
+---
+
+## Failure handling
+
+- Null target → camera holds its last position, logs warning once per scene load.

@@ -2,104 +2,117 @@
 
 ## Overview
 
-Central authority controlling **application state, lifecycle, and high-level coordination** across scenes.
+Central authority over **application state, lifecycle, and high-level
+coordination**. Owns references to all systems.
 
 ---
 
 ## Responsibilities
 
-- Own global **game state**
-- Coordinate **scene transitions**
-- Initialize core systems
-- Provide access to shared services
-- Handle app-level events (pause, resume, quit)
+- Own the global game-state machine
+- Coordinate scene transitions via SceneLoader
+- Initialize/teardown core systems
+- Provide access to shared services (Save, Audio, Input, UI)
+- Handle app-level events (focus, pause, quit)
 
 ---
 
 ## Ownership & Lifetime
 
-- Created in **Boot Scene**
-- Lives in **Persistent Scene**
-- Implemented as **singleton (controlled)**
-- Must persist across scene loads
+- Created in Boot scene during `GameBootstrap`.
+- Lives in Persistent scene.
+- **Controlled singleton**: `GameManager.Instance` for read-only access; never
+  set from outside.
+- Survives all scene loads.
 
 ---
 
-## Game States
+## Game states
 
-Defined states:
-
-- `Boot`
-- `Loading`
-- `Menu`
-- `Playing`
-- `Paused`
-
----
-
-## Core Data
-
-Holds:
-
-- Current game state
-- Previous game state
-- References to:
-  - SceneLoader
-  - SaveSystem
-  - InputManager
-  - AudioManager
-
----
-
-## Public Interface (Conceptual)
-
-- `StartGame()`
-- `ReturnToMenu()`
-- `PauseGame()`
-- `ResumeGame()`
-- `QuitGame()`
-- `LoadLastSession()`
-
----
-
-## State Transitions
-
-```id="gm-flow"
-Menu → Playing
-Playing → Paused
-Paused → Playing
-Playing → Menu
 ```
+enum GameState { Boot, Loading, Menu, Playing, Paused }
+```
+
+### Allowed transitions
+
+```
+Boot     → Loading
+Loading  → Menu
+Menu     → Loading       (when starting/continuing a game)
+Loading  → Playing
+Playing  → Paused
+Paused   → Playing
+Paused   → Loading       (returning to menu)
+Playing  → Loading       (returning to menu)
+```
+
+Any other transition is rejected with a logged warning.
+
+---
+
+## Core data
+
+- `GameState CurrentState { get; }`
+- `GameState PreviousState { get; }`
+- References (assigned by Bootstrap):
+  - `SceneLoader`
+  - `SaveSystem`
+  - `InputManager`
+  - `AudioManager`
+  - `UISystem`
+
+---
+
+## Public interface
+
+```
+void OnBootComplete()                 // called by GameBootstrap
+Task StartNewGameAsync()
+Task ContinueAsync()                  // requires SaveSystem.HasSave
+Task ReturnToMenuAsync()
+void PauseGame()
+void ResumeGame()
+void QuitGame()
+event Action<GameState, GameState> StateChanged;   // (previous, next)
+```
+
+---
+
+## App-level events
+
+- `OnApplicationPause(true)` while `Playing` → auto-PauseGame and Save.
+- `OnApplicationQuit` → Save if `Playing` or `Paused`.
+- Focus loss on mobile counts as pause.
 
 ---
 
 ## Interactions
 
 ### Uses
+- SceneLoader (scene transitions)
+- SaveSystem (persistence)
+- InputManager (enable/disable, pause polling)
+- AudioManager (snapshots on pause)
+- UISystem (screen routing)
 
-- SceneLoader → to load/unload scenes
-- SaveSystem → to load/save session
-- InputManager → to enable/disable input
-
----
-
-### Used By
-
-- UI (menu buttons)
-- Pause system
-- Bootstrap logic
+### Used by
+- UI controllers (menu/pause buttons)
+- GameBootstrap (handoff)
+- Debug overlay (state inspection)
 
 ---
 
 ## Constraints
 
-- No gameplay logic
-- No direct scene manipulation (delegates to SceneLoader)
-- Must be deterministic and simple
+- **No gameplay logic.** No ship, camera, or world references.
+- **No direct scene API calls.** Everything through SceneLoader.
+- Deterministic state machine: each transition is a single method.
+- No `Update` work beyond polling pause input.
 
 ---
 
-## Failure Handling
+## Failure handling
 
-- Invalid state transitions must be ignored or logged
-- If scene load fails → fallback to Menu
+- Invalid transition → log warning, no-op.
+- Scene load failure (from SceneLoader) → fall back to Menu.
+- Save failure on quit → log error, do not block quit.

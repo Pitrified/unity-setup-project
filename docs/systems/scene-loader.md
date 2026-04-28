@@ -2,100 +2,91 @@
 
 ## Overview
 
-Handles **all scene loading/unloading**, including additive scenes and transitions.
+Wraps `SceneManager` async APIs. Owned by GameManager. Single point that
+touches scene loading.
 
 ---
 
 ## Responsibilities
 
-* Load scenes (single or additive)
-* Unload scenes safely
-* Track active scenes
-* Provide loading state feedback
+- Load scenes (single or additive) asynchronously
+- Unload scenes safely
+- Track active scenes
+- Surface loading state to UI
 
 ---
 
 ## Ownership & Lifetime
 
-* Instantiated by GameManager
-* Lives in Persistent Scene
+- Lives in Persistent scene.
+- Owned by GameManager.
 
 ---
 
-## Core Data
+## Scene IDs
 
-* Active scene list
-* Loading state (bool)
-* Target scene identifiers
+Use a `static class SceneNames` with constants - never raw strings:
 
----
-
-## Scene Types
-
-* Boot (initial only)
-* Persistent (always loaded)
-* Menu
-* Game
+```
+Boot, Persistent, Menu, Game
+```
 
 ---
 
-## Public Interface (Conceptual)
+## Public interface
 
-* `LoadMenu()`
-* `LoadGame()`
-* `ReloadGame()`
-* `UnloadGame()`
-* `IsLoading()`
-
----
-
-## Loading Strategy
-
-### Menu Load
-
-* Unload Game Scene (if loaded)
-* Load Menu Scene
+```
+Task LoadMenuAsync(CancellationToken ct = default)
+Task LoadGameAsync(CancellationToken ct = default)
+Task UnloadGameAsync(CancellationToken ct = default)
+Task ReloadGameAsync(CancellationToken ct = default)
+bool IsLoading { get; }
+event Action<float> Progress;     // 0..1
+```
 
 ---
 
-### Game Load
+## Load strategy
 
-* Load Game Scene additively
-* Ensure Persistent Scene remains
+| Transition    | Steps                                                   |
+| ------------- | ------------------------------------------------------- |
+| → Menu        | Unload Game (if loaded) → Load Menu (Single sub-call but Persistent kept via additive trick) |
+| → Game        | Load Game additively. Set Game as active scene.         |
+| → Reload Game | Unload Game → Load Game.                                |
+
+Persistent is always loaded; never unload it.
 
 ---
 
-## Transition Behavior
+## Transition behavior
 
-* Trigger loading UI via GameManager
-* Block input during transitions
+- Block input for the duration (call `InputManager.SetEnabled(false)`).
+- Show loading UI via `UISystem.ShowLoading()`.
+- Enforce a minimum visible duration of `0.5 s` to avoid flicker.
 
 ---
 
 ## Interactions
 
 ### Uses
+- `SceneManager` async APIs
+- InputManager (disable/enable)
+- UISystem (loading screen)
 
-* Unity SceneManager API
-
----
-
-### Used By
-
-* GameManager (primary)
-* Debug tools (optional)
+### Used by
+- GameManager (only)
 
 ---
 
 ## Constraints
 
-* No game logic
-* No UI logic
-* Must be idempotent (safe to call multiple times)
+- No gameplay logic.
+- Idempotent: calling `LoadMenuAsync` while already on Menu is a no-op.
+- Concurrent calls return the in-flight Task instead of starting another load.
 
 ---
 
-## Failure Handling
+## Failure handling
 
-* Failed load → notify GameManager
-* Prevent duplicate loads
+- Failed load → log error, raise `Progress(1)`, transition to Menu.
+- Cancellation → unload anything partially loaded, return to previous state.
