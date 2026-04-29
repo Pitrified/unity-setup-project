@@ -20,12 +20,12 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 1 - Local toolchain
 
-- [ ] HUMAN: Install Unity Hub
-- [ ] HUMAN: Install Unity Editor **6000.0 LTS** with Android Build Support module - see [dev-environment-setup.md §2](dev-environment-setup.md#2-required-software-versions-are-pinned)
-- [ ] HUMAN: Install VS Code + extensions (C# Dev Kit, Unity, Copilot, EditorConfig)
-- [ ] HUMAN: Install .NET SDK 8.0+
-- [ ] HUMAN: Install Git ≥ 2.40 and Git LFS ≥ 3.4; run `git lfs install` once
-- [ ] HUMAN: Install `bundletool` (for AAB smoke-testing)
+- [x] HUMAN: Install Unity Hub
+- [x] HUMAN: Install Unity Editor **6000.xxx LTS** with Android Build Support module - see [dev-environment-setup.md §2](dev-environment-setup.md#2-required-software-versions-are-pinned)
+- [x] HUMAN: Install VS Code + extensions (C# Dev Kit, Unity, Copilot, EditorConfig)
+- [x] HUMAN: Install .NET SDK 8.0+
+- [x] HUMAN: Install Git ≥ 2.40 and Git LFS ≥ 3.4; run `git lfs install` once
+- [x] HUMAN: Install `bundletool` (for AAB smoke-testing)
 - [ ] HUMAN: Verify `adb devices` works with a real Android device (Developer Options + USB debugging on)
 
 ---

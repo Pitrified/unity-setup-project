@@ -129,3 +129,70 @@ adb logcat -s Unity:V
 
 - `Tools/setup.sh` that installs LFS hooks, copies `build.env.example`, verifies tooling.
 - Devcontainer for headless CLI builds (no Editor).
+
+# scratch pad
+
+user is doing this
+update docs with relevant info
+
+following this guide for unity hub on linux: https://docs.unity.com/en-us/hub/install-hub-linux
+
+opened `unityhub` from cli
+
+unity asks for login - did that with google SSO
+
+accepted unity personal to get a free license
+
+to install Unity Editor 6 LTS we picked latest one
+
+```
+Final Recommendation: Use Unity 6.4
+Since you are at Phase 0, there is no reason to use the older 6.3 workarounds. Starting with 6.4 ensures that:
+
+You are not using "legacy" code that will break in the next version.
+
+Your mobile performance is maximized by the Render Graph system out of the box.  
+
+You avoid the "Upgrade Friction" mentioned earlier, as you'll never have to "convert" your project to Render Graph-it's already there.  
+
+Update your Phase 1 Todo:
+
+[ ] HUMAN: Install Unity Editor 6.4 (6000.4.4f1) with Android Build Support.
+```
+
+when downloading we picked these options
+
+```
+Essential Modules (Pick These)
+Android Build Support: Mandatory for your project's target platform.  
+
+OpenJDK: Required for building Android apps; Unity installs a version based on OpenJDK by default.  
+
+Android SDK & NDK Tools: Necessary to build and run any code on an Android device.  
+
+Linux Build Support (IL2CPP): Since you are developing on Ubuntu, this is necessary for building your game as a standalone Linux application, which is useful for rapid testing on your host machine without needing to deploy to a device every time. IL2CPP is generally preferred for performance over Mono in final deployments.
+```
+
+for git lfs: https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage
+
+for extension
+https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit
+`ext install ms-dotnettools.csdevkit`
+
+`ext install VisualStudioToolsForUnity.vstuc` (the one from unity technologies is deprecated)
+
+`ext install EditorConfig.EditorConfig`
+
+
+for .NET
+we want to stick to 8 not go ahead apparently can create incompatibilities
+https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?tabs=dotnet8&pivots=os-linux-ubuntu-2604
+
+
+for bundletool: https://github.com/google/bundletool
+go to releases, download latest `bundletool-all-xxx.jar`, rename it to `bundletool-all.jar`
+create alias `bundletool` that runs `java -jar /path/to/bundletool-all.jar`
+`alias bundletool='java -jar bundletool-all.jar'`
+
+the `adb devices` is not on path, need to use the one we got from unity
+`~/Unity/Hub/Editor/6000.4.4f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb devices`
