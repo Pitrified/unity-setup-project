@@ -46,14 +46,14 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 ## Phase 3 - Unity project creation
 
 - [x] HUMAN: in Unity Hub, create new **3D (URP) Mobile** project at repo root, Unity 6 LTS
-- [ ] HUMAN: commit initial Unity project (`Assets/`, `Packages/`, `ProjectSettings/`, `UserSettings/` excluded by gitignore)
-- [ ] HUMAN: verify `git lfs ls-files` shows binary assets after first commit
-- [ ] AI: create folder skeleton per [project-structure.md §2](project-structure.md#2-top-level-layout) (empty folders + `.gitkeep`)
-- [ ] AI: create asmdefs per [project-structure.md §3](project-structure.md#3-assembly-definitions-asmdef)
-- [ ] AI: configure Player Settings per [build-and-release.md §3](build-and-release.md#3-android-player-settings-locked) (commit `ProjectSettings/`)
-- [ ] AI: create URP asset (mobile profile) in `Assets/Settings/`; assign in Graphics + Quality
-- [ ] AI: create `Assets/Settings/InputActions.inputactions` per [systems/input-manager.md](systems/input-manager.md)
-- [ ] HUMAN: confirm Editor opens with **0 errors / 0 warnings** after this phase
+- [x] HUMAN: commit initial Unity project (`Assets/`, `Packages/`, `ProjectSettings/`, `UserSettings/` excluded by gitignore)
+- [x] HUMAN: verify `git lfs ls-files` shows binary assets after first commit
+- [x] AI: create folder skeleton per [project-structure.md §2](project-structure.md#2-top-level-layout) (empty folders + `.gitkeep`)
+- [x] AI: create asmdefs per [project-structure.md §3](project-structure.md#3-assembly-definitions-asmdef)
+- [x] AI: configure Player Settings per [build-and-release.md §3](build-and-release.md#3-android-player-settings-locked) (commit `ProjectSettings/`)
+- [x] AI: create URP asset (mobile profile) in `Assets/Settings/`; assign in Graphics + Quality
+- [x] AI: create `Assets/Settings/InputActions.inputactions` per [systems/input-manager.md](systems/input-manager.md)
+- [x] HUMAN: confirm Editor opens with **0 errors / 0 warnings** after this phase
 
 ---
 

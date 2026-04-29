@@ -1,0 +1,27 @@
+{
+    "name": "Game.Tests.EditMode",
+    "rootNamespace": "",
+    "references": [
+        "GUID:88bcd4817ad448b58e4dca30e0843a13",
+        "GUID:b3b417d5ab3c401287c3100131b57be7",
+        "GUID:aee793a488ff40c49115e2d02831a794",
+        "GUID:bfd49a839de345a4ad37182ed9d9371c",
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
