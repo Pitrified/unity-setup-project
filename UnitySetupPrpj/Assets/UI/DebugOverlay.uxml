@@ -1,0 +1,17 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Style src="DebugOverlay.uss" />
+    <ui:VisualElement name="overlay-panel" class="overlay-panel">
+        <ui:Label name="fps-label"        class="overlay-stat" text="FPS  avg --   1% low --" />
+        <ui:Label name="frametime-label"  class="overlay-stat" text="CPU -.- ms   GPU -.- ms" />
+        <ui:Label name="state-label"      class="overlay-stat" text="State: ?" />
+        <ui:VisualElement class="overlay-divider" />
+        <ui:ScrollView name="log-scroll" class="overlay-log-scroll" mode="Vertical">
+            <ui:Label name="log-label" class="overlay-log-text" text="" />
+        </ui:ScrollView>
+        <ui:VisualElement class="overlay-buttons">
+            <ui:Button name="btn-reset-position" class="overlay-btn" text="Reset Position" />
+            <ui:Button name="btn-reload-scene"   class="overlay-btn" text="Reload Scene" />
+            <ui:Button name="btn-skip-loading"   class="overlay-btn" text="Skip Loading" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

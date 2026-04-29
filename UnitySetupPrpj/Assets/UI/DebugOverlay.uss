@@ -1,0 +1,68 @@
+/* DebugOverlay.uss
+   Styles for the in-game debug overlay (dev / Editor builds only).
+   All units are px unless otherwise noted.
+*/
+
+.overlay-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 520px;
+    max-height: 65%;
+    background-color: rgba(0, 0, 0, 0.78);
+    padding: 10px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 6px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    flex-direction: column;
+}
+
+.overlay-stat {
+    color: rgba(200, 255, 200, 1);
+    font-size: 13px;
+    margin-bottom: 2px;
+    -unity-font-style: bold;
+}
+
+.overlay-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.25);
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+
+.overlay-log-scroll {
+    flex-grow: 1;
+    min-height: 80px;
+    max-height: 280px;
+}
+
+.overlay-log-text {
+    color: rgba(220, 220, 220, 1);
+    font-size: 11px;
+    white-space: normal;
+    -unity-text-align: upper-left;
+}
+
+.overlay-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.overlay-btn {
+    margin-right: 6px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    padding: 4px 8px;
+    background-color: rgba(60, 60, 80, 0.9);
+    color: rgba(240, 240, 240, 1);
+    border-color: rgba(120, 120, 180, 0.8);
+    border-width: 1px;
+    border-radius: 3px;
+}
+
+.overlay-btn:hover {
+    background-color: rgba(80, 80, 120, 0.9);
+}
