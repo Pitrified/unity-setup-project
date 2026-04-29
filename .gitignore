@@ -1,0 +1,50 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Unity asset database
+*.pidb
+*.booproj
+*.svd
+*.pdb.meta
+
+# Unity3D generated meta files
+*.pidb.meta
+*.pdb.meta
+
+# IDEs
+.vs/
+.idea/
+*.csproj
+*.sln
+*.user
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+__MACOSX/
+
+# Local config / secrets (never commit)
+keystore/
+*.keystore
+*.jks
+*.env
+build.env
+
+# Logs
+*.log
+
+# OS clutter
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# NOTE: Packages/manifest.json and Packages/packages-lock.json MUST be committed.

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Tools/git-hooks/pre-commit
+# Install via: Tools/setup.sh
+# Blocks commits that would break the repo or expose secrets.
+
+set -euo pipefail
+
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+fail() {
+    echo -e "${RED}[pre-commit] ERROR: $*${NC}" >&2
+    exit 1
+}
+
+warn() {
+    echo -e "${YELLOW}[pre-commit] WARN: $*${NC}" >&2
+}
+
+# ── 1. Block Library/ or Build/ from being staged ───────────────────────────
+if git diff --cached --name-only | grep -qE '^(Library|Build|Builds|Temp|Logs)/'; then
+    fail "Unity generated folder (Library/, Build/, Temp/, Logs/) must not be committed.\n  Run: git rm -r --cached Library/ Build/ Builds/ Temp/ Logs/ 2>/dev/null; true"
+fi
+
+# ── 2. Block secrets: keystores, .env files, PRIVATE KEY strings ─────────────
+STAGED=$(git diff --cached --name-only)
+
+for f in $STAGED; do
+    # except for this very file, which will contain "PRIVATE KEY" in the grep text
+    [[ "$f" == "Tools/git-hooks/pre-commit" ]] && continue
+
+    # Block keystore / env files by extension
+    case "$f" in
+        *.keystore|*.jks|*.env|build.env)
+            fail "'$f' must not be committed. Add it to .gitignore and remove it:\n  git rm --cached '$f'"
+            ;;
+    esac
+
+    # Block files containing PRIVATE KEY text (PEM blocks, etc.)
+    if [[ -f "$f" ]]; then
+        if git show ":$f" 2>/dev/null | grep -qE '(PRIVATE KEY|CERTIFICATE|BEGIN RSA|BEGIN EC)'; then
+            fail "'$f' appears to contain a private key or certificate. Do not commit credentials."
+        fi
+    fi
+done
+
+# ── 3. Block non-LFS-tracked binaries larger than 1 MB ──────────────────────
+LFS_THRESHOLD=1048576  # 1 MiB
+
+for f in $STAGED; do
+    [[ -f "$f" ]] || continue
+
+    size=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null || echo 0)
+    if [[ "$size" -gt "$LFS_THRESHOLD" ]]; then
+        # Check if the file has a LFS filter configured
+        lfs_filter=$(git check-attr filter -- "$f" | awk '{print $3}')
+        if [[ "$lfs_filter" != "lfs" ]]; then
+            fail "'$f' is ${size} bytes (> 1 MB) and is NOT tracked by LFS.\n  Add a matching rule to .gitattributes:\n    echo '*.ext filter=lfs diff=lfs merge=lfs -text' >> .gitattributes\n  Then: git add .gitattributes && git add --renormalize '$f'"
+        fi
+    fi
+done
+
+echo "[pre-commit] All checks passed."
+exit 0

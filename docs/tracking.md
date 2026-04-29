@@ -32,14 +32,14 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 2 - Repository scaffolding (no Unity project yet)
 
-- [ ] AI: create `.gitignore` per [git-workflow.md §3](git-workflow.md#3-gitignore-essentials-unity)
-- [ ] AI: create `.gitattributes` per [git-workflow.md §4](git-workflow.md#4-gitattributes-lfs--required)
-- [ ] AI: create `.editorconfig` matching [coding-standards.md](coding-standards.md)
-- [ ] AI: create `.github/copilot-instructions.md` from [copilot-instructions-template.md](copilot-instructions-template.md)
-- [ ] AI: create `AGENTS.md` (short, links to `docs/`)
-- [ ] AI: create `Tools/git-hooks/pre-commit` per [git-workflow.md §6](git-workflow.md#6-pre-commit-guardrails)
-- [ ] AI: create `Tools/setup.sh` (installs LFS hook, copies `build.env.example`, verifies tooling)
-- [ ] HUMAN: run `Tools/setup.sh` once; confirm pre-commit hook is active
+- [x] AI: create `.gitignore` per [git-workflow.md §3](git-workflow.md#3-gitignore-essentials-unity)
+- [x] AI: create `.gitattributes` per [git-workflow.md §4](git-workflow.md#4-gitattributes-lfs--required)
+- [x] AI: create `.editorconfig` matching [coding-standards.md](coding-standards.md)
+- [x] AI: create `.github/copilot-instructions.md` from [copilot-instructions-template.md](copilot-instructions-template.md)
+- [x] AI: create `AGENTS.md` (short, links to `docs/`)
+- [x] AI: create `Tools/git-hooks/pre-commit` per [git-workflow.md §6](git-workflow.md#6-pre-commit-guardrails)
+- [x] AI: create `Tools/setup.sh` (installs LFS hook, copies `build.env.example`, verifies tooling)
+- [x] HUMAN: run `Tools/setup.sh` once; confirm pre-commit hook is active
 
 ---
 
