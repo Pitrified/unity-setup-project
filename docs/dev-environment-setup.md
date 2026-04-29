@@ -196,3 +196,6 @@ create alias `bundletool` that runs `java -jar /path/to/bundletool-all.jar`
 
 the `adb devices` is not on path, need to use the one we got from unity
 `~/Unity/Hub/Editor/6000.4.4f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb devices`
+
+then go to developer options on the phone, enable USB debugging, plug in the phone, tap on the notification for file transfer, accept the usb debugging prompt on the phone, and then run the above command again and it should show up as a connected device
+

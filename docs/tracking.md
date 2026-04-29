@@ -26,7 +26,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] HUMAN: Install .NET SDK 8.0+
 - [x] HUMAN: Install Git ≥ 2.40 and Git LFS ≥ 3.4; run `git lfs install` once
 - [x] HUMAN: Install `bundletool` (for AAB smoke-testing)
-- [ ] HUMAN: Verify `adb devices` works with a real Android device (Developer Options + USB debugging on)
+- [x] HUMAN: Verify `adb devices` works with a real Android device (Developer Options + USB debugging on)
 
 ---
 
