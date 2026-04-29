@@ -45,7 +45,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 3 - Unity project creation
 
-- [ ] HUMAN: in Unity Hub, create new **3D (URP) Mobile** project at repo root, Unity 6 LTS
+- [x] HUMAN: in Unity Hub, create new **3D (URP) Mobile** project at repo root, Unity 6 LTS
 - [ ] HUMAN: commit initial Unity project (`Assets/`, `Packages/`, `ProjectSettings/`, `UserSettings/` excluded by gitignore)
 - [ ] HUMAN: verify `git lfs ls-files` shows binary assets after first commit
 - [ ] AI: create folder skeleton per [project-structure.md §2](project-structure.md#2-top-level-layout) (empty folders + `.gitkeep`)
