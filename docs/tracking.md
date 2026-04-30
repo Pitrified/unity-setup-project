@@ -62,7 +62,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] AI: implement [systems/logging.md](systems/logging.md) (no dependencies)
 - [x] AI: implement [systems/save-system.md](systems/save-system.md) (+ EditMode tests)
 - [x] AI: implement [systems/input-manager.md](systems/input-manager.md)
-- [ ] AI: implement [systems/audio-manager.md](systems/audio-manager.md)
+- [x] AI: implement [systems/audio-manager.md](systems/audio-manager.md)
 - [ ] AI: implement [systems/ui-system.md](systems/ui-system.md) (loading + pause overlays)
 - [ ] AI: implement [systems/scene-loader.md](systems/scene-loader.md)
 - [ ] AI: implement [systems/game-manager.md](systems/game-manager.md) (+ state-machine EditMode tests)
