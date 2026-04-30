@@ -59,8 +59,8 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 4 - Core systems (one PR per system, in this order)
 
-- [ ] AI: implement [systems/logging.md](systems/logging.md) (no dependencies)
-- [ ] AI: implement [systems/save-system.md](systems/save-system.md) (+ EditMode tests)
+- [x] AI: implement [systems/logging.md](systems/logging.md) (no dependencies)
+- [x] AI: implement [systems/save-system.md](systems/save-system.md) (+ EditMode tests)
 - [ ] AI: implement [systems/input-manager.md](systems/input-manager.md)
 - [ ] AI: implement [systems/audio-manager.md](systems/audio-manager.md)
 - [ ] AI: implement [systems/ui-system.md](systems/ui-system.md) (loading + pause overlays)
