@@ -1,0 +1,29 @@
+/* Loading.uss
+   Styles for the full-screen loading overlay.
+   Reference resolution: 1920x1080 landscape (PanelSettings scale-with-screen).
+*/
+
+.loading-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.92);
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* safe-area-container: UISystem writes padding here dynamically. */
+.safe-area-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-label {
+    color: rgba(255, 255, 255, 1);
+    font-size: 36px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}

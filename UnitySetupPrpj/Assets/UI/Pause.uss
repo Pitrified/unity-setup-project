@@ -1,0 +1,62 @@
+/* Pause.uss
+   Styles for the pause overlay.
+   Reference resolution: 1920x1080 landscape (PanelSettings scale-with-screen).
+   Touch targets: buttons are >= 96 px tall in reference resolution,
+   which is >= 48 dp on a typical 2x-density Android device.
+*/
+
+.pause-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.72);
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+/* safe-area-container: UISystem writes padding here dynamically. */
+.safe-area-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.pause-panel {
+    background-color: rgba(20, 20, 28, 0.95);
+    border-radius: 16px;
+    padding: 48px;
+    min-width: 480px;
+    align-items: center;
+}
+
+.pause-title {
+    color: rgba(255, 255, 255, 1);
+    font-size: 52px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    margin-bottom: 40px;
+}
+
+.pause-btn {
+    width: 320px;
+    height: 96px;
+    font-size: 28px;
+    -unity-font-style: bold;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background-color: rgba(60, 100, 180, 1);
+    color: rgba(255, 255, 255, 1);
+    border-width: 0;
+    /* Ensure last button has no trailing margin */
+    align-self: center;
+}
+
+.pause-btn:hover {
+    background-color: rgba(80, 120, 200, 1);
+}
+
+.pause-btn:active {
+    background-color: rgba(40, 80, 160, 1);
+}

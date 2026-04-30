@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Style src="Loading.uss" />
+    <!--
+        loading-overlay: full-screen backdrop; UISystem toggles display on the root
+        visual element returned by UIDocument.rootVisualElement, which contains this.
+        safe-area-container: receives dynamic padding from UISystem.ApplySafeArea().
+    -->
+    <ui:VisualElement name="loading-overlay" class="loading-overlay">
+        <ui:VisualElement name="safe-area-container" class="safe-area-container">
+            <ui:Label name="loading-label" class="loading-label" text="Loading..." />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

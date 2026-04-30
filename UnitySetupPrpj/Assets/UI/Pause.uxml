@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Style src="Pause.uss" />
+    <!--
+        pause-overlay: full-screen semi-transparent backdrop.
+        safe-area-container: receives dynamic padding from UISystem.ApplySafeArea().
+        btn-resume / btn-return-to-menu: wired by UISystem to fire IUISystem events.
+        Touch targets are >= 96 px in reference resolution (1920x1080) which maps to
+        >= 48 dp on a typical 2x-density Android device.
+    -->
+    <ui:VisualElement name="pause-overlay" class="pause-overlay">
+        <ui:VisualElement name="safe-area-container" class="safe-area-container">
+            <ui:VisualElement class="pause-panel">
+                <ui:Label class="pause-title" text="Paused" />
+                <ui:Button name="btn-resume"         class="pause-btn" text="Resume" />
+                <ui:Button name="btn-return-to-menu" class="pause-btn" text="Main Menu" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
