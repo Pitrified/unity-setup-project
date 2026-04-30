@@ -66,7 +66,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] AI: implement [systems/ui-system.md](systems/ui-system.md) (loading + pause overlays)
 - [x] AI: implement [systems/scene-loader.md](systems/scene-loader.md)
 - [x] AI: implement [systems/game-manager.md](systems/game-manager.md) (+ state-machine EditMode tests)
-- [ ] AI: implement [systems/game-bootstrap.md](systems/game-bootstrap.md)
+- [x] AI: implement [systems/game-bootstrap.md](systems/game-bootstrap.md)
 
 ---
 
