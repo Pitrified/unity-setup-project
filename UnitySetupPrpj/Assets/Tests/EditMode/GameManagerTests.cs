@@ -113,7 +113,7 @@ namespace Game.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
-            Object.DestroyImmediate(_go);
+            UnityEngine.Object.DestroyImmediate(_go);
         }
 
         // Helper: drives through OnBootComplete to reach Menu.
@@ -439,7 +439,7 @@ namespace Game.Tests.EditMode
         [Test]
         public void Instance_IsCleared_AfterDestroy()
         {
-            Object.DestroyImmediate(_go);
+            UnityEngine.Object.DestroyImmediate(_go);
             _go = null; // prevent double-destroy in TearDown
 
             Assert.IsNull(GameManager.Instance);
