@@ -221,7 +221,12 @@ namespace Game.Core
             }
 
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // DontDestroyOnLoad is only meaningful (and valid) during actual play
+            // sessions. In EditMode unit tests Application.isPlaying is false,
+            // and calling it outside play mode can trigger an internal Unity error
+            // that fires OnDestroy, immediately clearing Instance again.
+            if (Application.isPlaying)
+                DontDestroyOnLoad(gameObject);
         }
 
         private void OnDestroy()

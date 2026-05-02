@@ -13,6 +13,7 @@
 namespace Game.Tests.EditMode
 {
     using System;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
@@ -99,8 +100,17 @@ namespace Game.Tests.EditMode
         [SetUp]
         public void SetUp()
         {
-            _go         = new GameObject("GameManager");
-            _gm         = _go.AddComponent<GameManager>();
+            _go = new GameObject("GameManager");
+            _gm = _go.AddComponent<GameManager>();
+
+            // In EditMode (Application.isPlaying == false) Unity does not dispatch
+            // Awake automatically when AddComponent is called. Invoke it explicitly
+            // so the singleton Instance is set before any test assertion.
+            typeof(GameManager)
+                .GetMethod("Awake",
+                    BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.Invoke(_gm, null);
+
             _fakeLoader = new FakeSceneLoader();
             _fakeSave   = new FakeSaveSystem();
             _fakeInput  = new FakeInputManager();
@@ -113,6 +123,15 @@ namespace Game.Tests.EditMode
         [TearDown]
         public void TearDown()
         {
+            // In EditMode, DestroyImmediate does not dispatch OnDestroy via the
+            // Unity message pump (symmetric with Awake not firing on AddComponent).
+            // Invoke it explicitly so Instance is genuinely null before the next test.
+            if (_go != null && _gm != null)
+            {
+                typeof(GameManager)
+                    .GetMethod("OnDestroy", BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.Invoke(_gm, null);
+            }
             UnityEngine.Object.DestroyImmediate(_go);
         }
 
@@ -439,10 +458,16 @@ namespace Game.Tests.EditMode
         [Test]
         public void Instance_IsCleared_AfterDestroy()
         {
+            // DestroyImmediate does not dispatch OnDestroy in EditMode; invoke manually.
+            typeof(GameManager)
+                .GetMethod("OnDestroy", BindingFlags.NonPublic | BindingFlags.Instance)
+                ?.Invoke(_gm, null);
+
             UnityEngine.Object.DestroyImmediate(_go);
-            _go = null; // prevent double-destroy in TearDown
+            _go = null; // prevent double-invoke in TearDown
 
             Assert.IsNull(GameManager.Instance);
         }
+
     }
 }
