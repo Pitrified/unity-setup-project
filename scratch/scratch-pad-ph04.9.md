@@ -96,6 +96,27 @@ It should no longer appear under `Assets/UI/`.
 "Missing", drag `Assets/Settings/SO_DebugOverlayPanel` from the Project window onto
 the Panel Settings field in the Inspector.
 
+### Step 3 outcome (done via Unity MCP on 2026-05-03)
+
+Status: **Completed**
+
+What was done with MCP tools:
+1. Searched assets to confirm current panel settings asset location and name.
+2. Opened `Assets/Scenes/SampleScene.unity`.
+3. Queried `DebugOverlay` -> `UIDocument` to verify `panelSettings` and source asset references.
+
+Verified results from MCP:
+- `Assets/Settings/SO_DebugOverlayPanel.asset` exists.
+- No `Assets/UI/NewPanelSettings.asset` asset was found.
+- `DebugOverlay` exists in `SampleScene` and has a `UIDocument`.
+- `UIDocument.panelSettings` is `SO_DebugOverlayPanel` at `Assets/Settings/SO_DebugOverlayPanel.asset`.
+- `UIDocument.visualTreeAsset` is `DebugOverlay` at `Assets/UI/DebugOverlay.uxml`.
+- `panelSettings` is not missing/null.
+
+What is still left to do manually:
+- Nothing required for Step 3.
+- Optional: open `SampleScene` and visually confirm the same references in the Inspector if you want a UI-level double check.
+
 ---
 
 ## Step 4 - Verify the DebugOverlay works in SampleScene
@@ -116,6 +137,35 @@ FPS, frame time, and a few log lines. Press F1 again - it should disappear.
 No red errors appear in the Console while the game is running.
 
 5. Press **Play** again to stop the game.
+
+### Step 4 outcome (done via Unity MCP on 2026-05-03)
+
+Status: **Completed with one manual confirmation still recommended**
+
+What was done with MCP tools:
+1. Loaded `Assets/Scenes/SampleScene.unity` and cleared Console.
+2. Entered Play Mode.
+3. Verified runtime setup on `DebugOverlay`:
+   - `UIDocument` exists.
+   - `panelSettings` = `SO_DebugOverlayPanel`.
+   - `visualTreeAsset` = `DebugOverlay`.
+   - `DebugOverlayController` exists (`Game.Systems.DebugOverlayController`).
+4. Verified runtime show/hide behavior by invoking controller visibility logic:
+   - Overlay panel display state observed as `None` (hidden) and `Flex` (visible).
+   - Controller internal visibility flag tracked the same state changes.
+5. Checked Console for red errors while running.
+6. Exited Play Mode.
+
+Notes:
+- No red Console errors were reported during this MCP run.
+- One warning entry appeared from the MCP transport layer (`WebSocket is not initialised`), not from gameplay/system scripts.
+- The F1 keypress itself was not physically sent from MCP in this run.
+
+What is still left to do manually:
+1. Open Game view and press **F1** once to confirm overlay appears.
+2. Press **F1** again to confirm overlay hides.
+3. Confirm no red Console errors during that manual key toggle check.
+OUTCOME: confirmed, started game, pressed F1, overlay appeared with no errors, pressed F1 again, overlay disappeared with no errors.
 
 ---
 
@@ -182,6 +232,67 @@ You need to expose three parameters so that C# code can change them by name.
 
 > The parameter names are case-sensitive and must match exactly. The C# code
 > uses the strings `"MasterVol"`, `"MusicVol"`, `"SfxVol"`.
+
+### Step 5 outcome (done via Unity MCP on 2026-05-03)
+
+Status: **Completed with one manual validation pass recommended**
+
+What was done with MCP tools:
+1. Confirmed no existing `MainMixer` asset.
+2. Created `Assets/Settings/MainMixer.mixer` via Unity editor internal API.
+3. Repaired an empty internal mixer view list (required so scripted group creation would work).
+4. Added child groups under `Master`:
+   - `Music`
+   - `SFX`
+5. Exposed the exact volume parameters by binding each group volume GUID:
+   - `MasterVol`
+   - `MusicVol`
+   - `SfxVol`
+6. Saved/refreshed assets and re-queried mixer configuration.
+
+Verified results from MCP:
+- `Assets/Settings/MainMixer.mixer` exists.
+- Mixer groups are exactly: `Master`, `Music`, `SFX`.
+- Exposed parameter names are exactly: `MasterVol`, `MusicVol`, `SfxVol`.
+
+Notes:
+- During automation, Unity logged warnings from internal editor APIs (for example, `AudioMixerController` internal class warnings and duplicate-create attempts during recovery).
+- These warnings occurred while scripting the setup and did not indicate missing final mixer/groups/parameters.
+
+What is still left to do manually:
+1. Open `Assets/Settings/MainMixer.mixer` in the Audio Mixer window.
+2. Visually confirm the left group tree shows:
+   - `Master`
+   - `Music`
+   - `SFX`
+3. Open **Exposed Parameters** and confirm exactly:
+   - `MasterVol`
+   - `MusicVol`
+   - `SfxVol`
+4. If any entry is missing or misspelled, fix it in the Audio Mixer UI before Step 6.
+OUTCOME: confirmed mixer and groups exist, visually checked group names, visually checked exposed parameter names, all correct. In groups, `Master` has `Music` and `SFX` as children. In exposed parameters, `MasterVol`, `MusicVol`, and `SfxVol` are all present with correct spelling and case.
+
+### Step 5 post-check recovery outcome (2026-05-03)
+
+After the visual check above, Unity later reported repeated console errors:
+- `[Worker0] Could not initialize audio mixer 'MainMixer' as it has an invalid snapshot reference at index 0...`
+- `Mixer is not initialized`
+
+Root cause from sanity checks:
+- The mixer asset generated through internal editor APIs was structurally inconsistent for runtime initialization.
+
+Recovery actions performed:
+1. Identified and removed corrupted mixer variants.
+2. Recreated `Assets/Settings/MainMixer.mixer` cleanly.
+3. Rebuilt group hierarchy (`Master` with `Music` and `SFX`).
+4. Rebound exposed parameters (`MasterVol`, `MusicVol`, `SfxVol`).
+5. Ran runtime sanity check in Play Mode:
+   - `AudioMixer.SetFloat` succeeded for all three parameters.
+   - Console stayed clean (0 errors, 0 warnings).
+
+Final status:
+- Step 5 is **completed and recovered**.
+- `MainMixer` is now runtime-valid and stable.
 
 ---
 
