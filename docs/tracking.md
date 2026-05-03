@@ -72,7 +72,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 5 - Scenes
 
-- [ ] HUMAN: create `Boot.unity`, `Persistent.unity`, `Menu.unity`, `Game.unity` (commit empty)
+- [x] HUMAN: create `Boot.unity`, `Persistent.unity`, `Menu.unity`, `Game.unity` (commit empty)
 - [ ] AI: wire `Boot.unity` (single `GameBootstrap`)
 - [ ] AI: wire `Persistent.unity` (GameManager, all systems, UIRoot)
 - [ ] AI: wire `Menu.unity` (Play / Continue / Quit buttons routed through GameManager)
