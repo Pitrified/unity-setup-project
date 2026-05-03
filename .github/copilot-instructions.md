@@ -6,6 +6,7 @@
 - Per-system specs: `docs/systems/*.md`
 - Coding rules: `docs/coding-standards.md`
 - AI rules of engagement: `docs/ai-development-playbook.md`
+- Unity MCP operational notes: `docs/unity-mcp-best-practices.md`
 
 If a request contradicts these, the docs win.
 

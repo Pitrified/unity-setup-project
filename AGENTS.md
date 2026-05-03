@@ -12,6 +12,7 @@ This is the `artificial-pi` Unity 6 LTS mobile project (v0.2, private alpha).
 | 4 | [docs/coding-standards.md](docs/coding-standards.md) | C# style rules |
 | 5 | [docs/systems/](docs/systems/) | One spec file per runtime system |
 | 6 | [docs/tracking.md](docs/tracking.md) | Current phase & checklist |
+| 7 | [docs/unity-mcp-best-practices.md](docs/unity-mcp-best-practices.md) | Unity MCP session tips, recovery patterns, validation workflow |
 
 ## Non-negotiable constraints
 
