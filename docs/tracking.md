@@ -74,10 +74,10 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 - [x] HUMAN: create `Boot.unity`, `Persistent.unity`, `Menu.unity`, `Game.unity` (commit empty)
 - [x] AI: wire `Boot.unity` (single `GameBootstrap`)
-- [ ] AI: wire `Persistent.unity` (GameManager, all systems, UIRoot)
-- [ ] AI: wire `Menu.unity` (Play / Continue / Quit buttons routed through GameManager)
-- [ ] AI: wire `Game.unity` minimum (sea plane, ship spawn, camera)
-- [ ] AI: register all scenes in Build Settings (Boot first)
+- [x] AI: wire `Persistent.unity` (GameManager, all systems, UIRoot)
+- [x] AI: wire `Menu.unity` (Play / Continue / Quit buttons routed through GameManager)
+- [x] AI: wire `Game.unity` minimum (sea plane, ship spawn, camera)
+- [x] AI: register all scenes in Build Settings (Boot first)
 - [ ] HUMAN: press Play in `Boot.unity` - expect Menu reachable, no console errors
 
 ---

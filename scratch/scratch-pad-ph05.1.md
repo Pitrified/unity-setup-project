@@ -127,11 +127,57 @@ Menu.unity
 
 ## wire game scene
 
-- [ ] AI: wire `Game.unity` minimum (sea plane, ship spawn, camera)
+- [x] AI: wire `Game.unity` minimum (sea plane, ship spawn, camera) -- done via MCP 2026-05-04
+
+### What was implemented (MCP)
+
+**No new scripts or assets** - Phase 6 scripts (ShipController, CameraController) do not exist yet; structural GOs only.
+
+**GameObjects + components:**
+
+| GameObject | Component(s) | Notes |
+|---|---|---|
+| `DirectionalLight` | `Transform`, `Light`, `UniversalAdditionalLightData` | rotation (50, -30, 0), type = Directional |
+| `Sea` | `Transform`, `MeshFilter`, `MeshCollider`, `MeshRenderer` | Plane primitive, scale (20, 1, 20), pos (0, 0, 0) |
+| `Ship` | `Transform`, `MeshFilter`, `BoxCollider`, `MeshRenderer` | Cube primitive, scale (1, 0.5, 2), pos (0, 0.5, 0) - placeholder for Phase 6 PF_Ship prefab |
+| `MainCamera` | `Transform`, `Camera`, `UniversalAdditionalCameraData` | tag = "MainCamera", pos (0, 3, -6), rotation (15, 0, 0) - Phase 6 adds CameraController |
+
+Console: pre-existing CS4014 warning only (no new errors or warnings).
+
+### Final Game.unity hierarchy
+```
+Game.unity
+├── DirectionalLight  [Transform, Light, UniversalAdditionalLightData]
+├── Sea               [Transform, MeshFilter, MeshCollider, MeshRenderer]
+├── Ship              [Transform, MeshFilter, BoxCollider, MeshRenderer]
+└── MainCamera        [Transform, Camera, UniversalAdditionalCameraData]  tag=MainCamera
+```
+
+### Notes
+- `Ship` is a cube placeholder. Phase 6 will replace it with the `PF_Ship` prefab and add `ShipController`.
+- `MainCamera` is tagged "MainCamera" so `Camera.main` returns it at runtime. Phase 6 adds `CameraController`.
+- Sea plane scale 20x20 units. Phase 6 can resize/replace with actual sea geometry.
+
+### Manual steps still to do
+- None for this scene wiring.
+- Build Settings must include all scenes (Boot first) before end-to-end test.
 
 ## register scenes
 
-- [ ] AI: register all scenes in Build Settings (Boot first)
+- [x] AI: register all scenes in Build Settings (Boot first) -- done via MCP 2026-05-04
+
+### What was implemented
+
+Used `manage_build scenes` to set `EditorBuildSettings.scenes`:
+
+| Index | Scene | Enabled |
+|-------|-------|---------|
+| 0 | `Assets/Scenes/Boot.unity` | true |
+| 1 | `Assets/Scenes/Persistent.unity` | true |
+| 2 | `Assets/Scenes/Menu.unity` | true |
+| 3 | `Assets/Scenes/Game.unity` | true |
+
+Console: pre-existing CS4014 warning only (no new errors).
 
 ## test in editor
 
