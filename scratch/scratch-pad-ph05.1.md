@@ -44,7 +44,50 @@ Boot.unity
 
 ## wire persistent scene
 
-- [ ] AI: wire `Persistent.unity` (GameManager, all systems, UIRoot)
+- [x] AI: wire `Persistent.unity` (GameManager, all systems, UIRoot) -- done via MCP 2026-05-04
+
+### What was implemented (MCP)
+
+**New asset created:**
+- `Assets/Settings/GamePanelSettings.asset` - PanelSettings (1920x1080, ScaleWithScreenSize, match=0.5, sortOrder=0)
+
+**GameObjects + components:**
+
+| GameObject | Component(s) | Serialized refs wired |
+|---|---|---|
+| `GameManager` | `Game.Core.GameManager` | none (receives refs via `Initialize()` at runtime) |
+| `SceneLoader` | `Game.Core.SceneLoader` | none (receives refs via `Initialize()` at runtime) |
+| `SaveSystem` | `Game.Systems.SaveSystem` | none (uses `Application.persistentDataPath`) |
+| `InputManager` | `Game.Systems.InputManager` | `_inputActions` -> `Assets/Settings/InputActions.inputactions` |
+| `AudioManager` | `Game.Systems.AudioManager` | `_mixer` -> MainMixer, `_musicGroup` -> Music, `_sfxGroup` -> SFX |
+| `UIRoot` | `Game.UI.UISystem` | `_loadingDocument` -> Loading child, `_pauseDocument` -> Pause child |
+| `UIRoot/Loading` | `UIDocument` | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Loading.uxml |
+| `UIRoot/Pause` | `UIDocument` | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Pause.uxml |
+
+All 10 references verified non-null. Console: 0 errors, 0 warnings after save.
+
+### Final Persistent.unity hierarchy
+```
+Persistent.unity
+├── GameManager   [Transform, GameManager]
+├── SceneLoader   [Transform, SceneLoader]
+├── SaveSystem    [Transform, SaveSystem]
+├── InputManager  [Transform, InputManager]
+├── AudioManager  [Transform, AudioManager]
+└── UIRoot        [Transform, UISystem]
+    ├── Loading   [Transform, UIDocument]  <- Loading.uxml + GamePanelSettings
+    └── Pause     [Transform, UIDocument]  <- Pause.uxml + GamePanelSettings
+```
+
+### Notes
+- `GameBootstrap` discovers all systems at runtime via `FindAnyObjectByType<T>()` and calls `GameManager.Initialize(...)`. No extra wiring needed in the scene.
+- `SceneLoader.Initialize(inputManager, uiSystem)` is called by `GameManager` - no scene-level ref needed.
+- `DontDestroyOnLoad` is applied by `GameManager.Awake()` on the GameManager GO.
+
+### Manual steps still to do
+- None for this scene wiring.
+- Boot.unity must be in Build Settings index 0; Persistent at index 1 (handled in "register scenes" task).
+- Full end-to-end boot test after Menu and Game scenes are wired.
 
 ## wire menu scene
 
