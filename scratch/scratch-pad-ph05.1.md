@@ -91,7 +91,39 @@ Persistent.unity
 
 ## wire menu scene
 
-- [ ] AI: wire `Menu.unity` (Play / Continue / Quit buttons routed through GameManager)
+- [x] AI: wire `Menu.unity` (Play / Continue / Quit buttons routed through GameManager) -- done via MCP 2026-05-04
+
+### What was implemented (MCP)
+
+**New files created:**
+- `Assets/UI/Menu.uxml` - menu layout with `btn-play`, `btn-continue`, `btn-quit` buttons
+- `Assets/UI/Menu.uss` - styles matching project palette (1920x1080 landscape, touch targets >= 96 px)
+- `Assets/Scripts/Core/MenuController.cs` - `Game.Core` MonoBehaviour; placed in Core (not UI) because it directly calls `GameManager.Instance` - circular dep with `Game.UI` asmdef is avoided this way
+
+**MenuController behaviour:**
+- `Start()` queries buttons from UIDocument root, wires `.clicked` callbacks
+- `btn-play` -> `GameManager.Instance.StartNewGameAsync()`
+- `btn-continue` -> `GameManager.Instance.ContinueAsync()`; disabled if `SaveSystem.HasSave == false`
+- `btn-quit` -> `GameManager.Instance.QuitGame()`
+- `OnDestroy()` unsubscribes all button handlers (no leaks)
+
+**GameObject + wired refs:**
+
+| GameObject | Component(s) | Serialized refs wired |
+|---|---|---|
+| `Menu` | `Game.Core.MenuController`, `UIDocument` | `_menuDocument` -> UIDocument; UIDocument `sourceAsset` -> Menu.uxml, `m_PanelSettings` -> GamePanelSettings |
+
+Console: 0 errors, 0 warnings after save (pre-existing CS4014 in GameBootstrap is unrelated).
+
+### Final Menu.unity hierarchy
+```
+Menu.unity
+└── Menu  [Transform, MenuController, UIDocument]  <- Menu.uxml + GamePanelSettings
+```
+
+### Manual steps still to do
+- None for this scene wiring.
+- Build Settings must include all scenes (Boot first) before end-to-end test.
 
 ## wire game scene
 

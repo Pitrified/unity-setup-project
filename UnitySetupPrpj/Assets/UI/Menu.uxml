@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Style src="Menu.uss" />
+    <!--
+        menu-root: full-screen container; always visible (no show/hide toggling needed).
+        safe-area-container: receives dynamic padding from UISystem.ApplySafeArea().
+        btn-play / btn-continue / btn-quit: wired by MenuController.
+        Touch targets are >= 96 px tall in reference resolution (1920x1080) which maps
+        to >= 48 dp on a typical 2x-density Android device.
+    -->
+    <ui:VisualElement name="menu-root" class="menu-root">
+        <ui:VisualElement name="safe-area-container" class="safe-area-container">
+            <ui:VisualElement class="menu-panel">
+                <ui:Label class="menu-title" text="Artificial Pi" />
+                <ui:Button name="btn-play"     class="menu-btn" text="New Game" />
+                <ui:Button name="btn-continue" class="menu-btn" text="Continue" />
+                <ui:Button name="btn-quit"     class="menu-btn menu-btn--quit" text="Quit" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
