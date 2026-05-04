@@ -8,13 +8,13 @@ gather additional context before implementing (eg, review relevant docs, load mc
 
 ## Relevant docs by task
 
-| Task | Doc reference |
-|------|---------------|
-| wire `Boot.unity` | [systems/game-bootstrap.md](../docs/systems/game-bootstrap.md) - flow, constraints, single GO rule |
-| wire `Persistent.unity` | [systems/game-manager.md](../docs/systems/game-manager.md), [systems/scene-loader.md](../docs/systems/scene-loader.md), [systems/audio-manager.md](../docs/systems/audio-manager.md), [systems/input-manager.md](../docs/systems/input-manager.md), [systems/save-system.md](../docs/systems/save-system.md), [systems/ui-system.md](../docs/systems/ui-system.md) |
-| wire `Menu.unity` | [systems/game-manager.md](../docs/systems/game-manager.md) §Public interface - Play/Continue/Quit entry points, [systems/ui-system.md](../docs/systems/ui-system.md) §Screens |
-| wire `Game.unity` | [systems/ship-controller.md](../docs/systems/ship-controller.md), [systems/camera-controller.md](../docs/systems/camera-controller.md), [project-structure.md](../docs/project-structure.md) §2 (sea plane, PF_Ship prefab) |
-| register scenes in Build Settings | [project-structure.md](../docs/project-structure.md) §2 - scene list: Boot, Persistent, Menu, Game (Boot index 0) |
+| Task                              | Doc reference                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| wire `Boot.unity`                 | [systems/game-bootstrap.md](../docs/systems/game-bootstrap.md) - flow, constraints, single GO rule                                                                                                                                                                                                                                                                 |
+| wire `Persistent.unity`           | [systems/game-manager.md](../docs/systems/game-manager.md), [systems/scene-loader.md](../docs/systems/scene-loader.md), [systems/audio-manager.md](../docs/systems/audio-manager.md), [systems/input-manager.md](../docs/systems/input-manager.md), [systems/save-system.md](../docs/systems/save-system.md), [systems/ui-system.md](../docs/systems/ui-system.md) |
+| wire `Menu.unity`                 | [systems/game-manager.md](../docs/systems/game-manager.md) §Public interface - Play/Continue/Quit entry points, [systems/ui-system.md](../docs/systems/ui-system.md) §Screens                                                                                                                                                                                      |
+| wire `Game.unity`                 | [systems/ship-controller.md](../docs/systems/ship-controller.md), [systems/camera-controller.md](../docs/systems/camera-controller.md), [project-structure.md](../docs/project-structure.md) §2 (sea plane, PF_Ship prefab)                                                                                                                                        |
+| register scenes in Build Settings | [project-structure.md](../docs/project-structure.md) §2 - scene list: Boot, Persistent, Menu, Game (Boot index 0)                                                                                                                                                                                                                                                  |
 
 ## Scene Creation
 
@@ -25,6 +25,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 - [x] AI: wire `Boot.unity` (single `GameBootstrap`) -- done via MCP 2026-05-04
 
 ### What was implemented (MCP)
+
 - Loaded `Assets/Scenes/Boot.unity` (was empty)
 - Created one GameObject named `GameBootstrap` at origin
 - Added `Game.Core.GameBootstrap` component (no serialized fields - component is self-contained)
@@ -32,12 +33,14 @@ gather additional context before implementing (eg, review relevant docs, load mc
 - Console verified clean (0 errors, 0 warnings)
 
 ### Final Boot.unity hierarchy
+
 ```
 Boot.unity
 └── GameBootstrap  [Transform, GameBootstrap]
 ```
 
 ### Manual steps still to do
+
 - None for this scene. The `GameBootstrap` script handles all boot logic at runtime.
 - The Persistent scene must be wired (next task) before Boot→Persistent handoff works.
 - Boot.unity must be added to Build Settings at index 0 (handled in the "register scenes" task).
@@ -49,24 +52,26 @@ Boot.unity
 ### What was implemented (MCP)
 
 **New asset created:**
+
 - `Assets/Settings/GamePanelSettings.asset` - PanelSettings (1920x1080, ScaleWithScreenSize, match=0.5, sortOrder=0)
 
 **GameObjects + components:**
 
-| GameObject | Component(s) | Serialized refs wired |
-|---|---|---|
-| `GameManager` | `Game.Core.GameManager` | none (receives refs via `Initialize()` at runtime) |
-| `SceneLoader` | `Game.Core.SceneLoader` | none (receives refs via `Initialize()` at runtime) |
-| `SaveSystem` | `Game.Systems.SaveSystem` | none (uses `Application.persistentDataPath`) |
-| `InputManager` | `Game.Systems.InputManager` | `_inputActions` -> `Assets/Settings/InputActions.inputactions` |
-| `AudioManager` | `Game.Systems.AudioManager` | `_mixer` -> MainMixer, `_musicGroup` -> Music, `_sfxGroup` -> SFX |
-| `UIRoot` | `Game.UI.UISystem` | `_loadingDocument` -> Loading child, `_pauseDocument` -> Pause child |
-| `UIRoot/Loading` | `UIDocument` | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Loading.uxml |
-| `UIRoot/Pause` | `UIDocument` | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Pause.uxml |
+| GameObject       | Component(s)                | Serialized refs wired                                                 |
+| ---------------- | --------------------------- | --------------------------------------------------------------------- |
+| `GameManager`    | `Game.Core.GameManager`     | none (receives refs via `Initialize()` at runtime)                    |
+| `SceneLoader`    | `Game.Core.SceneLoader`     | none (receives refs via `Initialize()` at runtime)                    |
+| `SaveSystem`     | `Game.Systems.SaveSystem`   | none (uses `Application.persistentDataPath`)                          |
+| `InputManager`   | `Game.Systems.InputManager` | `_inputActions` -> `Assets/Settings/InputActions.inputactions`        |
+| `AudioManager`   | `Game.Systems.AudioManager` | `_mixer` -> MainMixer, `_musicGroup` -> Music, `_sfxGroup` -> SFX     |
+| `UIRoot`         | `Game.UI.UISystem`          | `_loadingDocument` -> Loading child, `_pauseDocument` -> Pause child  |
+| `UIRoot/Loading` | `UIDocument`                | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Loading.uxml |
+| `UIRoot/Pause`   | `UIDocument`                | `m_PanelSettings` -> GamePanelSettings, `sourceAsset` -> Pause.uxml   |
 
 All 10 references verified non-null. Console: 0 errors, 0 warnings after save.
 
 ### Final Persistent.unity hierarchy
+
 ```
 Persistent.unity
 ├── GameManager   [Transform, GameManager]
@@ -80,11 +85,13 @@ Persistent.unity
 ```
 
 ### Notes
+
 - `GameBootstrap` discovers all systems at runtime via `FindAnyObjectByType<T>()` and calls `GameManager.Initialize(...)`. No extra wiring needed in the scene.
 - `SceneLoader.Initialize(inputManager, uiSystem)` is called by `GameManager` - no scene-level ref needed.
 - `DontDestroyOnLoad` is applied by `GameManager.Awake()` on the GameManager GO.
 
 ### Manual steps still to do
+
 - None for this scene wiring.
 - Boot.unity must be in Build Settings index 0; Persistent at index 1 (handled in "register scenes" task).
 - Full end-to-end boot test after Menu and Game scenes are wired.
@@ -96,11 +103,13 @@ Persistent.unity
 ### What was implemented (MCP)
 
 **New files created:**
+
 - `Assets/UI/Menu.uxml` - menu layout with `btn-play`, `btn-continue`, `btn-quit` buttons
 - `Assets/UI/Menu.uss` - styles matching project palette (1920x1080 landscape, touch targets >= 96 px)
 - `Assets/Scripts/Core/MenuController.cs` - `Game.Core` MonoBehaviour; placed in Core (not UI) because it directly calls `GameManager.Instance` - circular dep with `Game.UI` asmdef is avoided this way
 
 **MenuController behaviour:**
+
 - `Start()` queries buttons from UIDocument root, wires `.clicked` callbacks
 - `btn-play` -> `GameManager.Instance.StartNewGameAsync()`
 - `btn-continue` -> `GameManager.Instance.ContinueAsync()`; disabled if `SaveSystem.HasSave == false`
@@ -109,19 +118,21 @@ Persistent.unity
 
 **GameObject + wired refs:**
 
-| GameObject | Component(s) | Serialized refs wired |
-|---|---|---|
-| `Menu` | `Game.Core.MenuController`, `UIDocument` | `_menuDocument` -> UIDocument; UIDocument `sourceAsset` -> Menu.uxml, `m_PanelSettings` -> GamePanelSettings |
+| GameObject | Component(s)                             | Serialized refs wired                                                                                        |
+| ---------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `Menu`     | `Game.Core.MenuController`, `UIDocument` | `_menuDocument` -> UIDocument; UIDocument `sourceAsset` -> Menu.uxml, `m_PanelSettings` -> GamePanelSettings |
 
 Console: 0 errors, 0 warnings after save (pre-existing CS4014 in GameBootstrap is unrelated).
 
 ### Final Menu.unity hierarchy
+
 ```
 Menu.unity
 └── Menu  [Transform, MenuController, UIDocument]  <- Menu.uxml + GamePanelSettings
 ```
 
 ### Manual steps still to do
+
 - None for this scene wiring.
 - Build Settings must include all scenes (Boot first) before end-to-end test.
 
@@ -135,16 +146,17 @@ Menu.unity
 
 **GameObjects + components:**
 
-| GameObject | Component(s) | Notes |
-|---|---|---|
-| `DirectionalLight` | `Transform`, `Light`, `UniversalAdditionalLightData` | rotation (50, -30, 0), type = Directional |
-| `Sea` | `Transform`, `MeshFilter`, `MeshCollider`, `MeshRenderer` | Plane primitive, scale (20, 1, 20), pos (0, 0, 0) |
-| `Ship` | `Transform`, `MeshFilter`, `BoxCollider`, `MeshRenderer` | Cube primitive, scale (1, 0.5, 2), pos (0, 0.5, 0) - placeholder for Phase 6 PF_Ship prefab |
-| `MainCamera` | `Transform`, `Camera`, `UniversalAdditionalCameraData` | tag = "MainCamera", pos (0, 3, -6), rotation (15, 0, 0) - Phase 6 adds CameraController |
+| GameObject         | Component(s)                                              | Notes                                                                                       |
+| ------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `DirectionalLight` | `Transform`, `Light`, `UniversalAdditionalLightData`      | rotation (50, -30, 0), type = Directional                                                   |
+| `Sea`              | `Transform`, `MeshFilter`, `MeshCollider`, `MeshRenderer` | Plane primitive, scale (20, 1, 20), pos (0, 0, 0)                                           |
+| `Ship`             | `Transform`, `MeshFilter`, `BoxCollider`, `MeshRenderer`  | Cube primitive, scale (1, 0.5, 2), pos (0, 0.5, 0) - placeholder for Phase 6 PF_Ship prefab |
+| `MainCamera`       | `Transform`, `Camera`, `UniversalAdditionalCameraData`    | tag = "MainCamera", pos (0, 3, -6), rotation (15, 0, 0) - Phase 6 adds CameraController     |
 
 Console: pre-existing CS4014 warning only (no new errors or warnings).
 
 ### Final Game.unity hierarchy
+
 ```
 Game.unity
 ├── DirectionalLight  [Transform, Light, UniversalAdditionalLightData]
@@ -154,11 +166,13 @@ Game.unity
 ```
 
 ### Notes
+
 - `Ship` is a cube placeholder. Phase 6 will replace it with the `PF_Ship` prefab and add `ShipController`.
 - `MainCamera` is tagged "MainCamera" so `Camera.main` returns it at runtime. Phase 6 adds `CameraController`.
 - Sea plane scale 20x20 units. Phase 6 can resize/replace with actual sea geometry.
 
 ### Manual steps still to do
+
 - None for this scene wiring.
 - Build Settings must include all scenes (Boot first) before end-to-end test.
 
@@ -170,12 +184,12 @@ Game.unity
 
 Used `manage_build scenes` to set `EditorBuildSettings.scenes`:
 
-| Index | Scene | Enabled |
-|-------|-------|---------|
-| 0 | `Assets/Scenes/Boot.unity` | true |
-| 1 | `Assets/Scenes/Persistent.unity` | true |
-| 2 | `Assets/Scenes/Menu.unity` | true |
-| 3 | `Assets/Scenes/Game.unity` | true |
+| Index | Scene                            | Enabled |
+| ----- | -------------------------------- | ------- |
+| 0     | `Assets/Scenes/Boot.unity`       | true    |
+| 1     | `Assets/Scenes/Persistent.unity` | true    |
+| 2     | `Assets/Scenes/Menu.unity`       | true    |
+| 3     | `Assets/Scenes/Game.unity`       | true    |
 
 Console: pre-existing CS4014 warning only (no new errors).
 
@@ -186,6 +200,7 @@ Console: pre-existing CS4014 warning only (no new errors).
 ### Test run 1 - results
 
 **What worked:**
+
 - Boot scene started, all systems initialized (logs visible in Console)
 - Menu appeared: New Game clickable, Continue disabled (no save), Quit present
 - Clicking New Game transitioned to Game scene, ship visible at center
@@ -197,6 +212,7 @@ Console: pre-existing CS4014 warning only (no new errors).
 **Root cause:** Menu.unity had no camera. When Boot unloads (additive load of Persistent, then unload of Boot), the only active scene is Persistent + Menu - neither had a camera, so Unity showed the "no cameras rendering" overlay.
 
 **Fix applied (MCP 2026-05-04):**
+
 - Added `MenuCamera` GameObject to Menu.unity: `[Transform, Camera, UniversalAdditionalCameraData, AudioListener]`
 - Tagged `MainCamera`, position (0, 0, -10), default rotation
 - Saved Menu.unity
@@ -204,11 +220,13 @@ Console: pre-existing CS4014 warning only (no new errors).
 **Also found:** `no audio listener` warning from two boot states (menu + game). Each scene camera should own its AudioListener since scenes load/unload exclusively (Menu unloads before Game loads, so there is never a duplicate listener).
 
 **Fix applied (MCP 2026-05-04):**
+
 - Added `AudioListener` to `MenuCamera` in Menu.unity
 - Added `AudioListener` to `MainCamera` in Game.unity
 - Both scenes saved
 
 **Updated Menu.unity hierarchy:**
+
 ```
 Menu.unity
 ├── Menu        [Transform, MenuController, UIDocument]  <- Menu.uxml + GamePanelSettings
@@ -216,6 +234,7 @@ Menu.unity
 ```
 
 **Updated Game.unity hierarchy:**
+
 ```
 Game.unity
 ├── DirectionalLight  [Transform, Light, UniversalAdditionalLightData]
@@ -235,6 +254,7 @@ Game.unity
 **Root cause:** `GameBootstrap` calls `QualitySettings.SetQualityLevel` by name for a level called "Mobile" which has not been added to this project's quality settings. The project uses Unity's default quality tiers.
 
 **Debug steps to verify:**
+
 1. Open Edit -> Project Settings -> Quality
 2. Check the list of quality level names
 3. Either add a "Mobile" level or update `GameBootstrap` to use an existing level name
@@ -245,13 +265,44 @@ Game.unity
 
 After pressing Play in Boot.unity again, record:
 
-| Check | Expected | Actual |
-|-------|----------|--------|
-| Console errors | 0 errors | |
-| Console warnings | CS4014 only (GameBootstrap line 139) | |
-| "no cameras rendering" overlay | Gone | |
-| "no audio listener" warnings | Gone | |
-| "Quality level Mobile not found" | Still present (not yet fixed) | |
-| Menu loads | New Game enabled, Continue disabled | |
-| Click New Game | Game scene loads, ship visible | |
-| Click Quit from menu | Application quits (no-op in Editor) | |
+| Check                            | Expected                             | Actual                            |
+| -------------------------------- | ------------------------------------ | --------------------------------- |
+| Console errors                   | 0 errors                             | 0 errors, 2 warnings logged below |
+| Console warnings                 | CS4014 only (GameBootstrap line 139) | ?                                 |
+| "no cameras rendering" overlay   | Gone                                 | confirmed gone                    |
+| "no audio listener" warnings     | Gone                                 | confirmed gone                    |
+| "Quality level Mobile not found" | Still present (not yet fixed)        | still present                     |
+| Menu loads                       | New Game enabled, Continue disabled  | ok confirmed                      |
+| Click New Game                   | Game scene loads, ship visible       | ok confirmed                      |
+| Click Quit from menu             | Application quits (no-op in Editor)  | logs application quit requested   |
+
+#### warnings
+
+```log
+[WARN][Boot] Quality level 'Mobile' not found; keeping current level.
+UnityEngine.Debug:LogWarning (object)
+Game.Systems.Log:Warn (Game.Systems.LogCat,string,object[]) (at Assets/Scripts/Systems/Logging/Log.cs:85)
+Game.Core.GameBootstrap:ApplyRuntimeDefaults () (at Assets/Scripts/Core/GameBootstrap.cs:57)
+Game.Core.GameBootstrap/<Start>d__3:MoveNext () (at Assets/Scripts/Core/GameBootstrap.cs:33)
+System.Runtime.CompilerServices.AsyncVoidMethodBuilder:Start<Game.Core.GameBootstrap/<Start>d__3> (Game.Core.GameBootstrap/<Start>d__3&)
+Game.Core.GameBootstrap:Start ()
+```
+
+```log
+[WARN][Scene] Scene transition cancelled; cleaning up partial state.
+UnityEngine.Debug:LogWarning (object)
+Game.Systems.Log:Warn (Game.Systems.LogCat,string,object[]) (at Assets/Scripts/Systems/Logging/Log.cs:85)
+Game.Core.SceneLoader/<RunTransitionAsync>d__15:MoveNext () (at Assets/Scripts/Core/SceneLoader.cs:128)
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder:SetException (System.Exception)
+Game.Core.SceneLoader/<LoadGameInternalAsync>d__17:MoveNext () (at Assets/Scripts/Core/SceneLoader.cs:187)
+System.Runtime.CompilerServices.AsyncTaskMethodBuilder:SetResult ()
+Game.Core.SceneLoader/<UnloadSceneAsync>d__21:MoveNext () (at Assets/Scripts/Core/SceneLoader.cs:243)
+UnityEngine.UnitySynchronizationContext:ExecuteTasks () (at /home/bokken/build/output/unity/unity/Runtime/Export/Scripting/UnitySynchronizationContext.cs:110)
+```
+
+#### quality
+
+| levels | linux     | android   |
+| ------ | --------- | --------- |
+| mobile | unchecked | checked   |
+| pc     | checked   | unchecked |
