@@ -182,3 +182,76 @@ Console: pre-existing CS4014 warning only (no new errors).
 ## test in editor
 
 - [ ] HUMAN: press Play in `Boot.unity` - expect Menu reachable, no console errors
+
+### Test run 1 - results
+
+**What worked:**
+- Boot scene started, all systems initialized (logs visible in Console)
+- Menu appeared: New Game clickable, Continue disabled (no save), Quit present
+- Clicking New Game transitioned to Game scene, ship visible at center
+
+**Issues found:**
+
+#### Issue 1 -- "display 1 no cameras rendering" on Menu
+
+**Root cause:** Menu.unity had no camera. When Boot unloads (additive load of Persistent, then unload of Boot), the only active scene is Persistent + Menu - neither had a camera, so Unity showed the "no cameras rendering" overlay.
+
+**Fix applied (MCP 2026-05-04):**
+- Added `MenuCamera` GameObject to Menu.unity: `[Transform, Camera, UniversalAdditionalCameraData, AudioListener]`
+- Tagged `MainCamera`, position (0, 0, -10), default rotation
+- Saved Menu.unity
+
+**Also found:** `no audio listener` warning from two boot states (menu + game). Each scene camera should own its AudioListener since scenes load/unload exclusively (Menu unloads before Game loads, so there is never a duplicate listener).
+
+**Fix applied (MCP 2026-05-04):**
+- Added `AudioListener` to `MenuCamera` in Menu.unity
+- Added `AudioListener` to `MainCamera` in Game.unity
+- Both scenes saved
+
+**Updated Menu.unity hierarchy:**
+```
+Menu.unity
+├── Menu        [Transform, MenuController, UIDocument]  <- Menu.uxml + GamePanelSettings
+└── MenuCamera  [Transform, Camera, UniversalAdditionalCameraData, AudioListener]  tag=MainCamera  pos(0,0,-10)
+```
+
+**Updated Game.unity hierarchy:**
+```
+Game.unity
+├── DirectionalLight  [Transform, Light, UniversalAdditionalLightData]
+├── Sea               [Transform, MeshFilter, MeshCollider, MeshRenderer]
+├── Ship              [Transform, MeshFilter, BoxCollider, MeshRenderer]
+└── MainCamera        [Transform, Camera, UniversalAdditionalCameraData, AudioListener]  tag=MainCamera  pos(0,3,-6)
+```
+
+#### Issue 2 -- No pause / virtual stick buttons in Game scene
+
+**Root cause:** Expected. Pause button, virtual stick, and in-game HUD are Phase 6 work (see `tracking.md` Phase 6). The `UIRoot/Pause` document exists in Persistent but UISystem only shows it when `GameManager` transitions to `Paused` state, which requires Phase 6 ShipController input wiring.
+
+**Action:** None for Phase 5. Confirmed as Phase 6 scope.
+
+#### Issue 3 -- "Quality level 'Mobile' not found" warning
+
+**Root cause:** `GameBootstrap` calls `QualitySettings.SetQualityLevel` by name for a level called "Mobile" which has not been added to this project's quality settings. The project uses Unity's default quality tiers.
+
+**Debug steps to verify:**
+1. Open Edit -> Project Settings -> Quality
+2. Check the list of quality level names
+3. Either add a "Mobile" level or update `GameBootstrap` to use an existing level name
+
+**Action:** Not blocking for Phase 5 but should be resolved before Phase 6 testing.
+
+### Test run 2 - actions to take after fixes
+
+After pressing Play in Boot.unity again, record:
+
+| Check | Expected | Actual |
+|-------|----------|--------|
+| Console errors | 0 errors | |
+| Console warnings | CS4014 only (GameBootstrap line 139) | |
+| "no cameras rendering" overlay | Gone | |
+| "no audio listener" warnings | Gone | |
+| "Quality level Mobile not found" | Still present (not yet fixed) | |
+| Menu loads | New Game enabled, Continue disabled | |
+| Click New Game | Game scene loads, ship visible | |
+| Click Quit from menu | Application quits (no-op in Editor) | |
