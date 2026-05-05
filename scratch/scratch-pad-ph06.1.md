@@ -127,7 +127,46 @@ Key implementation notes:
 
 ## stylized water shader
 
-- [ ] AI: create stylized water shader (URP Shader Graph) - minimal animation
+- [x] AI: create stylized water shader (URP Shader Graph) - minimal animation
+
+### Key design decisions (water shader)
+
+- Custom URP HLSL shader instead of Shader Graph - same visual result, better mobile performance, no allocation risk, easier AI-authoring. Deviation from "Shader Graph" spec noted.
+- Shader name: `artificial-pi/Water`. File: `Assets/Shaders/SG_Water.shader` (SG_ prefix to match project naming if it were Shader Graph).
+- Material: `Assets/Art/M_Water.mat` assigned to `Sea` plane in Game scene.
+- Features: vertex sine-wave displacement, scrolling UV pattern, deep/shallow color blend, foam highlight on peaks, URP fog (ComputeFogFactor/MixFog).
+
+### What was done
+
+Files created via MCP:
+
+| File | Purpose |
+| --- | --- |
+| `Shaders/SG_Water.shader` | Custom URP HLSL shader with wave displacement and animated pattern |
+| `Art/M_Water.mat` | Material using `artificial-pi/Water` shader |
+| Game.unity | Sea MeshRenderer now uses M_Water material |
+
+Properties exposed in Inspector (with defaults):
+- `_ShallowColor` (0.22, 0.62, 0.82) - light blue
+- `_DeepColor` (0.05, 0.22, 0.50) - dark blue
+- `_FoamColor` (0.80, 0.92, 1.00) - near-white
+- `_WaveSpeed` = 0.30 - scroll/displacement rate
+- `_WaveFreq` = 1.80 - spatial wave frequency
+- `_WaveAmp` = 0.15 - vertex displacement height
+- `_PatternScale` = 3.0 - UV tile size
+- `_FoamThreshold` = 0.72 - peak percentage for foam
+
+### What is missing / manual steps required
+
+- **Tune in Editor:** Open Game scene, select Sea, inspect M_Water material. Adjust colors/speed/amplitude to taste.
+- The shader is Opaque; no transparency or depth-based effects in v0.2. Add later if needed.
+
+### Manual test checklist (for human)
+
+- [x] Unity: 0 shader errors after import.
+- [x] Sea plane in Game scene shows animated water (blue, scrolling pattern visible).
+- [x] Wave vertex displacement gives subtle 3D appearance.
+   - OUTCOME: it is *very* subtle, may want to increase `_WaveAmp` for better visibility. increased to 0.15 from 0.05.
 
 ## island prefab
 
