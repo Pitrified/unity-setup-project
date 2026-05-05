@@ -45,18 +45,26 @@ namespace Game.Tests.EditMode
 
     internal sealed class FakeSaveSystem : ISaveSystem
     {
+        private SaveData _stored = SaveData.CreateDefault();
+
         public bool HasSave { get; set; }
-        public SaveData Load() => SaveData.CreateDefault();
-        public void Save(SaveData data) { HasSave = true; }
+        public SaveData LastSaved => _stored;
+
+        public SaveData Load() => _stored;
+        public void Save(SaveData data) { _stored = data; HasSave = true; }
         public void DeleteSave() { HasSave = false; }
+
+        /// <summary>Pre-seeds stored data without marking HasSave.</summary>
+        public void SetStored(SaveData data) => _stored = data;
     }
 
     internal sealed class FakeInputManager : IInputManager
     {
         public bool PausePressed { get; set; }
+        public bool IsEnabled { get; private set; } = true;
         public MovementInput GetMovementInput() => default;
         public bool ConsumePausePressed() { bool v = PausePressed; PausePressed = false; return v; }
-        public void SetEnabled(bool enabled) { }
+        public void SetEnabled(bool enabled) { IsEnabled = enabled; }
     }
 
     internal sealed class FakeAudioManager : IAudioManager
@@ -72,10 +80,11 @@ namespace Game.Tests.EditMode
     internal sealed class FakeUISystem : IUISystem
     {
         public bool IsAnyOverlayOpen => false;
+        public ScreenId? LastHiddenScreen { get; private set; }
         public void ShowLoading() { }
         public void HideLoading() { }
         public void ShowScreen(ScreenId id) { }
-        public void HideScreen(ScreenId id) { }
+        public void HideScreen(ScreenId id) { LastHiddenScreen = id; }
         public event Action OnResumeRequested;
         public event Action OnReturnToMenuRequested;
         public void FireResumeRequested() => OnResumeRequested?.Invoke();
@@ -467,6 +476,68 @@ namespace Game.Tests.EditMode
             _go = null; // prevent double-invoke in TearDown
 
             Assert.IsNull(GameManager.Instance);
+        }
+
+        // ------------------------------------------------------------------ RegisterShip / save-restore
+
+        [Test]
+        public void RegisterShip_WithExistingSave_Teleports_Ship_To_SavedPosition()
+        {
+            var shipGo = new UnityEngine.GameObject("Ship");
+            var ship   = shipGo.AddComponent<Game.Gameplay.ShipController>();
+
+            var stored = SaveData.CreateDefault();
+            stored.ship = new ShipSaveData { x = 10f, y = 0f, z = 20f, yawDeg = 45f };
+            _fakeSave.SetStored(stored);
+            _fakeSave.HasSave = true;
+
+            _gm.RegisterShip(ship);
+
+            Game.Gameplay.ShipState state = ship.GetState();
+            Assert.AreEqual(10f,  state.Position.x, 1e-4f);
+            Assert.AreEqual(20f,  state.Position.z, 1e-4f);
+            Assert.AreEqual(45f,  state.YawDeg,     1e-4f);
+
+            UnityEngine.Object.DestroyImmediate(shipGo);
+        }
+
+        [Test]
+        public void RegisterShip_WithNoSave_DoesNotMoveShip()
+        {
+            var shipGo = new UnityEngine.GameObject("Ship");
+            var ship   = shipGo.AddComponent<Game.Gameplay.ShipController>();
+            _fakeSave.HasSave = false;
+
+            _gm.RegisterShip(ship);
+
+            // Ship should remain at the default position (origin).
+            Game.Gameplay.ShipState state = ship.GetState();
+            Assert.AreEqual(0f, state.Position.x, 1e-4f);
+            Assert.AreEqual(0f, state.Position.z, 1e-4f);
+
+            UnityEngine.Object.DestroyImmediate(shipGo);
+        }
+
+        [Test]
+        public async Task ReturnToMenuAsync_From_Paused_HidesPauseScreen()
+        {
+            await BootToPausedAsync();
+
+            await _gm.ReturnToMenuAsync();
+
+            Assert.AreEqual(ScreenId.Pause, _fakeUI.LastHiddenScreen);
+        }
+
+        [Test]
+        public async Task ReturnToMenuAsync_From_Paused_ReEnablesInput()
+        {
+            await BootToPausedAsync();
+            // PauseGame disables input; verify it was disabled first.
+            Assert.IsFalse(_fakeInput.IsEnabled);
+
+            await _gm.ReturnToMenuAsync();
+
+            Assert.IsTrue(_fakeInput.IsEnabled);
         }
 
     }

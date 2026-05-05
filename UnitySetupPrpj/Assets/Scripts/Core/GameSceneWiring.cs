@@ -30,6 +30,7 @@ namespace Game.Core
             else
             {
                 _ship.Inject(gm.InputManager);
+                gm.RegisterShip(_ship);
                 Log.Info(LogCat.Gameplay, "GameSceneWiring: ShipController injected with InputManager");
             }
 

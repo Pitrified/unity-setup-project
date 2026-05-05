@@ -84,13 +84,13 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 6 - Gameplay vertical slice
 
-- [ ] AI: implement [systems/ship-controller.md](systems/ship-controller.md) (+ tests for input clamping)
-- [ ] AI: implement [systems/camera-controller.md](systems/camera-controller.md)
-- [ ] AI: create stylized water shader (URP Shader Graph) - minimal animation
-- [ ] AI: create island prefab (static mesh, no collisions in v0.2)
-- [ ] AI: implement on-screen virtual stick + pause button (UI Toolkit overlay)
-- [ ] AI: wire SaveSystem into GameManager pause/quit and Menu Continue button
-- [ ] HUMAN: play in Editor - Menu → Game → drive → Pause → Resume → Menu → Continue restores position
+- [x] AI: implement [systems/ship-controller.md](systems/ship-controller.md) (+ tests for input clamping)
+- [x] AI: implement [systems/camera-controller.md](systems/camera-controller.md)
+- [x] AI: create stylized water shader (URP Shader Graph) - minimal animation
+- [x] AI: create island prefab (static mesh, no collisions in v0.2)
+- [x] AI: implement on-screen virtual stick + pause button (UI Toolkit overlay)
+- [x] AI: wire SaveSystem into GameManager pause/quit and Menu Continue button
+- [x] HUMAN: play in Editor - Menu → Game → drive → Pause → Resume → Menu → Continue restores position
 
 ---
 

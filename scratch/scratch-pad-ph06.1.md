@@ -236,6 +236,11 @@ Island hierarchy:
 - The `Text` component uses legacy uGUI Text. No TextMeshPro dependency needed for v0.2.
 - Verify in Play mode that touch on the bottom-right drags the ship and top-left "II" button triggers pause overlay.
 
+### Key implementation notes
+
+- `EventSystem` GameObject must have `InputSystemUIInputModule` (not `StandaloneInputModule`) for `OnScreenStick` / `OnScreenButton` to receive pointer events. Without it, `IPointerDownHandler` never fires.
+- Root cause of original "no-op" bug: Game scene had no `EventSystem` at all. `GraphicRaycaster` on the HUD Canvas has no way to dispatch pointer events without one.
+
 ### Manual test checklist (for human)
 
 **NOTE: `OnScreenStick` and `OnScreenButton` respond to touch input only, not mouse clicks.** To test in Editor:
@@ -262,30 +267,51 @@ Island hierarchy:
 **Required manual step:** Stop Play Mode, then re-enter Play Mode so Unity reloads the updated `InputActions.inputactions`.
 
 - [x] Re-enter Play Mode after asset refresh.
-- [ ] In Play mode (Device Simulator + "Simulate Touch Input From Mouse or Pen" enabled): drag joystick → ship turns and moves continuously while held. Release → ship slows.
-   - OUTCOME: no-op
-- [ ] In Play mode: tap "II" button (top-left) → pause overlay appears.
-   - OUTCOME: no-op
-- [ ] If pause button still not working: check Unity console for "InputManager initialized" log + verify InputManager._inputActions = `Assets/Settings/InputActions.asset`.
-   - OUTCOME: no ide how to verify the `InputManager._inputActions`, where is that?
-
-```log
-[Input] InputManager initialized.
-UnityEngine.Debug:Log (object)
-Game.Systems.Log:Info (Game.Systems.LogCat,string,object[]) (at Assets/Scripts/Systems/Logging/Log.cs:77)
-Game.Systems.InputManager:Awake () (at Assets/Scripts/Systems/Input/InputManager.cs:28)
-```
-
-OUTCOME:
-now the input joystick is working and the click on pause works
-
-however after `pause -> main menu -> continue` the overlay for paused state keeps showing and the ui/ship is unresponsive.
-will this be done in save system integration task?
+- [x] In Play mode (Device Simulator + "Simulate Touch Input From Mouse or Pen" enabled): drag joystick → ship turns and moves continuously while held. Release → ship slows.
+   - OUTCOME: PASS - confirmed working after EventSystem fix.
+- [x] In Play mode: tap "II" button (top-left) → pause overlay appears.
+   - OUTCOME: PASS - confirmed working after EventSystem fix.
 
 ## SaveSystem integration
 
-- [ ] AI: wire SaveSystem into GameManager pause/quit and Menu Continue button
+- [x] AI: wire SaveSystem into GameManager pause/quit and Menu Continue button
+
+### Key design decisions (SaveSystem integration)
+
+- `GameManager` already owned `ISaveSystem` and called `PersistCurrentState()` (a stub) on pause, quit, and return-to-menu. The TODO comment in `PersistCurrentState` explicitly called for live ship data.
+- `GameSceneWiring.Start()` is the natural registration point: it already wires InputManager into ShipController. Adding `gm.RegisterShip(_ship)` here means GameManager always has the active ship reference within the same frame the Game scene comes alive.
+- `RegisterShip` in GameManager: stores `_activeShip`; if `HasSave` is true, loads and calls `ship.Teleport()` to restore saved position. This makes Continue work without any changes to `ContinueAsync`.
+- `PersistCurrentState` updated to build `ShipSaveData` from `_activeShip.GetState()` before writing.
+- **Bug fix included**: `ReturnToMenuAsync` did not hide the pause screen or re-enable input before loading the Menu scene. Since UISystem lives in the Persistent scene, the pause overlay survived the scene transition. Fixed by calling `UISystem?.HideScreen(ScreenId.Pause)` and `InputManager?.SetEnabled(true)` before `TransitionTo(GameState.Loading)`.
+
+### What was done
+
+| File | Change |
+| --- | --- |
+| `Scripts/Core/GameManager.cs` | Added `_activeShip` field; added `RegisterShip()`; updated `PersistCurrentState()` to capture live ship state; fixed `ReturnToMenuAsync()` to hide pause + re-enable input |
+| `Scripts/Core/GameSceneWiring.cs` | Added `gm.RegisterShip(_ship)` after `_ship.Inject()` |
+| `Tests/EditMode/GameManagerTests.cs` | Updated `FakeSaveSystem` + `FakeUISystem` + `FakeInputManager` to track calls; added 4 new tests |
+
+### Key implementation notes
+
+- `_activeShip` is cleared (`= null`) inside `ReturnToMenuAsync` after `PersistCurrentState()` runs, before the Game scene is unloaded, to prevent a dangling MonoBehaviour reference.
+- `RegisterShip(null)` is safe: stores null and returns early (no-op restore). Defensive for future callers.
+- `ShipSaveData` uses plain floats (`x, y, z, yawDeg`) matching the schema in `SaveData.cs`.
+- No async I/O - `ISaveSystem.Save` is sync per spec; file is <1 KB.
+
+### What is missing / manual steps required
+
+- No new assets required. All changes are code only.
+- `SaveSystem` MonoBehaviour must be present in the Persistent scene and assigned to GameManager - verify in Bootstrap if it was wired there already. (It was wired during Phase 2 bootstrap setup.)
+
+### Manual test checklist (for human)
+
+- [x] Unity: 0 errors after recompile.
+- [x] EditMode Test Runner: new `GameManagerTests` pass (4 new tests + existing).
+- [x] New Game → drive to position ~(30, 0, 10) → Pause → Main Menu → the pause overlay is GONE and Menu is interactive.
+- [x] From Menu: Continue → ship appears at saved position (~30, 0, 10), not at origin.
+- [x] Repeat: drive further → app quit and relaunch → Continue → restored to last position.
 
 ## Manual test: gameplay vertical slice
 
-- [ ] HUMAN: play in Editor - Menu → Game → drive → Pause → Resume → Menu → Continue restores position
+- [x] HUMAN: play in Editor - Menu → Game → drive → Pause → Resume → Menu → Continue restores position

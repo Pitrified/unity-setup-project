@@ -5,6 +5,7 @@ namespace Game.Core
     using System.Threading.Tasks;
     using UnityEngine;
     using Game.Systems;
+    using Game.Gameplay;
     using Game.UI;
 
     /// <summary>
@@ -51,6 +52,10 @@ namespace Game.Core
         /// <summary>The persistent UI root. Assigned by <see cref="Initialize"/>.</summary>
         public IUISystem UISystem { get; private set; }
 
+        // ------------------------------------------------------------------ active scene refs
+
+        private ShipController _activeShip;
+
         // ------------------------------------------------------------------ initializer
 
         /// <summary>
@@ -77,6 +82,30 @@ namespace Game.Core
             Log.GetGameState = () => CurrentState.ToString();
 
             Log.Info(LogCat.Boot, "GameManager initialized.");
+        }
+
+        // ------------------------------------------------------------------ scene registration
+
+        /// <summary>
+        /// Called by <see cref="GameSceneWiring"/> when the Game scene loads.
+        /// Stores the active ship reference and restores saved position if a save exists.
+        /// </summary>
+        public void RegisterShip(ShipController ship)
+        {
+            _activeShip = ship;
+            if (ship == null)
+                return;
+
+            if (SaveSystem != null && SaveSystem.HasSave)
+            {
+                SaveData data = SaveSystem.Load();
+                ship.Teleport(
+                    new UnityEngine.Vector3(data.ship.x, data.ship.y, data.ship.z),
+                    data.ship.yawDeg);
+                Log.Info(LogCat.Boot,
+                    "RegisterShip: restored position ({0:F1}, {1:F1}, {2:F1}) yaw {3:F1}.",
+                    data.ship.x, data.ship.y, data.ship.z, data.ship.yawDeg);
+            }
         }
 
         // ------------------------------------------------------------------ IGameManager public API
@@ -158,6 +187,9 @@ namespace Game.Core
             }
 
             PersistCurrentState();
+            _activeShip = null;                         // Game scene is about to unload
+            UISystem?.HideScreen(ScreenId.Pause);       // clear any lingering pause overlay
+            InputManager?.SetEnabled(true);             // restore input for Menu scene
             TransitionTo(GameState.Loading);
 
             try
@@ -305,9 +337,8 @@ namespace Game.Core
         }
 
         /// <summary>
-        /// Re-persists the current save data so the timestamp is updated.
-        /// TODO(phase6): extend to collect live ship-position data from the
-        ///               ship controller before writing.
+        /// Captures the current ship state and writes it to the save file.
+        /// Silently skips if <see cref="SaveSystem"/> is not yet assigned.
         /// </summary>
         private void PersistCurrentState()
         {
@@ -317,6 +348,19 @@ namespace Game.Core
             try
             {
                 SaveData data = SaveSystem.Load();
+
+                if (_activeShip != null)
+                {
+                    ShipState state = _activeShip.GetState();
+                    data.ship = new ShipSaveData
+                    {
+                        x      = state.Position.x,
+                        y      = state.Position.y,
+                        z      = state.Position.z,
+                        yawDeg = state.YawDeg,
+                    };
+                }
+
                 SaveSystem.Save(data);
             }
             catch (Exception ex)
