@@ -53,37 +53,25 @@ Key implementation notes:
 
 ### What is missing / manual steps required
 
-1. **Create `SO_ShipTuning` asset instance in Unity Editor:**
-   - Assets > Create > artificial-pi > Ship Tuning
-   - Save as `Assets/Settings/SO_ShipTuning.asset` (or in a Gameplay subfolder)
-   - Values default to spec; adjust as needed.
-
-2. **Create `PF_Ship` prefab in Unity Editor:**
-   - New GameObject in Game scene, name it `Ship`.
-   - Add `ShipController` component.
-   - Drag `SO_ShipTuning` asset into the `_tuning` field.
-   - Save as `Assets/Prefabs/PF_Ship.prefab`.
-   - (No model/mesh required in v0.2 - a primitive cube works as placeholder.)
-
-3. **Wire InputManager injection in scene:**
-   - After the Game scene loads, find the `ShipController` and call `Inject(inputManager)`.
-   - This wiring belongs in the scene wiring script (or `GameBootstrap` / a `GameSceneWiring` MonoBehaviour on the Game scene root).
-
-4. **Run EditMode tests:**
-   - Window > General > Test Runner > EditMode > run `ShipControllerTests`
-   - All 9 tests should pass.
+1. ~~Create `SO_ShipTuning` asset~~ - DONE via MCP: `Assets/Settings/SO_ShipTuning.asset`
+2. ~~Create `PF_Ship` prefab~~ - DONE via MCP: `Assets/Prefabs/PF_Ship.prefab` (from existing Ship GO in Game scene). Tuning is baked into prefab.
+3. ~~Wire InputManager injection in scene~~ - DONE via MCP: `GameSceneWiring.cs` in `Scripts/Core/`, placed in Game scene, `_ship` and `_camera` fields wired to correct components. Runs `Inject` and `SetTarget/SnapToTarget` in `Start`.
+4. **Verify in Inspector:** Open Game.unity, select `GameSceneWiring` object - confirm `_ship` = Ship.ShipController, `_camera` = MainCamera.CameraController.
+5. **Run EditMode tests:**
+   - Window > General > Test Runner > EditMode > run `ShipControllerTests` (9 tests)
+   - Already passing - confirm unchanged.
 
 ### Manual test checklist (for human)
 
 - [x] Unity recompiles with 0 errors after importing the new scripts.
    - OUTCOME: pass - no compile errors.
 - [ ] `SO_ShipTuning` asset created and assigned to `PF_Ship.ShipController._tuning`.
-   - OUTCOME: unclear. what is `PF_Ship`? Does it exist at this stage of development? If not, should we create it now or wait until later phases?
+   - OUTCOME: seems ok
 - [ ] Press Play in Boot.unity: ship visible in Game scene, moves with keyboard WASD / virtual stick.
-   - OUTCOME: unclear.
+   - OUTCOME: promising.
    - ship is visible but in an all white scene (no water/island yet).
    - virtual stick is not shown.
-   - WASD input moves has no visual effect, which could just be due to the lack of water/island context
+   - WASD input moves moves camera and ship ok
 - [x] Ship does not drift in Y (stays on sea surface plane).
    - OUTCOME: pass - ship Y locked to 0 as expected. as much as we can understand without the water/island context.
 - [ ] Pause in Game scene stops ship movement (InputManager disabled).
@@ -93,7 +81,49 @@ Key implementation notes:
 
 ## camera controller
 
-- [ ] AI: implement [systems/camera-controller.md](systems/camera-controller.md)
+- [x] AI: implement [systems/camera-controller.md](systems/camera-controller.md)
+
+### Key design decisions (camera controller)
+
+- `SO_CameraTuning` - ScriptableObject; `LocalOffset=(0,3,-6)`, `PositionLerp=5`, `RotationLerp=5`, `LookAtTarget=true`.
+- `CameraController` - `sealed` MonoBehaviour on `MainCamera`. `SetTarget(Transform)`, `SnapToTarget()` public. `internal Tick(float dt)` for tests. Runs in `LateUpdate`.
+- Smoothing: `1 - Mathf.Exp(-k * dt)` for framerate-independent position Lerp and rotation Slerp.
+- Null target: holds last position, logs `Log.Warn` once per null episode (reset when target becomes non-null or `SetTarget` is called again).
+
+### What was done
+
+Files created (all in `UnitySetupPrpj/Assets/`):
+
+| File | Purpose |
+| --- | --- |
+| `Scripts/Gameplay/SO_CameraTuning.cs` | ScriptableObject; `[CreateAssetMenu]`; default values match spec |
+| `Scripts/Gameplay/CameraController.cs` | Sealed MonoBehaviour; `SetTarget`, `SnapToTarget`, internal `Tick` |
+| `Tests/EditMode/CameraControllerTests.cs` | 7 EditMode tests covering SnapToTarget, null target, position smoothing, SetTarget |
+
+Key implementation notes:
+- Same lazy-init guard pattern as ShipController: `if (_transform == null) _transform = transform` at the top of `Tick`, `SnapToTarget`.
+- Position smoothing: `t = 1 - Mathf.Exp(-PositionLerp * dt)`, then `Vector3.Lerp`.
+- Rotation smoothing: `t = 1 - Mathf.Exp(-RotationLerp * dt)`, then `Quaternion.Slerp` toward `Quaternion.LookRotation(target - camera)`.
+- `SnapToTarget` immediately places camera at `target.TransformPoint(LocalOffset)` and calls `LookAt` if `LookAtTarget` is true.
+
+### What is missing / manual steps required
+
+1. ~~Create `SO_CameraTuning` asset~~ - DONE via MCP: `Assets/Settings/SO_CameraTuning.asset`
+2. ~~Wire `CameraController` in Game scene~~ - DONE via MCP: component added to MainCamera, tuning assigned
+3. ~~Create `GameSceneWiring` object~~ - DONE via MCP: GameObject in Game scene with _ship + _camera wired
+4. **Verify in Inspector:** Open Game.unity, select `GameSceneWiring` object - confirm `_ship` = Ship.ShipController, `_camera` = MainCamera.CameraController.
+5. **Run EditMode tests:**
+   - Window > General > Test Runner > EditMode > run `CameraControllerTests`
+   - All 7 tests should pass.
+
+### Manual test checklist (for human)
+
+- [x] Unity recompiles with 0 errors after importing the new scripts.
+- [x] `SO_CameraTuning` asset created and assigned to `MainCamera.CameraController._tuning`.
+- [x] Press Play in Boot.unity: camera follows ship smoothly from behind-and-above.
+- [x] Camera snaps to correct offset after scene load (no jarring slide from origin).
+- [x] Camera rotates to look at ship while ship turns.
+- [x] EditMode Test Runner: all `CameraControllerTests` green.
 
 ## stylized water shader
 
