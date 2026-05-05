@@ -195,7 +195,7 @@ Console: pre-existing CS4014 warning only (no new errors).
 
 ## test in editor
 
-- [ ] HUMAN: press Play in `Boot.unity` - expect Menu reachable, no console errors
+- [x] HUMAN: press Play in `Boot.unity` - expect Menu reachable, no console errors
 
 ### Test run 1 - results
 
