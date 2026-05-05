@@ -306,3 +306,40 @@ UnityEngine.UnitySynchronizationContext:ExecuteTasks () (at /home/bokken/build/o
 | ------ | --------- | --------- |
 | mobile | unchecked | checked   |
 | pc     | checked   | unchecked |
+
+### Fixes applied after test run 2
+
+#### Fix A -- Quality level name case mismatch
+
+`GameBootstrap.MobileQualityName` was `"Mobile"` but the quality level is named `"mobile"` (lowercase). `FindQualityIndex` does a case-sensitive string match, so it returned -1 and emitted the warning.
+
+Changed in `GameBootstrap.cs`:
+```csharp
+// before
+private const string MobileQualityName = "Mobile";
+// after
+private const string MobileQualityName = "mobile";
+```
+
+#### Fix B -- MenuController.destroyCancellationToken cancels in-flight scene load
+
+`OnPlayClicked` / `OnContinueClicked` passed `destroyCancellationToken` to `StartNewGameAsync` / `ContinueAsync`. During the transition, `LoadGameInternalAsync` unloads Menu first. That unload destroys `MenuController`, which fires the token. The already-started `LoadSceneAdditiveAsync(Game)` then calls `ct.ThrowIfCancellationRequested()` inside its polling loop, throwing `OperationCanceledException`. The catch block in `RunTransitionAsync` logged the "transition cancelled" warning and tried to clean up -- even though the Game scene continued loading in the background (Unity AsyncOperation cannot be aborted once started).
+
+Changed in `MenuController.cs` -- call without token so `ct` defaults to `CancellationToken.None`:
+```csharp
+// before
+_ = gm.StartNewGameAsync(destroyCancellationToken);
+_ = gm.ContinueAsync(destroyCancellationToken);
+// after
+_ = gm.StartNewGameAsync();
+_ = gm.ContinueAsync();
+```
+
+### Test run 3 - expected outcome
+
+| Check | Expected |
+|-------|----------|
+| "Quality level 'mobile' not found" | Gone (name now matches) |
+| "Scene transition cancelled" | Gone (no spurious cancellation) |
+| CS4014 warning in GameBootstrap | Still present (fire-and-forget unload - accepted) |
+| Menu -> New Game -> Game | Loads cleanly, no warnings |

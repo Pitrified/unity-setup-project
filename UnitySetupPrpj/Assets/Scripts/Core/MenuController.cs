@@ -59,14 +59,17 @@ namespace Game.Core
         {
             GameManager gm = GameManager.Instance;
             if (gm == null) { Log.Error(LogCat.UI, "MenuController: GameManager.Instance is null."); return; }
-            _ = gm.StartNewGameAsync(destroyCancellationToken);
+            // Do not pass destroyCancellationToken: MenuController is destroyed when Menu
+            // unloads, which happens as part of this very transition. Passing it would
+            // cancel the in-flight LoadGameAsync mid-way and log a spurious warning.
+            _ = gm.StartNewGameAsync();
         }
 
         private void OnContinueClicked()
         {
             GameManager gm = GameManager.Instance;
             if (gm == null) { Log.Error(LogCat.UI, "MenuController: GameManager.Instance is null."); return; }
-            _ = gm.ContinueAsync(destroyCancellationToken);
+            _ = gm.ContinueAsync();
         }
 
         private void OnQuitClicked()
