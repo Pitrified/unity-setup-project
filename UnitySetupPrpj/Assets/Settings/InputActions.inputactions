@@ -82,17 +82,6 @@
                 },
                 {
                     "name": "",
-                    "id": "a1b2c3d4-0001-0000-0000-000000000015",
-                    "path": "<Touchscreen>/touch*/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Touch",
-                    "action": "Move",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "a1b2c3d4-0001-0000-0000-000000000016",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",

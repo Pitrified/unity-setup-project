@@ -253,6 +253,35 @@ Island hierarchy:
    - OUTCOME: tested with simulator. Touch input on pause button does not trigger pause. might still be bug of using mouse on button.
 - [x] WASD keyboard still drives ship (unaffected by new bindings).
 
+### Manual test checklist part 2 - after fix
+
+**Bug found and fixed:** The old `<Touchscreen>/touch*/delta` binding was still in `Gameplay/Move`. This binding sends *incremental deltas* (not absolute position) which caused the "burst" movement: each touch event sent a delta, then returned to zero, causing the ship to jerk. The fix: removed `<Touchscreen>/touch*/delta` from `InputActions.inputactions`.
+
+**Pause button:** Was likely working but the user had a stale in-memory InputActions asset from before the bindings were added. Re-entering Play Mode after the asset refresh will pick up the new `<Gamepad>/start` binding.
+
+**Required manual step:** Stop Play Mode, then re-enter Play Mode so Unity reloads the updated `InputActions.inputactions`.
+
+- [x] Re-enter Play Mode after asset refresh.
+- [ ] In Play mode (Device Simulator + "Simulate Touch Input From Mouse or Pen" enabled): drag joystick → ship turns and moves continuously while held. Release → ship slows.
+   - OUTCOME: no-op
+- [ ] In Play mode: tap "II" button (top-left) → pause overlay appears.
+   - OUTCOME: no-op
+- [ ] If pause button still not working: check Unity console for "InputManager initialized" log + verify InputManager._inputActions = `Assets/Settings/InputActions.asset`.
+   - OUTCOME: no ide how to verify the `InputManager._inputActions`, where is that?
+
+```log
+[Input] InputManager initialized.
+UnityEngine.Debug:Log (object)
+Game.Systems.Log:Info (Game.Systems.LogCat,string,object[]) (at Assets/Scripts/Systems/Logging/Log.cs:77)
+Game.Systems.InputManager:Awake () (at Assets/Scripts/Systems/Input/InputManager.cs:28)
+```
+
+OUTCOME:
+now the input joystick is working and the click on pause works
+
+however after `pause -> main menu -> continue` the overlay for paused state keeps showing and the ui/ship is unresponsive.
+will this be done in save system integration task?
+
 ## SaveSystem integration
 
 - [ ] AI: wire SaveSystem into GameManager pause/quit and Menu Continue button
