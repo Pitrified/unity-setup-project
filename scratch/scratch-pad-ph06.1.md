@@ -170,7 +170,42 @@ Properties exposed in Inspector (with defaults):
 
 ## island prefab
 
-- [ ] AI: create island prefab (static mesh, no collisions in v0.2)
+- [x] AI: create island prefab (static mesh, no collisions in v0.2)
+
+### Key design decisions (island prefab)
+
+- Static visual mesh only, no collider per spec ("no collisions in v0.2"). `Static` flag set for batching.
+- Built from primitives (cylinder base + scaled sphere top) as island silhouette. No external mesh assets needed.
+- Material: `Assets/Art/M_Island.mat` - flat green URP Lit, no texture (mobile-friendly).
+- Placed at world position (20, 0, 30) so it is visible from ship start.
+- Saved as `Assets/Prefabs/PF_Island.prefab`.
+
+### What was done
+
+Files created via MCP:
+
+| File | Purpose |
+| --- | --- |
+| `Prefabs/PF_Island.prefab` | Static island prefab: root `Island` + children `IslandBase` (Cylinder) + `IslandHill` (Sphere) |
+| `Art/M_Island.mat` | URP Lit material, green `_BaseColor` (0.28, 0.52, 0.18), assigned to both children |
+| Game.unity | `PF_Island` instance placed at (20, 0, 30), linked prefab |
+
+Island hierarchy:
+- `Island` (empty root, static, pos (20, 0, 30))
+  - `IslandBase` (Cylinder, scale (6, 0.4, 6), pos y=-0.3, no collider)
+  - `IslandHill` (Sphere, scale (5, 1.5, 5), pos y=0.5, no collider)
+
+### What is missing / manual steps required
+
+- No collider intentional per spec (v0.2). Add MeshCollider in v0.3 when ship-island collision is planned.
+- You may want to tune the island position / scale - it is placed visually to be visible from ship start but not tested in Play mode.
+
+### Manual test checklist (for human)
+
+- [x] Unity: 0 errors after scene load.
+- [x] Island visible in Game scene: green mound above the waterline.
+- [x] No collider on island (ship passes through).
+- [x] `PF_Island.prefab` exists in Assets/Prefabs/.
 
 ## UI overlay
 
