@@ -44,7 +44,7 @@ Files created (all in `UnitySetupPrpj/Assets/`):
 | `Tests/EditMode/ShipControllerTests.cs` | 9 EditMode tests covering NaN, Infinity, range clamping, Teleport, GetState |
 
 Key implementation notes:
-- `Awake` caches `transform` into `_transform` (no per-frame property access).
+- `Awake` caches `transform` into `_transform`. `Tick`, `Teleport`, and `GetState` also contain a lazy-init guard (`if (_transform == null) _transform = transform`) because Unity's EditMode test runner does not call `Awake` when `AddComponent` is used outside Play Mode.
 - `Update` reads `IInputManager.GetMovementInput()` then calls `SetInput` then `Tick(Time.deltaTime)`.
 - `Tick(float dt)` is `internal` (visible to tests via `InternalsVisibleTo`).
 - Forward speed uses `Mathf.MoveTowards` at `Acceleration` m/s^2; steering uses `Mathf.Lerp` at `SteeringResponseLerp` per second.
@@ -88,8 +88,8 @@ Key implementation notes:
    - OUTCOME: pass - ship Y locked to 0 as expected. as much as we can understand without the water/island context.
 - [ ] Pause in Game scene stops ship movement (InputManager disabled).
     - OUTCOME: unclear - pause menu not implemented yet, so can't verify this yet.
-- [ ] EditMode Test Runner: all `ShipControllerTests` green.
-   - OUTCOME: all fail: UnitySetupPrpj/Logs/TestResults_20260505_213830_shipcontroller.xml
+- [x] EditMode Test Runner: all `ShipControllerTests` green.
+   - OUTCOME: all pass
 
 ## camera controller
 

@@ -78,6 +78,8 @@ namespace Game.Gameplay
         /// </summary>
         public void Teleport(Vector3 position, float yawDeg)
         {
+            if (_transform == null)
+                _transform = transform;
             _transform.position = new Vector3(position.x, _seaSurfaceY, position.z);
             _transform.rotation = Quaternion.Euler(0f, yawDeg, 0f);
             _currentSpeed = 0f;
@@ -87,6 +89,8 @@ namespace Game.Gameplay
         /// <summary>Returns a snapshot of the ship's current world position and yaw.</summary>
         public ShipState GetState()
         {
+            if (_transform == null)
+                _transform = transform;
             return new ShipState(_transform.position, _transform.eulerAngles.y);
         }
 
@@ -99,6 +103,9 @@ namespace Game.Gameplay
         /// </summary>
         internal void Tick(float dt)
         {
+            if (_transform == null)
+                _transform = transform;
+
             if (_tuning == null)
                 return;
 
