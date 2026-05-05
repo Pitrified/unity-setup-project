@@ -93,6 +93,28 @@
                 },
                 {
                     "name": "",
+                    "id": "a1b2c3d4-0001-0000-0000-000000000016",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a1b2c3d4-0001-0000-0000-000000000021",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Touch",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a1b2c3d4-0001-0000-0000-000000000020",
                     "path": "<Keyboard>/escape",
                     "interactions": "",

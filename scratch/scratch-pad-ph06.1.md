@@ -209,7 +209,49 @@ Island hierarchy:
 
 ## UI overlay
 
-- [ ] AI: implement on-screen virtual stick + pause button (UI Toolkit overlay)
+- [x] AI: implement on-screen virtual stick + pause button (UI Toolkit overlay)
+
+### Key design decisions (UI overlay)
+
+- uGUI Canvas overlay used for virtual stick and pause button per spec allowance: "uGUI permitted only for v0.2 fallbacks (e.g. virtual joystick) where UI Toolkit is awkward."
+- `OnScreenStick` (Unity Input System) component on the joystick knob image, `controlPath = "<Gamepad>/leftStick"`. A `<Gamepad>/leftStick` binding is added to `Gameplay/Move` action so the virtual stick feeds the existing `InputManager` pipeline.
+- `OnScreenButton` (Unity Input System) on the pause button image, `controlPath = "<Gamepad>/start"`. A `<Gamepad>/start` binding is added to `Gameplay/Pause` action so the pause button feeds `InputManager.ConsumePausePressed()` → `GameManager.Update` → `PauseGame()`. No custom script needed.
+- No new C# script created - all wiring is via Unity components. Pure data, zero logic.
+- Canvas: Screen Space - Overlay, sort order 10. Two children: `JoystickBackground` (bottom-right), `BtnPause` (top-left).
+
+### What was done
+
+| File / Asset | Change |
+| --- | --- |
+| `Settings/InputActions.inputactions` | Added `<Gamepad>/leftStick` binding to `Gameplay/Move`; added `<Gamepad>/start` binding to `Gameplay/Pause` |
+| `Game.unity` | Added `HUD` Canvas (Screen Space Overlay, sort 10, ScaleWithScreenSize 1920x1080) with two children |
+| `HUD/JoystickBackground` | `Image` (alpha 0.15), `RectTransform` bottom-right anchor (240x240, offset -60,60) |
+| `HUD/JoystickBackground/JoystickKnob` | `Image` (alpha 0.5), `OnScreenStick` (controlPath `<Gamepad>/leftStick`, movementRange 80) |
+| `HUD/BtnPause` | `Image` (alpha 0.3), `OnScreenButton` (controlPath `<Gamepad>/start`), `RectTransform` top-left (120x80, offset 30,-30) |
+| `HUD/BtnPause/Label` | `Text` "II", fontSize 36, white, centered |
+
+### What is missing / manual steps required
+
+- No sprite art for joystick/button. They display as white rectangles. Replace `Image.sprite` with proper art when available.
+- The `Text` component uses legacy uGUI Text. No TextMeshPro dependency needed for v0.2.
+- Verify in Play mode that touch on the bottom-right drags the ship and top-left "II" button triggers pause overlay.
+
+### Manual test checklist (for human)
+
+**NOTE: `OnScreenStick` and `OnScreenButton` respond to touch input only, not mouse clicks.** To test in Editor:
+- Option A: Window > General > **Device Simulator** (converts mouse events to touch).
+- Option B: Edit > Project Settings > Input System Package > enable **"Simulate Touch Input From Mouse or Pen"**.
+
+- [x] Unity: 0 errors after scene load.
+- [x] HUD Canvas visible in Game scene Hierarchy under Game scene.
+- [ ] In Play mode (Device Simulator or touch-sim enabled): drag on bottom-right joystick area → ship moves.
+   - OUTCOME: tested with simulator. Touch input moves the ship not as expected. might still be bug of using mouse on joystick.
+   - the stick seem to work in "burst": when I click and hold, it moves the ship for a moment then stops until I release and click again.
+   - clicking on the screen, outside the joystick area, moves in the same way.
+   - rotation keeps working in a "snake" pattern so i can steer left right, but i expected that if i kept the stick held left, the ship would keep turning left, but it only turns left for a moment then stops. if i do not release and move right, it rotates right for a moment then stops, and so on.
+- [ ] In Play mode (Device Simulator or touch-sim enabled): tap "II" button (top-left) → pause overlay appears.
+   - OUTCOME: tested with simulator. Touch input on pause button does not trigger pause. might still be bug of using mouse on button.
+- [x] WASD keyboard still drives ship (unaffected by new bindings).
 
 ## SaveSystem integration
 
