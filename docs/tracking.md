@@ -96,9 +96,9 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 7 - Tests & quality gates
 
-- [ ] AI: PlayMode test: full Boot → Menu → Game → Menu loop, asserts no leaked GameObjects
-- [ ] AI: PlayMode test: pause → resume preserves ship transform
-- [ ] AI: PlayMode test: save → reload scene → Continue restores position
+- [x] AI: PlayMode test: full Boot → Menu → Game → Menu loop, asserts no leaked GameObjects
+- [x] AI: PlayMode test: pause → resume preserves ship transform
+- [x] AI: PlayMode test: save → reload scene → Continue restores position
 - [ ] HUMAN: run all tests in Test Runner - all green
 
 ---
