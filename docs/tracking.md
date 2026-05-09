@@ -99,15 +99,15 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] AI: PlayMode test: full Boot → Menu → Game → Menu loop, asserts no leaked GameObjects
 - [x] AI: PlayMode test: pause → resume preserves ship transform
 - [x] AI: PlayMode test: save → reload scene → Continue restores position
-- [ ] HUMAN: run all tests in Test Runner - all green
+- [x] HUMAN: run all tests in Test Runner - all green
 
 ---
 
 ## Phase 8 - Build pipeline
 
-- [ ] AI: implement `Game.Editor.BuildPipeline` per [build-and-release.md §6](build-and-release.md#6-build-script-toolsbuild-androidsh)
-- [ ] AI: implement `Tools/build-android.sh` (`dev` / `profile` / `release` modes)
-- [ ] AI: implement `build.env.example`
+- [x] AI: implement `Game.Editor.BuildPipeline` per [build-and-release.md §6](build-and-release.md#6-build-script-toolsbuild-androidsh)
+- [x] AI: implement `Tools/build-android.sh` (`dev` / `profile` / `release` modes)
+- [x] AI: implement `build.env.example`
 - [ ] HUMAN: generate debug keystore (Unity does this on first build) - verify gitignored
 - [ ] HUMAN: `./Tools/build-android.sh dev` produces installable APK
 - [ ] HUMAN: install on device, run, watch `adb logcat -s Unity:V` - no errors

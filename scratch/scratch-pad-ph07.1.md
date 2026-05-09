@@ -17,7 +17,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 - [x] AI: PlayMode test: full Boot → Menu → Game → Menu loop, asserts no leaked GameObjects
 - [x] AI: PlayMode test: pause → resume preserves ship transform
 - [x] AI: PlayMode test: save → reload scene → Continue restores position
-- [ ] HUMAN: run all tests in Test Runner - all green
+- [x] HUMAN: run all tests in Test Runner - all green
 
 ## ai test 1: Boot → Menu → Game → Menu loop
 
@@ -63,7 +63,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 - With zero throttle/steering, `ShipController.Tick` is a no-op for position and rotation:
   - `MoveTowards(0, 0, acc*dt) = 0` → no forward movement
   - `Lerp(0, 0, rate*dt) = 0` → no yaw rotation
-- `PauseGame()` and `ResumeGame()` are synchronous — state changes immediately, no Task to await.
+- `PauseGame()` and `ResumeGame()` are synchronous - state changes immediately, no Task to await.
 - Transform comparison uses epsilon `0.001f` on `Vector3.Distance` and `Mathf.DeltaAngle` for float robustness.
 - Extra `yield return null` after `WaitForState(Playing)` ensures `GameSceneWiring.Start()` has run and injected InputManager into the ship before recording the pre-pause transform.
 
@@ -73,7 +73,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 - Test: `PauseResume_ShipTransformPreserved`
   - Boot.unity → Menu → StartNewGameAsync → Playing
   - Extra frame yield for Start() callbacks
-  - FindObjectsByType<ShipController> — asserts exactly 1
+  - FindObjectsByType<ShipController> - asserts exactly 1
   - Record positionBefore, yawBefore
   - PauseGame → advance 10 frames → ResumeGame
   - Assert Vector3.Distance < 0.001f and |DeltaAngle| < 0.001f
@@ -89,7 +89,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 ### key decisions
 
 - `StartNewGameAsync` deletes any prior save → test starts with clean slate.
-- Ship teleported to `(100, 0, 100)` yaw `90°` — integer values that round-trip through JSON float serialization without loss.
+- Ship teleported to `(100, 0, 100)` yaw `90°` - integer values that round-trip through JSON float serialization without loss.
 - `ReturnToMenuAsync` calls `PersistCurrentState()` BEFORE `SceneLoader.LoadMenuAsync` runs → save is written while `_activeShip` is still valid and Game scene is still loaded.
 - `ContinueAsync` loads a fresh Game scene; `GameSceneWiring.Start()` → `RegisterShip()` reads save → calls `ship.Teleport(savedPos, savedYaw)` on the new instance.
 - Extra `yield return null` after each `WaitForState(Playing)` call ensures `Start()` callbacks have fired before querying ship state.

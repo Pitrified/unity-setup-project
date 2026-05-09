@@ -24,15 +24,15 @@ clone → install Unity 6 LTS via Hub → open → run on device
 | Visual Studio Code | latest                    |                                        |
 | Git               | ≥ 2.40                     |                                        |
 | Git LFS           | ≥ 3.4                      | **Required.** [Install guide](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage). See [git-workflow.md](git-workflow.md) |
-| .NET SDK          | **8.0** (exact)            | Do not upgrade to 9+ — may cause incompatibilities with Unity tooling. [Ubuntu install guide](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?tabs=dotnet8&pivots=os-linux-ubuntu-2604) |
+| .NET SDK          | **8.0** (exact)            | Do not upgrade to 9+ - may cause incompatibilities with Unity tooling. [Ubuntu install guide](https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu-install?tabs=dotnet8&pivots=os-linux-ubuntu-2604) |
 | bundletool        | latest                     | For locally testing AAB files. See §9 for setup |
 
-VS Code extensions — install by ID via VS Code Quick Open (`Ctrl+P` → `ext install <id>`):
+VS Code extensions - install by ID via VS Code Quick Open (`Ctrl+P` → `ext install <id>`):
 
-- `ms-dotnettools.csdevkit` — C# Dev Kit
-- `VisualStudioToolsForUnity.vstuc` — Unity (**not** the deprecated "Unity (by Unity Technologies)" marketplace listing)
+- `ms-dotnettools.csdevkit` - C# Dev Kit
+- `VisualStudioToolsForUnity.vstuc` - Unity (**not** the deprecated "Unity (by Unity Technologies)" marketplace listing)
 - GitHub Copilot + Copilot Chat (install from Marketplace UI)
-- `EditorConfig.EditorConfig` — EditorConfig for VS Code
+- `EditorConfig.EditorConfig` - EditorConfig for VS Code
 
 ---
 
@@ -124,7 +124,7 @@ adb logcat -s Unity:V
 | `adb` doesn't see device                    | USB debugging off, wrong cable, missing OEM driver   |
 | "Multiple precompiled assemblies"           | Duplicate package in `Packages/manifest.json`        |
 | Long iteration on script change             | Missing `.asmdef` boundary - see [project-structure.md](project-structure.md) |
-| `adb: command not found`                    | `adb` is not on the system PATH; use the Unity-bundled path or add to PATH — see §9 |
+| `adb: command not found`                    | `adb` is not on the system PATH; use the Unity-bundled path or add to PATH - see §9 |
 
 ---
 
