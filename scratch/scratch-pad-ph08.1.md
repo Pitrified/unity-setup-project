@@ -96,9 +96,17 @@ Reference docs: [build-and-release.md](../docs/build-and-release.md)
 
 ## Manual Steps (HUMAN)
 
-1. Open Unity Editor with `Boot.unity` active.
-2. Try `./Tools/build-android.sh dev` - Unity Hub must be installed, Android Build Support module present.
-3. On first build, Unity auto-generates a debug keystore in `UnitySetupPrpj/keystore/` - verify it is gitignored.
-4. Locate the APK in `UnitySetupPrpj/Build/dev/artificial-pi-dev.apk`.
-5. `adb install UnitySetupPrpj/Build/dev/artificial-pi-dev.apk`
-6. Launch on device, watch `adb logcat -s Unity:V` - no errors.
+Detailed novice-friendly walkthrough added to **docs/build-and-release.md §11**.
+Follow sections 11.1 through 11.6 in order.
+
+Quick reference:
+
+1. Run `./Tools/setup.sh` (once per machine).
+2. Confirm Android Build Support module is installed in Unity Hub.
+3. Connect device with USB debugging on; confirm `adb devices` shows `device`.
+4. Run `./Tools/build-android.sh dev` from repo root.
+5. Verify keystore is gitignored: `git status --short | grep -i keystore` should be empty.
+6. `adb install -r UnitySetupPrpj/Build/dev/artificial-pi-dev.apk`
+7. Launch app, watch `adb logcat -s Unity:V` - no errors; drive demo loop manually.
+
+See [docs/build-and-release.md §11](../docs/build-and-release.md#11-first-dev-build-walkthrough-step-by-step) for every detail.
