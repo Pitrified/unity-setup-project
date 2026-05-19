@@ -267,12 +267,31 @@ adb logcat -s Unity:V            # show only Unity log lines, verbose level
 ```
 
 **Terminal 2 - Launch the app:**
+
+First, confirm the exact package name that was installed:
 ```bash
-adb shell am start \
-    -n com.DefaultCompany.UnitySetupPrpj/com.unity3d.player.UnityPlayerGameActivity
+adb shell pm list packages | grep -i unity
+# Example output:
+#   package:com.UnityTechnologies.com.unity.template.urpblank
+#
+# The package name matches applicationIdentifier > Android in
+# ProjectSettings/ProjectSettings.asset (grep "applicationIdentifier" to read it).
+# Before publishing, change it in Edit -> Project Settings -> Player -> Other
+# Settings -> Package Name to your real reverse-DNS name (e.g. com.myorg.artificialpi).
 ```
 
-Replace the package/activity name with your actual package name from Player Settings.
+Then launch with the confirmed package name:
+```bash
+adb shell am start \
+    -n <your-package-name>/com.unity3d.player.UnityPlayerGameActivity
+# Example with the default template name:
+#   adb shell am start \
+#       -n com.UnityTechnologies.com.unity.template.urpblank/com.unity3d.player.UnityPlayerGameActivity
+```
+
+The activity class is always `com.unity3d.player.UnityPlayerGameActivity` in Unity 6.
+If you get "Activity class does not exist", the package name is wrong - re-check with
+`adb shell pm list packages`.
 
 **Expected log output (good):**
 ```

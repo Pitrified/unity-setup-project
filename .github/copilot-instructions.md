@@ -30,3 +30,8 @@ kinematic movement · JSON save in `Application.persistentDataPath`.
 - Tests for non-trivial logic in matching `Game.Tests.*` asmdef.
 - Ask one clarifying question if scope is ambiguous; do not invent scope.
 - No em dashes `--`, `---`, curly quotes, or other fancy punctuation.
+
+## Permanent chat
+
+at the end of all the tasks assigned, always ask a follow up question using the tool #askQuestions to let the user give feedback on the result and guide the next steps
+
