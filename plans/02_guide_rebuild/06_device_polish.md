@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 06 - Polish from the device run
@@ -28,3 +28,4 @@ On a flat untextured plane the avatar's movement is hard to see; a few static la
 - The temporary script was named after this plan's phase; the user, the same day: source files never mention plans or phases, temporary ones included. `headless-unity.md` §4 now says to name one-off scripts for what they do.
 - Gates: `Tools/gates.sh all` green (0 warnings, 114/114, 4/4). `dev` APK `com.pitrified.unitysetup`, `Unity Setup`, 70 MB.
 - Open: the HUMAN look on the phone.
+- 2026-11-18, the user on the phone: "Lovely works."
