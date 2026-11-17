@@ -57,7 +57,8 @@ ok "git-lfs $LFS_VERSION"
 # Aliases are not expanded in non-interactive scripts, so probe real locations:
 #   1. Already on PATH (custom install or CI)
 #   2. Unity Hub SDK path (the alias target on this machine)
-ADB_UNITY_PATH="$HOME/Unity/Hub/Editor/6000.4.4f1/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb"
+UNITY_VERSION="$(sed -n 's/^m_EditorVersion: //p' "$REPO_ROOT/UnitySetup/ProjectSettings/ProjectVersion.txt")"
+ADB_UNITY_PATH="$HOME/Unity/Hub/Editor/$UNITY_VERSION/Editor/Data/PlaybackEngines/AndroidPlayer/SDK/platform-tools/adb"
 if command -v adb &>/dev/null; then
     ok "adb found in PATH: $(command -v adb)"
 elif [[ -x "$ADB_UNITY_PATH" ]]; then
@@ -81,6 +82,14 @@ elif [[ -f "$BUNDLETOOL_JAR" ]]; then
     warn "bundletool jar found at $BUNDLETOOL_JAR but java is not on PATH."
 else
     warn "bundletool not found. Download from https://github.com/google/bundletool/releases -> save as ~/Unity/bundletool-all.jar"
+fi
+
+# Unity's YAML merge driver, which .gitattributes names for scenes, prefabs and assets.
+# It is per-user git config; docs/git-workflow.md has the command.
+if git config --get merge.unityyamlmerge.driver &>/dev/null; then
+    ok "git merge driver 'unityyamlmerge' configured"
+else
+    warn "git merge driver 'unityyamlmerge' not configured: scene and prefab conflicts merge as text. See docs/git-workflow.md."
 fi
 
 # ── 2. Install LFS hooks ─────────────────────────────────────────────────────
@@ -118,7 +127,7 @@ ENV_EXAMPLE="$REPO_ROOT/build.env.example"
 ENV_TARGET="$HOME/.config/unity-setup/build.env"
 
 if [[ ! -f "$ENV_EXAMPLE" ]]; then
-    warn "build.env.example not found (will be created in Phase 8). Skipping."
+    warn "build.env.example not found. Skipping."
 else
     if [[ -f "$ENV_TARGET" ]]; then
         warn "$ENV_TARGET already exists. Skipping copy (delete it to reset)."

@@ -79,8 +79,21 @@ fi
 # ── Resolve Unity binary ──────────────────────────────────────────────────────
 UNITY_BIN="${UNITY_PATH:-}"
 
+# The project's own editor version first (ProjectSettings/ProjectVersion.txt).
+PROJECT_VERSION="$(sed -n 's/^m_EditorVersion: //p' "$PROJECT_DIR/ProjectSettings/ProjectVersion.txt")"
 if [[ -z "$UNITY_BIN" ]]; then
-    # Scan Unity Hub default install paths (Linux then macOS).
+    for candidate in \
+        "$HOME/Unity/Hub/Editor/$PROJECT_VERSION/Editor/Unity" \
+        "/Applications/Unity/Hub/Editor/$PROJECT_VERSION/Unity.app/Contents/MacOS/Unity"; do
+        if [[ -x "$candidate" ]]; then
+            UNITY_BIN="$candidate"
+            break
+        fi
+    done
+fi
+
+if [[ -z "$UNITY_BIN" ]]; then
+    # Otherwise the newest editor in the Unity Hub default install paths (Linux then macOS).
     while IFS= read -r -d '' candidate; do
         if [[ -x "$candidate" ]]; then
             UNITY_BIN="$candidate"

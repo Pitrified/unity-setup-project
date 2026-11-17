@@ -18,15 +18,21 @@ warn() {
     echo -e "${YELLOW}[pre-commit] WARN: $*${NC}" >&2
 }
 
-# ── 1. Block Library/ or Build/ from being staged ───────────────────────────
-if git diff --cached --name-only | grep -qE '^(Library|Build|Builds|Temp|Logs)/'; then
-    fail "Unity generated folder (Library/, Build/, Temp/, Logs/) must not be committed.\n  Run: git rm -r --cached Library/ Build/ Builds/ Temp/ Logs/ 2>/dev/null; true"
-fi
+# Staged paths that are added, copied, modified or renamed, NUL-separated so a
+# path with a space ("UI Toolkit/...") stays one path.
+mapfile -d '' STAGED < <(git diff --cached --name-only -z --diff-filter=ACMR)
+
+# ── 1. Block Unity generated folders at any depth ───────────────────────────
+# The Unity project sits in a subfolder, so the folders are matched anywhere.
+GENERATED='(^|/)([Ll]ibrary|[Tt]emp|[Oo]bj|[Bb]uilds?|[Ll]ogs|[Uu]ser[Ss]ettings)/'
+for f in "${STAGED[@]}"; do
+    if [[ "$f" =~ $GENERATED ]]; then
+        fail "'$f' is in a Unity generated folder (Library/, Temp/, obj/, Build/, Logs/, UserSettings/) and must not be committed.\n  Run: git rm -r --cached '$f'"
+    fi
+done
 
 # ── 2. Block secrets: keystores, .env files, PRIVATE KEY strings ─────────────
-STAGED=$(git diff --cached --name-only)
-
-for f in $STAGED; do
+for f in "${STAGED[@]}"; do
     # except for this very file, which will contain "PRIVATE KEY" in the grep text
     [[ "$f" == "Tools/git-hooks/pre-commit" ]] && continue
 
@@ -48,13 +54,12 @@ done
 # ── 3. Block non-LFS-tracked binaries larger than 1 MB ──────────────────────
 LFS_THRESHOLD=1048576  # 1 MiB
 
-for f in $STAGED; do
-    [[ -f "$f" ]] || continue
-
-    size=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null || echo 0)
+for f in "${STAGED[@]}"; do
+    # Size of the staged blob, which is what gets committed (an LFS pointer is tiny).
+    size=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
     if [[ "$size" -gt "$LFS_THRESHOLD" ]]; then
-        # Check if the file has a LFS filter configured
-        lfs_filter=$(git check-attr filter -- "$f" | awk '{print $3}')
+        # Check if the file has a LFS filter configured (-z output: path, attribute, value)
+        lfs_filter=$(git check-attr -z filter -- "$f" | tr '\0' '\n' | sed -n 3p)
         if [[ "$lfs_filter" != "lfs" ]]; then
             fail "'$f' is ${size} bytes (> 1 MB) and is NOT tracked by LFS.\n  Add a matching rule to .gitattributes:\n    echo '*.ext filter=lfs diff=lfs merge=lfs -text' >> .gitattributes\n  Then: git add .gitattributes && git add --renormalize '$f'"
         fi
