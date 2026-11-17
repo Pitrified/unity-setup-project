@@ -23,7 +23,7 @@ Priorities (in order):
 
 | Concern        | Decision                                  | Rationale                              |
 | -------------- | ----------------------------------------- | -------------------------------------- |
-| Engine         | **Unity 6 LTS** (6000.0.x)                | Current LTS, 2-year support window     |
+| Engine         | **Unity 6.4** (`6000.4.4f1`)              | Supported Update release, kept until the next LTS ships, then moved to it |
 | Render         | **URP**                                   | Best mobile perf/quality tradeoff      |
 | Scripting      | **C# / .NET Standard 2.1**                | Default Unity 6 setting                |
 | Backend        | **IL2CPP**, ARM64 only                    | Required for Play Store, best perf     |

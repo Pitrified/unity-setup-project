@@ -40,3 +40,4 @@ Append-only. Newest at the bottom.
 - 2026-11-17 : phase 02 done. Audit table with a coverage check seen failing then passing, and a GUID graph. Findings for phase 03: the debug overlay lives only in `SampleScene`, `SampleSceneProfile` is also the URP assets' volume profile, the template's project-wide input actions are unused; folded into `03_pre_split_cleanup.md`.
 - 2026-11-17 : phase 03 done in four commits (`453cba9`, `2b9d161`, `78df44a`, `ed02a2f`): MCP pinned, PlayMode test isolation fixed, debug overlay kept, leftovers removed, guide ids set, save system generic. `dev` APK verified with the new id.
 - 2026-11-17 : phase 04 implemented in `2425e1f`: `docs/headless-unity.md`, playbook and instructions rewritten for Claude running its own gates, one MCP doc. Open: Q16 (Unity 6.4 is not LTS; the spec says LTS) and the fresh-session check of the done-when.
+- 2026-11-17 : Q16 answered: keep 6.4, move to the next LTS when it ships. Spec's engine row corrected.
