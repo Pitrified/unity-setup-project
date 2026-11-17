@@ -49,3 +49,7 @@ ehthumbs.db
 Desktop.ini
 
 # NOTE: Packages/manifest.json and Packages/packages-lock.json MUST be committed.
+
+# Python (Tools/asset_builders)
+.venv/
+__pycache__/

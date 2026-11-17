@@ -1,0 +1,13 @@
+[project]
+name = "asset-builders"
+version = "0.1.0"
+description = "Blender builder scripts that export the project's models as FBX, run headless through bpy."
+requires-python = "==3.13.*"
+dependencies = [
+    "bpy==5.2.1",
+    "numpy>=2.5",
+    "pillow>=11",
+]
+
+[tool.uv]
+package = false

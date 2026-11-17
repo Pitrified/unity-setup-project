@@ -15,7 +15,7 @@ From `00_start.md` Q1 to Q6:
 
 | #  | Phase                        | Plan                                         | Status  |
 | -- | ---------------------------- | -------------------------------------------- | ------- |
-| 01 | Pipeline spike               | [`01_spike.md`](01_spike.md)                 | planned |
+| 01 | Pipeline spike               | [`01_spike.md`](01_spike.md)                 | done    |
 | 02 | Match the barrel to a photo  | [`02_barrel.md`](02_barrel.md)               | planned |
 | 03 | Method doc and skill         | [`03_method.md`](03_method.md)               | planned |
 | 04 | Verify                       | [`04_verify.md`](04_verify.md)               | planned |
@@ -29,3 +29,4 @@ Append-only. Newest at the bottom.
 - 2026-11-14 : drafted with Q1 to Q5 answered; Q6 (Unity on the box) answered b.
 - 2026-11-17 : Unity installed headless on the box; the condition on Q1 to Q5 met.
 - 2026-11-18 : picked up unsupervised on the user's go, after `02_guide_rebuild` closed. Four phases planned; branch `feat/03_asset_method` from `feat/02_guide_rebuild`.
+- 2026-11-18 : phase 01 - builder to FBX to Unity headless: `Tools/asset_builders`, deterministic FBX, `ModelSetup` and `SceneCapture` editor tools, `BarrelModelTests`, three barrels in the sample scene. Gates green.
