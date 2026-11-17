@@ -23,7 +23,7 @@ From the answers in `00_start.md` (Q1 to Q15, 2026-11-17):
 | 02 | Audit                              | [`02_audit.md`](02_audit.md)                         | done   |
 | 03 | Clean up before duplicating        | [`03_pre_split_cleanup.md`](03_pre_split_cleanup.md) | done   |
 | 04 | Review the docs and AI workflow    | [`04_docs_review.md`](04_docs_review.md)             | done   |
-| 05 | Write artificial-pirate            | [`05_pirate_repo.md`](05_pirate_repo.md)             | draft  |
+| 05 | Write artificial-pirate            | [`05_pirate_repo.md`](05_pirate_repo.md)             | in progress |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
 
@@ -42,3 +42,4 @@ Append-only. Newest at the bottom.
 - 2026-11-17 : phase 04 implemented in `2425e1f`: `docs/headless-unity.md`, playbook and instructions rewritten for Claude running its own gates, one MCP doc. Open: Q16 (Unity 6.4 is not LTS; the spec says LTS) and the fresh-session check of the done-when.
 - 2026-11-17 : Q16 answered: keep 6.4, move to the next LTS when it ships. Spec's engine row corrected.
 - 2026-11-17 : phase 04 done: the user accepted the verbatim run of the gate commands instead of a fresh-session check. Branch merged into `main` (fast-forward) for phase 05; `Pitrified/artificial-pirate` created empty by the user.
+- 2026-11-17 : phase 05 - artificial-pirate written on `feat/01_bootstrap` there, box checks green in a fresh clone. Waiting on the push, its merge commit and the device run.

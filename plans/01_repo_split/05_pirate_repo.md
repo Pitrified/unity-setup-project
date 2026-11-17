@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 ---
 
 # Phase 05 - Write artificial-pirate
@@ -41,3 +41,7 @@ Written into the new repo as `plans/01_bootstrap/` with these phases:
 - This repo's log names the new repo's merge commit.
 
 ## What the implementation found
+
+- 2026-11-17. artificial-pirate written on the box in its own `plans/01_bootstrap/`, from `main` at `8b521a7`, branch `feat/01_bootstrap`: baseline `3ad8ed2`, renames `190c3c1`, docs `cb8e824`, plans `6424bfc`, verify `67eb75a`. Its findings are there.
+- Box checks green in a fresh clone (compile 0 warnings, EditMode 114/114, PlayMode 4/4, `dev` APK `com.pitrified.artificialpirate`). Open: the push from g4, the merge into its `main`, and the device run.
+- artificial-pirate links the guide's playbook, MCP setup and dev environment on this repo's `main`; `02_guide_rebuild` should keep those paths or update the links there.
