@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 priority: 0
 depends_on: [01_repo_split]
 description: |
@@ -10,7 +10,7 @@ description: |
 
 # Rebuild this repo into the Unity guide
 
-Draft spin-off, raised 2026-11-14 with [`01_repo_split`](../01_repo_split/00_start.md); brainstorm and questions written 2026-11-17, after that folder closed. No phases agreed.
+Draft spin-off, raised 2026-11-14 with [`01_repo_split`](../01_repo_split/00_start.md); brainstorm and questions written 2026-11-17, after that folder closed. Q1 to Q10 answered 2026-11-17, all as recommended; phases in [`tracking.md`](tracking.md).
 
 ## Where this came from
 
@@ -45,36 +45,46 @@ From `01_repo_split`, done 2026-11-17:
   - b. keep the ship slice as the sample. No work, but it is a second copy of the game that drifts from artificial-pirate, and every new project deletes a ship.
   - c. no gameplay at all: Boot, Persistent and Menu, with an empty Game scene. Smallest, but save, pause and the PlayMode restore test then have nothing to act on.
   - Recommended: a. The runtime is the thing being demonstrated, and a placeholder avatar is the smallest thing that exercises all of it; the chase camera is generic enough to stay.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q2: the project folder name.
   - a. `UnitySetup/`, matching the product name.
   - b. keep `UnitySetupPrpj/`.
   - Recommended: a, done in the same way as artificial-pirate's (one `git mv`, the scripts and docs follow; the guide links artificial-pirate uses are under `docs/`, so they do not move).
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q3: the guide's spec. `functional-specs.md` is the game's.
   - a. rewrite it as the sample's spec, short, keeping the shape a new project copies (overview, the locked-decisions table, lifecycle, scenes, save schema, definition of done).
   - b. delete it; a new project writes its own from nothing.
   - Recommended: a. The locked-decisions table and the "anything not listed is not decided" rule are the pattern; the sample needs a spec for its tests to point at.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q4: the docs written for the game but mostly generic: `performance-budget.md`, `build-and-release.md`, `google-play-private-alpha.md`.
   - Recommended: keep all three here, with the game's names and numbers made generic (the budget's numbers stay as the default for a mid-range Android target). artificial-pirate keeps its own copies.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q5: `docs/copilot-instructions-template.md`.
   - Recommended: delete it. The bootstrap how-to (Q6) says to copy `.github/copilot-instructions.md`, `CLAUDE.md` and `AGENTS.md` and change what names the project, as artificial-pirate did.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q6: a bootstrap how-to, `docs/bootstrap-new-project.md`: how a session starts a new Unity project from this repo (plan first, `git archive`, the renames with an editor method in batch mode, docs, the gates in a fresh clone, the human steps), with artificial-pirate's `plans/01_bootstrap/` as the worked example.
   - Recommended: yes; it is the guide's main reader, as in the flutter guide's brainstorm.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q7: the pattern index.
   - a. a section of the root README, one line per pattern with the link: artificial-pirate's ship controller with its tuning ScriptableObject, the water shader graph, and anything later projects add.
   - b. a separate `docs/patterns.md`.
   - Recommended: a, until it outgrows a screen.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q8: a gates script, `Tools/gates.sh [compile|edit|play|all]`, running the commands of `headless-unity.md` §3 and exiting non-zero on any `error CS`, `warning CS` or failed test; the doc then points at it.
   - a. yes, here and copied to artificial-pirate.
   - b. no, the doc's commands are enough.
   - Recommended: a. Every session so far wrapped the same commands in a scratch script; one real script is less to get wrong. CI stays out (it needs a Unity licence on a hosted runner).
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q9: the pre-commit hook's two bugs (the anchored pattern, splitting on spaces).
   - Recommended: fix here in the template review, and the same fix in artificial-pirate as its own small change there.
+  - ANS: the recommendation, the user, 2026-11-17.
 - Q10: `docs/tracking.md` and `scratch/`.
   - a. stay where they are; the root README says they are the history of how the template and the game were built.
   - b. move to `docs/history/`.
   - Recommended: a. Moving breaks the diary's own links again and gains nothing.
+  - ANS: the recommendation, the user, 2026-11-17.
 
-## Proposed phases, once the questions are answered
+## Phases
 
 1. **Sample** (Q1): the ship slice out, the placeholder in, `GameManager` and `GameSceneWiring` generic, tests rewritten; gates and a capture.
 2. **Folder rename** (Q2), with the scripts and docs following.
