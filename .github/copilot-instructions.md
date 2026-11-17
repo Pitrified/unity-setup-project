@@ -1,4 +1,4 @@
-# Project: artificial-pi (Unity 6, mobile)
+# Project: unity-setup (Unity 6, mobile)
 
 Canonical instructions for agents working in this repo, imported by `CLAUDE.md`.
 The file keeps its Copilot name for consistency with the other repos; it is written for Claude Code.
@@ -29,7 +29,7 @@ compile with 0 errors and 0 warnings, EditMode and PlayMode tests green, the `de
 Results go in the commit message. The device run is the human's.
 
 ## Stack
-Unity `6000.4.4f1` (exact version in `UnitySetupPrpj/ProjectSettings/ProjectVersion.txt`) · URP · IL2CPP · ARM64 ·
+Unity `6000.4.4f1` (exact version in `UnitySetup/ProjectSettings/ProjectVersion.txt`) · URP · IL2CPP · ARM64 ·
 Unity Input System · UI Toolkit · kinematic movement · JSON save in `Application.persistentDataPath`.
 
 ## Hard rules

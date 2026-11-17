@@ -4,10 +4,10 @@ namespace Game.Gameplay
 
     /// <summary>
     /// Designer-tunable data for the avatar kinematic model.
-    /// Create an instance via Assets > Create > artificial-pi > Avatar Tuning
+    /// Create an instance via Assets > Create > unity-setup > Avatar Tuning
     /// and assign it to the AvatarController on PF_Avatar.
     /// </summary>
-    [CreateAssetMenu(menuName = "artificial-pi/Avatar Tuning", fileName = "SO_AvatarTuning")]
+    [CreateAssetMenu(menuName = "unity-setup/Avatar Tuning", fileName = "SO_AvatarTuning")]
     public sealed class SO_AvatarTuning : ScriptableObject
     {
         [SerializeField] private float _maxSpeed = 8f;

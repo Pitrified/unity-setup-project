@@ -23,7 +23,7 @@ namespace Game.Editor
     public static class BuildPipeline
     {
         private const string BuildRoot   = "Build";
-        private const string ProductName = "artificial-pi";
+        private const string ProductName = "unity-setup";
 
         // ------------------------------------------------------------------ public entry points
 
@@ -192,7 +192,7 @@ namespace Game.Editor
             if (string.IsNullOrEmpty(value))
                 throw new InvalidOperationException(
                     $"Required environment variable '{name}' is not set. "
-                    + "Configure it in ~/.config/artificial-pi/build.env.");
+                    + "Configure it in ~/.config/unity-setup/build.env.");
             return value;
         }
     }

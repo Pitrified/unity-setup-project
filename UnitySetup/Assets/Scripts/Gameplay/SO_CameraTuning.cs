@@ -4,10 +4,10 @@ namespace Game.Gameplay
 
     /// <summary>
     /// Designer-tunable data for the third-person chase camera.
-    /// Create an instance via Assets > Create > artificial-pi > Camera Tuning
+    /// Create an instance via Assets > Create > unity-setup > Camera Tuning
     /// and assign it to the CameraController on MainCamera.
     /// </summary>
-    [CreateAssetMenu(menuName = "artificial-pi/Camera Tuning", fileName = "SO_CameraTuning")]
+    [CreateAssetMenu(menuName = "unity-setup/Camera Tuning", fileName = "SO_CameraTuning")]
     public sealed class SO_CameraTuning : ScriptableObject
     {
         [SerializeField] private Vector3 _localOffset = new Vector3(0f, 3f, -6f);

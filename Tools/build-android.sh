@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Tools/build-android.sh
-# Builds an Android APK or AAB for the artificial-pi Unity project.
+# Builds an Android APK or AAB for the unity-setup Unity project.
 #
 # Usage:
 #   ./Tools/build-android.sh dev         → development APK (fast, debug keystore)
 #   ./Tools/build-android.sh profile     → profiling APK   (IL2CPP, deep profiling)
 #   ./Tools/build-android.sh release     → release AAB     (signed, stripped, LZ4HC)
 #
-# Environment variables (set in ~/.config/artificial-pi/build.env):
+# Environment variables (set in ~/.config/unity-setup/build.env):
 #   UNITY_PATH              path to the Unity Editor binary (optional; auto-detected from Hub)
 #   ANDROID_KEYSTORE_PATH   absolute path to upload keystore (release only)
 #   ANDROID_KEYSTORE_PASS   keystore password                (release only)
@@ -43,14 +43,14 @@ fi
 # ── Resolve paths ─────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-PROJECT_DIR="$REPO_ROOT/UnitySetupPrpj"
+PROJECT_DIR="$REPO_ROOT/UnitySetup"
 
 if [[ ! -d "$PROJECT_DIR/Assets" ]]; then
     fail "Unity project not found at $PROJECT_DIR (expected Assets/ subfolder)."
 fi
 
 # ── Source build.env ──────────────────────────────────────────────────────────
-BUILD_ENV_FILE="$HOME/.config/artificial-pi/build.env"
+BUILD_ENV_FILE="$HOME/.config/unity-setup/build.env"
 if [[ -f "$BUILD_ENV_FILE" ]]; then
     # shellcheck source=/dev/null
     set +u
@@ -111,15 +111,15 @@ ok "Unity binary: $UNITY_BIN"
 case "$MODE" in
     dev)
         METHOD="Game.Editor.BuildPipeline.BuildDev"
-        ARTIFACT="$PROJECT_DIR/Build/dev/${PRODUCT_NAME:-artificial-pi}-dev.apk"
+        ARTIFACT="$PROJECT_DIR/Build/dev/${PRODUCT_NAME:-unity-setup}-dev.apk"
         ;;
     profile)
         METHOD="Game.Editor.BuildPipeline.BuildProfile"
-        ARTIFACT="$PROJECT_DIR/Build/profile/${PRODUCT_NAME:-artificial-pi}-profile.apk"
+        ARTIFACT="$PROJECT_DIR/Build/profile/${PRODUCT_NAME:-unity-setup}-profile.apk"
         ;;
     release)
         METHOD="Game.Editor.BuildPipeline.BuildRelease"
-        ARTIFACT="$PROJECT_DIR/Build/release/${PRODUCT_NAME:-artificial-pi}-release.aab"
+        ARTIFACT="$PROJECT_DIR/Build/release/${PRODUCT_NAME:-unity-setup}-release.aab"
         ;;
 esac
 

@@ -66,7 +66,7 @@ Tag format: `v0.2.0-alpha3` on the commit that produced the AAB.
   - Filename convention: `keystore/upload.keystore` (folder gitignored).
 - **App signing key:** managed by Google Play (Play App Signing). Do not export.
 
-Local environment vars (e.g. `~/.config/artificial-pi/build.env`, gitignored):
+Local environment vars (e.g. `~/.config/unity-setup/build.env`, gitignored):
 
 ```
 ANDROID_KEYSTORE_PATH=/abs/path/upload.keystore
@@ -178,11 +178,11 @@ If ADB is not on your PATH, see the note printed by `Tools/setup.sh` about the U
 ./Tools/setup.sh
 ```
 
-This creates `~/.config/artificial-pi/build.env` from `build.env.example` if it does not
+This creates `~/.config/unity-setup/build.env` from `build.env.example` if it does not
 already exist. The file only needs to be filled in for release builds (keystore settings).
 For dev builds, leaving it as-is is fine.
 
-**Verification:** `ls ~/.config/artificial-pi/build.env` should exist.
+**Verification:** `ls ~/.config/unity-setup/build.env` should exist.
 
 ---
 
@@ -198,7 +198,7 @@ What happens:
 2. Unity opens in headless mode (no window).
 3. `Game.Editor.BuildPipeline.BuildDev` is called.
 4. Unity compiles IL2CPP and links the APK (~5-15 minutes for the first build).
-5. The APK is written to `UnitySetupPrpj/Build/dev/artificial-pi-dev.apk`.
+5. The APK is written to `UnitySetup/Build/dev/unity-setup-dev.apk`.
 6. The script prints the artifact path, file size, and SHA256.
 
 **What success looks like:**
@@ -206,13 +206,13 @@ What happens:
 [build]  OK    Unity binary: ~/Unity/Hub/Editor/6000.4.4f1/Editor/Unity
 [build]        Starting Unity build...
 [build]  OK    Build SUCCEEDED
-[build]        Artifact : .../UnitySetupPrpj/Build/dev/artificial-pi-dev.apk
+[build]        Artifact : .../UnitySetup/Build/dev/unity-setup-dev.apk
 [build]        Size     : 87M
 [build]        SHA256   : a1b2c3...
 ```
 
 **If it fails:** the script prints the last 40 lines of the build log. The full log is at
-`UnitySetupPrpj/Build/build-dev.log`. Search it for `error CS` (compile errors) or
+`UnitySetup/Build/build-dev.log`. Search it for `error CS` (compile errors) or
 `Error` (runtime Unity errors).
 
 ---
@@ -227,7 +227,7 @@ accidentally committed:
 git status --short | grep -i keystore || echo "OK - no keystore files visible to git"
 
 # Confirm .gitignore covers the pattern:
-git check-ignore -v UnitySetupPrpj/keystore/ 2>/dev/null \
+git check-ignore -v UnitySetup/keystore/ 2>/dev/null \
   || echo "keystore/ is gitignored (or does not exist yet)"
 ```
 
@@ -246,7 +246,7 @@ adb devices
 #   R58T309JZXY    device      <- "device" = ready; "unauthorized" = enable USB debugging
 
 # Install the APK (replace existing install if present):
-adb install -r UnitySetupPrpj/Build/dev/artificial-pi-dev.apk
+adb install -r UnitySetup/Build/dev/unity-setup-dev.apk
 ```
 
 **Expected output:** `Success` at the end of the adb install output.

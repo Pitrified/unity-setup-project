@@ -12,7 +12,7 @@ Verified on Ubuntu 26.04 with an NVIDIA GPU, Unity `6000.4.4f1`, 2026-11-17.
 
 - **Unity CLI** (`unity`), installed per user to `~/.local/bin`. Read `https://unity.com/install.sh` before running it, and run it with `UNITY_CLI_SKIP_SETUP=1`: otherwise it ends by installing Unity's agent skills into every AI client it finds.
   Then `unity analytics opt-out`.
-- **Editor and Android module**, at the version in `UnitySetupPrpj/ProjectSettings/ProjectVersion.txt`:
+- **Editor and Android module**, at the version in `UnitySetup/ProjectSettings/ProjectVersion.txt`:
   ```
   unity install 6000.4.4f1 --changeset 360f97ecca93 -m android --cm --accept-eula --non-interactive
   ```
@@ -35,7 +35,7 @@ Every run below has the same shape:
 ```
 EDITOR=~/Unity/Hub/Editor/6000.4.4f1/Editor/Unity
 xvfb-run -a -s "-screen 0 1280x1024x24" "$EDITOR" -batchmode -force-vulkan \
-  -projectPath UnitySetupPrpj -logFile <log> <what to run>
+  -projectPath UnitySetup -logFile <log> <what to run>
 ```
 
 - `xvfb-run` gives the editor a virtual display.
@@ -53,7 +53,7 @@ xvfb-run -a -s "-screen 0 1280x1024x24" "$EDITOR" -batchmode -force-vulkan \
 | Compile | `-quit` | exit 0, no `error CS` and no `warning CS` lines in the log |
 | EditMode tests | `-runTests -testPlatform EditMode -testResults <xml>` | exit 0; the XML root has `failed="0"` |
 | PlayMode tests | `-runTests -testPlatform PlayMode -testResults <xml>` | exit 0; the XML root has `failed="0"` |
-| `dev` APK | `Tools/build-android.sh dev`, itself under `xvfb-run -a` | `Build SUCCEEDED`; the APK under `UnitySetupPrpj/Build/dev/` |
+| `dev` APK | `Tools/build-android.sh dev`, itself under `xvfb-run -a` | `Build SUCCEEDED`; the APK under `UnitySetup/Build/dev/` |
 | Capture | `-executeMethod <Class.Method>` of an editor script that renders a camera to a PNG | the PNG looks right, and measures right where the change is visual |
 
 `-runTests` must not be combined with `-quit`. A failing test's message is in the XML's `failure/message`.

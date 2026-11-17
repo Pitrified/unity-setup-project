@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Tools/setup.sh
-# One-time dev-machine setup for artificial-pi.
+# One-time dev-machine setup for unity-setup.
 # Run from any directory; script resolves the repo root automatically.
 #
 # What it does:
 #   1. Verifies required toolchain (git, git-lfs, adb, bundletool)
 #   2. Runs `git lfs install` (installs LFS hooks globally)
 #   3. Installs the pre-commit hook from Tools/git-hooks/pre-commit
-#   4. Copies build.env.example -> ~/.config/artificial-pi/build.env (if example exists)
+#   4. Copies build.env.example -> ~/.config/unity-setup/build.env (if example exists)
 
 set -euo pipefail
 
@@ -115,7 +115,7 @@ info ""
 info "--- Checking build.env ---"
 
 ENV_EXAMPLE="$REPO_ROOT/build.env.example"
-ENV_TARGET="$HOME/.config/artificial-pi/build.env"
+ENV_TARGET="$HOME/.config/unity-setup/build.env"
 
 if [[ ! -f "$ENV_EXAMPLE" ]]; then
     warn "build.env.example not found (will be created in Phase 8). Skipping."

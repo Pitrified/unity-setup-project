@@ -1,5 +1,5 @@
 ---
-status: planned
+status: done
 ---
 
 # Phase 02 - Folder and names
@@ -21,3 +21,10 @@ Q2: `UnitySetupPrpj/` becomes `UnitySetup/`, and the game's names still here (`a
 - Compile with 0 warnings, EditMode and PlayMode green; the `dev` APK named `unity-setup-dev.apk`, id `com.pitrified.unitysetup`.
 
 ## What the implementation found
+
+- 2026-11-17. `git mv UnitySetupPrpj UnitySetup`; `artificial-pi` to `unity-setup` in the build and setup scripts, `build.env.example`, `BuildPipeline`, both tuning menus, the instructions, `AGENTS.md` and three docs; `cd artificial-pi` in the dev environment doc became `cd unity-setup-project`.
+  Windows Store package name and description through `PlayerSettings.WSA` in batch mode. Left on purpose: `projectName: UnitySetupPrpj`, the Unity Cloud link's name.
+- **A moved project needs a fresh `Library/`.** With the `Library/` that moved along with the folder, EditMode passed but PlayMode failed 2 of 4: the Game scene's `AvatarController` was a missing script ("The referenced script (Unknown) on this Behaviour is missing!"). Deleting `Library/` and importing again fixed it, with no change to any tracked file.
+  artificial-pirate's rename did not show it, its `Library/` being minutes old; the bootstrap how-to says to delete `Library/` after moving the project folder.
+- Gates on the fresh `Library/`: compile 0 warnings (after the one-time Shader Graph import errors), EditMode 114/114, PlayMode 4/4.
+- `dev` APK: `UnitySetup/Build/dev/unity-setup-dev.apk`, `com.pitrified.unitysetup`, label `Unity Setup`, `arm64-v8a`.

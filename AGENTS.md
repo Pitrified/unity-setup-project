@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is the `artificial-pi` Unity 6 mobile project (v0.2, private alpha).
+This is the `unity-setup` Unity 6 mobile project (v0.2, private alpha).
 
 The repo instructions, hard rules included, are in [.github/copilot-instructions.md](.github/copilot-instructions.md); `CLAUDE.md` imports the same file.
 They are not repeated here, so they cannot drift.
