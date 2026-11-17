@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 ---
 
 # Phase 01 - Land phase 6 work, adopt `plans/`
@@ -32,3 +32,8 @@ This repo also gets the `plans/` convention this folder uses, so the audit and l
 - `plans/` is on `feat/01_repo_split` and the instructions point at it.
 
 ## What the implementation found
+
+- 2026-11-17: `main` was already at `2c0c76b`, fast-forwarded by the user; this branch was cut from it.
+- Phase 8 items, per Q5 b: keystore gitignored and `dev` APK build ticked from the box checks; the device and logcat item marked as moved to artificial-pirate's first device run.
+- `plans.py` vendored as `Tools/plans.py`, not `scripts/plans.py`: this repo keeps its scripts in `Tools/`.
+- `AGENTS.md`'s reading table pointed at `docs/tracking.md` as the current phase; it now points at `plans/`.

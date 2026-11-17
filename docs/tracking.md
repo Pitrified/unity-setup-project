@@ -108,9 +108,11 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] AI: implement `Game.Editor.BuildPipeline` per [build-and-release.md §6](build-and-release.md#6-build-script-toolsbuild-androidsh)
 - [x] AI: implement `Tools/build-android.sh` (`dev` / `profile` / `release` modes)
 - [x] AI: implement `build.env.example`
-- [ ] HUMAN: generate debug keystore (Unity does this on first build) - verify gitignored
-- [ ] HUMAN: `./Tools/build-android.sh dev` produces installable APK
-- [ ] HUMAN: install on device, run, watch `adb logcat -s Unity:V` - no errors
+- [x] HUMAN: generate debug keystore (Unity does this on first build) - verify gitignored (2026-11-17: `keystore/` and `*.keystore` in `.gitignore`, none tracked)
+- [x] HUMAN: `./Tools/build-android.sh dev` produces installable APK (2026-11-17, built headless on the box; not yet installed)
+- [ ] HUMAN: install on device, run, watch `adb logcat -s Unity:V` - no errors (moved to the artificial-pirate repo's first device run)
+
+New work from 2026-11-17 is planned in [`plans/`](../plans/), not in this file.
 
 ---
 

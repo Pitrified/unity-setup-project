@@ -11,8 +11,16 @@ This is the `artificial-pi` Unity 6 LTS mobile project (v0.2, private alpha).
 | 3 | [docs/project-structure.md](docs/project-structure.md) | Folder layout & asmdef boundaries |
 | 4 | [docs/coding-standards.md](docs/coding-standards.md) | C# style rules |
 | 5 | [docs/systems/](docs/systems/) | One spec file per runtime system |
-| 6 | [docs/tracking.md](docs/tracking.md) | Current phase & checklist |
+| 6 | [plans/](plans/) | Current work: one folder per feature, see "Plans" below |
 | 7 | [docs/unity-mcp-best-practices.md](docs/unity-mcp-best-practices.md) | Unity MCP session tips, recovery patterns, validation workflow |
+
+## Plans
+
+New work is planned in `plans/NN_name/`, in the shape the `tracked-development` skill describes:
+`00_start.md` for the brainstorm and questions, `tracking.md` for the phases and log, one file per phase.
+`python3 Tools/plans.py list` shows the folders and their status; `python3 Tools/plans.py check` checks them.
+`Tools/plans.py` is a vendored copy of the skill's script; to update it, copy the skill's file over it.
+`docs/tracking.md` and `scratch/` are the diary from before `plans/`, kept as history.
 
 ## Non-negotiable constraints
 

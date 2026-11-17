@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 priority: 1
 description: |
   Split artificial-pi, the naval game, out of this repo into its own repo, artificial-pirate,
