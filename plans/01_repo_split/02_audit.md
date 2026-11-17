@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 ---
 
 # Phase 02 - Audit
@@ -38,3 +38,9 @@ Context: [`00_start.md`](00_start.md), after [`01_land_ph6.md`](01_land_ph6.md).
 - The GUID report is summarised in the table file, with every cross-destination reference either resolved or raised as a question.
 
 ## What the implementation found
+
+- 2026-11-17: table in [`02.1_audit_table.md`](02.1_audit_table.md), 308 tracked paths, 60 patterns, 0 unmatched.
+  `scratch/audit/coverage.py` was seen failing on a copy of the table with a misspelt pattern and a misspelt destination (4 unmatched, 6 errors), then passing on the real one.
+  The rule is longest pattern wins; the resolved `pirate` and `drop` paths were listed and read once, since a short pattern only just beats the `Assets/*.meta` catch-all.
+- `scratch/audit/guid_graph.py` needed two passes: UXML references a stylesheet by `guid=` or by a relative `src` path, not `guid: `, so the first run reported every `.uss` as an orphan.
+- Three findings change phase 03 beyond Q10's list: the debug overlay is wired only into `SampleScene`, `SampleSceneProfile` is also the URP assets' volume profile, and the template's project-wide input actions are unused. Details in the table file, findings 1 to 3. None needed a new question: each restores what the spec or the scratch pad already said, or removes a template leftover of the kind Q10 already dropped.

@@ -20,7 +20,7 @@ From the answers in `00_start.md` (Q1 to Q15, 2026-11-17):
 | #  | Phase                              | Plan                                                 | Status |
 | -- | ---------------------------------- | ---------------------------------------------------- | ------ |
 | 01 | Land phase 6 work, adopt `plans/`  | [`01_land_ph6.md`](01_land_ph6.md)                   | done   |
-| 02 | Audit                              | [`02_audit.md`](02_audit.md)                         | draft  |
+| 02 | Audit                              | [`02_audit.md`](02_audit.md)                         | done   |
 | 03 | Clean up before duplicating        | [`03_pre_split_cleanup.md`](03_pre_split_cleanup.md) | draft  |
 | 04 | Review the docs and AI workflow    | [`04_docs_review.md`](04_docs_review.md)             | draft  |
 | 05 | Write artificial-pirate            | [`05_pirate_repo.md`](05_pirate_repo.md)             | draft  |
@@ -37,3 +37,4 @@ Append-only. Newest at the bottom.
 - 2026-11-17 : Q1 to Q13 answered by the user, mostly the recommendations; Q5 unknown, so b, with keystore and `dev` APK checked on the box. Phase 04, docs and AI workflow review, added at the user's request with an assessment (the docs assume a person verifies every change; now the agent can run the gates itself); the copy becomes phase 05. Q14 (MCP's role) and Q15 (which agent) raised. fala's package id left as an open point in fala-language-tutor.
 - 2026-11-17 : Q14 a (batch mode first, MCP the interactive option) and Q15 a (Claude Code first; the Copilot file kept only for consistency, no Copilot workarounds) answered; `04_docs_review.md` updated to match.
 - 2026-11-17 : execution started on the user's go. Phase 01 done: `CLAUDE.md`, a Plans section in the instructions and `AGENTS.md`, `Tools/plans.py` vendored, phase 8 items settled per Q5.
+- 2026-11-17 : phase 02 done. Audit table with a coverage check seen failing then passing, and a GUID graph. Findings for phase 03: the debug overlay lives only in `SampleScene`, `SampleSceneProfile` is also the URP assets' volume profile, the template's project-wide input actions are unused; folded into `03_pre_split_cleanup.md`.
