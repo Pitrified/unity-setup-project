@@ -35,7 +35,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 - [x] AI: create `.gitignore` per [git-workflow.md §3](git-workflow.md#3-gitignore-essentials-unity)
 - [x] AI: create `.gitattributes` per [git-workflow.md §4](git-workflow.md#4-gitattributes-lfs--required)
 - [x] AI: create `.editorconfig` matching [coding-standards.md](coding-standards.md)
-- [x] AI: create `.github/copilot-instructions.md` from [copilot-instructions-template.md](copilot-instructions-template.md)
+- [x] AI: create `.github/copilot-instructions.md` from [copilot-instructions-template.md](https://github.com/Pitrified/unity-setup-project/blob/8b521a7/docs/copilot-instructions-template.md)
 - [x] AI: create `AGENTS.md` (short, links to `docs/`)
 - [x] AI: create `Tools/git-hooks/pre-commit` per [git-workflow.md §6](git-workflow.md#6-pre-commit-guardrails)
 - [x] AI: create `Tools/setup.sh` (installs LFS hook, copies `build.env.example`, verifies tooling)
@@ -84,7 +84,7 @@ Mark complete with `[x]`. Add a date + commit/tag in parentheses if useful.
 
 ## Phase 6 - Gameplay vertical slice
 
-- [x] AI: implement [systems/ship-controller.md](systems/ship-controller.md) (+ tests for input clamping)
+- [x] AI: implement [systems/ship-controller.md](https://github.com/Pitrified/unity-setup-project/blob/8b521a7/docs/systems/ship-controller.md) (+ tests for input clamping)
 - [x] AI: implement [systems/camera-controller.md](systems/camera-controller.md)
 - [x] AI: create stylized water shader (URP Shader Graph) - minimal animation
 - [x] AI: create island prefab (static mesh, no collisions in v0.2)

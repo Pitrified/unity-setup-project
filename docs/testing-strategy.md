@@ -13,7 +13,7 @@ few high-value smoke tests, not a per-class test farm.
 | PlayMode    | `Assets/Tests/PlayMode/` | `Game.Tests.PlayMode`       | seconds   | Pre-merge / pre-build |
 | Smoke (manual) | n/a                  | n/a                         | minutes   | Pre-release      |
 
-Framework: **Unity Test Framework** (NUnit-based). No third-party test deps in v0.2.
+Framework: **Unity Test Framework** (NUnit-based). No third-party test deps.
 
 ---
 
@@ -39,7 +39,7 @@ Required:
 
 - Bootstrap → Persistent loaded → Menu reachable
 - Menu → Game → Menu loop, no leaked GameObjects
-- Pause → Resume preserves ship transform
+- Pause → Resume preserves the avatar's transform
 - Save → reload scene → Continue restores position
 
 PlayMode tests load real scenes and run for a few frames. Keep them
@@ -52,9 +52,9 @@ deterministic: fixed `Time.captureDeltaTime`, no real-time waits.
 Run on a physical device:
 
 - [ ] Cold start to Menu < 5 s
-- [ ] One full demo loop (Menu → Game → island reached → Pause → Menu)
+- [ ] One full demo loop (Menu → Game → drive the avatar → Pause → Menu)
 - [ ] App backgrounded 30 s, foregrounded - resumes cleanly
-- [ ] Airplane mode on - app behaves identically (no network in v0.2)
+- [ ] Airplane mode on - app behaves identically (no network)
 - [ ] Force-quit + relaunch + Continue - position restored
 - [ ] Profiler trace: meets [performance-budget.md](performance-budget.md)
 
@@ -75,7 +75,7 @@ Run on a physical device:
 
 In Editor: **Window → General → Test Runner**.
 
-Headless, as the agent runs them: [headless-unity.md §3](headless-unity.md#3-gates).
+Headless, as the agent runs them: `Tools/gates.sh edit` and `Tools/gates.sh play` ([headless-unity.md §3](headless-unity.md#3-gates)).
 PlayMode needs `xvfb-run` and `-force-vulkan`, not `-nographics`. Exit code is non-zero on any failure.
 
 ---

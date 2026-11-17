@@ -56,9 +56,12 @@ xvfb-run -a -s "-screen 0 1280x1024x24" "$EDITOR" -batchmode -force-vulkan \
 | `dev` APK | `Tools/build-android.sh dev`, itself under `xvfb-run -a` | `Build SUCCEEDED`; the APK under `UnitySetup/Build/dev/` |
 | Capture | `-executeMethod <Class.Method>` of an editor script that renders a camera to a PNG | the PNG looks right, and measures right where the change is visual |
 
+`Tools/gates.sh [compile|edit|play|all]` runs the first three gates this way and exits non-zero on any `error CS`, `warning CS` or failed test, naming the failed tests; logs and results go to `UnitySetup/Logs/gates/`.
+It uses the editor of the project's version and, on Linux, always `xvfb-run` when installed.
+
 `-runTests` must not be combined with `-quit`. A failing test's message is in the XML's `failure/message`.
 
-`build-android.sh` finds the editor under `~/Unity/Hub/Editor/` by itself; `UNITY_PATH` overrides it.
+`build-android.sh` takes the project's editor version under `~/Unity/Hub/Editor/`, or the newest one there; `UNITY_PATH` overrides it.
 To read the APK's id, label and ABI: `aapt2 dump badging <apk>`, with `aapt2` from the editor's `AndroidPlayer/SDK/build-tools/`.
 
 ---
@@ -71,13 +74,18 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 - A one-off migration lives in an `Editor` folder while it runs and is deleted before the commit; the plan log records what it did.
 - Read the YAML diff before committing: a change should touch what it meant to and nothing else.
 - After deleting an asset, check that nothing references its GUID: `git grep <guid>` over the project, excluding `.meta` files.
+- Rename a script or asset with its `.meta` (`git mv` both), so the GUID and every reference to it survive.
+- A renamed serialized field loses its value at the next save of each scene or prefab that set it. Add `[FormerlySerializedAs("oldName")]` before that save, or set the field again through `SerializedObject`.
+- A renamed class keeps its old name in each component's `m_EditorClassIdentifier`; `ForceReserializeAssets` does not refresh it. Set it through `SerializedObject.FindProperty("m_EditorClassIdentifier")`.
 
 ---
 
 ## 5. Pitfalls seen here
 
 - **First import of a fresh `Library/`** fails once inside the Shader Graph package (`error CS0246: 'GUID' could not be found`); Unity's API updater fixes it and the next run compiles. Expect it once per new clone.
-- **Do not copy `Library/` between clones.** A copied one compiled, then every scene component came up as "referenced script is missing" in PlayMode. Delete it and let Unity import (a few minutes).
+- **Do not copy `Library/` between clones, and delete it after moving the project folder.** A copied or moved one compiled and passed EditMode, then scene components came up as "referenced script is missing" in PlayMode. Delete it and let Unity import (a few minutes).
 - **An interrupted build** leaves `Assets/Resources/PerformanceTestRun*.json` behind (the performance test package's build step). Delete it; a finished build removes it itself.
 - **PlayMode tests that boot the game** must destroy the `DontDestroyOnLoad` `GameManager` in teardown (`PlayModeTestReset`), or the next test waits on the old instance.
-- **Animated shaders** (the water uses `_Time`) make two captures differ even with no change. Compare a change against a control pair of captures, not against zero.
+- **Animated shaders** (anything using `_Time`, such as a water shader) make two captures differ even with no change. Compare a change against a control pair of captures, not against zero.
+- **`DISPLAY` set but not usable**: a session over SSH can inherit `DISPLAY=:0` from a desktop it cannot open, and Unity then fails with "Error opening default X display". Run under `xvfb-run` regardless, as `gates.sh` does.
+- **A RAM-backed `/tmp`**: Ubuntu 25.10 and later mount `/tmp` as a tmpfs with a per-user quota. A project clone there fills RAM, and Unity's package import fails with error -122 (`EDQUOT`). Keep projects and their `Library/` on disk.

@@ -23,7 +23,7 @@ to navigate. Every file has one obvious place.
 │   ├── Scripts/
 │   │   ├── Core/             # Bootstrap, GameManager, SceneLoader
 │   │   ├── Systems/          # Input, Save, Audio, Logging
-│   │   ├── Gameplay/         # Ship, Camera
+│   │   ├── Gameplay/         # Avatar, Camera, the save payload
 │   │   ├── UI/               # UI controllers, view models
 │   │   └── Editor/           # Editor-only tools (own .asmdef)
 │   ├── Settings/             # URP assets, Input Actions, Quality settings
@@ -76,14 +76,14 @@ never depend on Gameplay or UI.
 - Suffix by role: `Controller`, `Manager`, `System`, `View`, `Settings`, `Data`.
 - Private fields: `_camelCase`. Serialized private fields: `[SerializeField] private T _name;`.
 
-**GameObjects:** Clear descriptive names (`Ship`, `MainCamera`, `UIRoot`).
+**GameObjects:** Clear descriptive names (`Avatar`, `MainCamera`, `UIRoot`).
 Never leave `GameObject (1)`.
 
 **Assets:**
 
-- Prefabs: `PF_Ship`, `PF_Island`
-- Materials: `M_Water`, `M_Hull`
-- Textures: `T_Hull_Albedo`, `T_Hull_Normal`
+- Prefabs: `PF_Avatar`
+- Materials: `M_Ground`
+- Textures: `T_Ground_Albedo`, `T_Ground_Normal`
 - Scenes: bare name (`Game.unity`)
 - Input Actions: `InputActions.inputactions`
 - ScriptableObject instances: `SO_<purpose>`
@@ -111,7 +111,7 @@ Never leave `GameObject (1)`.
 
 Use `ScriptableObject` for:
 
-- Static gameplay data (ship stats, camera tuning)
+- Static gameplay data (avatar tuning, camera tuning)
 - Cross-system references that should not live in scenes
 
 Do **not** use `ScriptableObject` for runtime mutable state.

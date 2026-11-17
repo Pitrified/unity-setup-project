@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This is the `unity-setup` Unity 6 mobile project (v0.2, private alpha).
+This is Unity Setup, a guide and starting point for Unity 6 mobile projects, with a placeholder sample over a generic runtime ([README.md](README.md)).
 
 The repo instructions, hard rules included, are in [.github/copilot-instructions.md](.github/copilot-instructions.md); `CLAUDE.md` imports the same file.
 They are not repeated here, so they cannot drift.
@@ -17,3 +17,4 @@ They are not repeated here, so they cannot drift.
 | 6 | [docs/coding-standards.md](docs/coding-standards.md) | C# style rules |
 | 7 | [docs/systems/](docs/systems/) | One spec file per runtime system |
 | 8 | [plans/](plans/) | Current work, one folder per feature |
+| - | [docs/bootstrap-new-project.md](docs/bootstrap-new-project.md) | When the task is starting a new project from this repo |

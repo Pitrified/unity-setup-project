@@ -2,7 +2,7 @@
 
 ## Overview
 
-Third-person chase camera. Follows the ship from a fixed offset with smoothing.
+Third-person chase camera. Follows the avatar from a fixed offset with smoothing.
 
 ---
 
@@ -44,7 +44,7 @@ void SnapToTarget()              // teleport, used after scene load
 
 ## Update rules
 
-- Runs in `LateUpdate` (after ship moves).
+- Runs in `LateUpdate` (after the avatar moves).
 - Interpolation uses `1 - Mathf.Exp(-k * dt)` for framerate-independent smoothing.
 - Caches `transform` once.
 
@@ -53,7 +53,7 @@ void SnapToTarget()              // teleport, used after scene load
 ## Interactions
 
 ### Uses
-- Target `Transform` (typically ShipController's transform)
+- Target `Transform` (the AvatarController's, set by `GameSceneWiring`)
 
 ### Used by
 - (Nothing - pure consumer)

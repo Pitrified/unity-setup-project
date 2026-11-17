@@ -20,9 +20,9 @@ making it public**. Use **Internal Testing** for fastest turnaround.
 
 | Track             | Max testers  | Approval delay | Use when                  |
 | ----------------- | ------------ | -------------- | ------------------------- |
-| **Internal**      | 100          | Minutes        | **Default for v0.2**      |
+| **Internal**      | 100          | Minutes        | **Default for a first alpha** |
 | Closed (Alpha)    | Larger lists | ~hours         | When > 100 testers needed |
-| Open              | Public       | Hours/days     | Not for v0.2              |
+| Open              | Public       | Hours/days     | Not for a first alpha     |
 
 ---
 
@@ -41,19 +41,19 @@ Play Console → **Create app**:
 
 These block AAB upload or rollout if missing:
 
-- [ ] **App access** - describe demo flow if any login (none for v0.2 → "All functionality available without restrictions")
+- [ ] **App access** - describe demo flow if any login (none for an offline game with no login → "All functionality available without restrictions")
 - [ ] **Ads** - declare No
 - [ ] **Content rating** - fill IARC questionnaire
 - [ ] **Target audience** - pick age group
 - [ ] **News app** - No
 - [ ] **COVID-19 contact tracing** - No
-- [ ] **Data safety** - declare what's collected (v0.2: nothing leaves device)
+- [ ] **Data safety** - declare what's collected (an offline game with no analytics: nothing leaves the device)
 - [ ] **Government app** - No
 - [ ] **Financial features** - No
 - [ ] **Health** - No
 - [ ] **Privacy policy URL**
 
-For v0.2 (offline, no analytics) the Data Safety form is short: *No data
+For an offline game with no analytics the Data Safety form is short: *No data
 collected, no data shared.* Keep this honest - adding analytics later requires
 updating the form.
 
@@ -118,7 +118,7 @@ Always strictly increasing `versionCode`. Once uploaded, a versionCode cannot be
 
 - Listed as **(Unreleased)** on their Play Store page - fine.
 - Can leave private feedback via the opt-in page.
-- If they uninstall and reinstall, position/save is **gone** (local-only persistence in v0.2).
+- If they uninstall and reinstall, position/save is **gone** (local-only persistence).
 
 ---
 

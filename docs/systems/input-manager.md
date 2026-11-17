@@ -50,8 +50,8 @@ void SetEnabled(bool enabled); // disabled during scene transitions
 
 - Deadzone radius `0.15` on the Move stick.
 - After deadzone, remap magnitude to `[0, 1]`.
-- Clamp throttle to `[-1, +1]`; v0.2 may clamp negative throttle to a small
-  reverse factor (configurable in ShipController, not here).
+- Clamp throttle to `[-1, +1]`; the reverse factor on negative throttle is the
+  avatar's (`SO_AvatarTuning`), not here.
 
 ---
 
@@ -61,7 +61,7 @@ void SetEnabled(bool enabled); // disabled during scene transitions
 - Unity Input System (`PlayerInput` or direct `InputAction` asset)
 
 ### Used by
-- ShipController
+- AvatarController
 - GameManager (pause)
 - UI Toolkit input (does not need to query InputManager directly)
 
@@ -70,5 +70,5 @@ void SetEnabled(bool enabled); // disabled during scene transitions
 ## Constraints
 
 - No gameplay logic.
-- No direct references to ship, camera, or UI.
+- No direct references to the avatar, camera, or UI.
 - No allocations in `GetMovementInput()` (called every frame).

@@ -15,10 +15,10 @@ Follow this exactly.
 
 ## 2. Commits
 
-- Imperative mood: "Add ship throttle clamp".
+- Imperative mood: "Add avatar throttle clamp".
 - Subject ≤ 72 chars. Body wrapped at 80 if present.
 - One logical change per commit. AI-generated diffs are split if they cross systems.
-- Reference docs by path: `Per docs/systems/ship-controller.md, ...`.
+- Reference docs by path: `Per docs/systems/avatar-controller.md, ...`.
 
 ---
 

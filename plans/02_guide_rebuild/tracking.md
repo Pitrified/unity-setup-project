@@ -19,7 +19,7 @@ From `00_start.md` Q1 to Q10, 2026-11-17, all as recommended:
 | 01 | Neutral sample           | [`01_sample.md`](01_sample.md)           | done    |
 | 02 | Folder and names         | [`02_rename.md`](02_rename.md)           | done    |
 | 03 | Template review          | [`03_template.md`](03_template.md)       | done    |
-| 04 | Docs                     | [`04_docs.md`](04_docs.md)               | planned |
+| 04 | Docs                     | [`04_docs.md`](04_docs.md)               | done    |
 | 05 | Verify                   | [`05_verify.md`](05_verify.md)           | planned |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
@@ -33,3 +33,4 @@ Append-only. Newest at the bottom.
 - 2026-11-17 : phase 01 - the ship slice became a capsule avatar on a ground plane, island and water assets removed, save schema v3. EditMode 114/114, PlayMode 4/4, 0 warnings.
 - 2026-11-17 : phase 02 - `UnitySetup/`, `unity-setup` names. A moved project folder needs a fresh `Library/` (PlayMode failed 2/4 on the moved one). EditMode 114/114, PlayMode 4/4, `dev` APK `com.pitrified.unitysetup`.
 - 2026-11-17 : phase 03 - hook fixed (two bugs seen first), `Tools/gates.sh`, setup and build scripts use the project's editor version, fonts in LFS; the same in artificial-pirate on `fix/template_from_guide` (`f6c487e`).
+- 2026-11-17 : phase 04 - root README with the pattern index, `bootstrap-new-project.md`, the sample's spec and systems docs, generic release docs, `gates.sh` and new pitfalls in `headless-unity.md`, template deleted. Link check back to the 8 old diary links.

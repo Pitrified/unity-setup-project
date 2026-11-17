@@ -1,6 +1,7 @@
-# Project: unity-setup (Unity 6, mobile)
+# Project: Unity Setup (Unity 6, mobile guide)
 
 Canonical instructions for agents working in this repo, imported by `CLAUDE.md`.
+This repo is a guide: a generic runtime with a placeholder sample, docs, and links to projects that use it. A new project copies this file and adapts it ([`docs/bootstrap-new-project.md`](../docs/bootstrap-new-project.md)).
 The file keeps its Copilot name for consistency with the other repos; it is written for Claude Code.
 
 ## Source of truth
@@ -24,7 +25,7 @@ New work is planned in `plans/NN_name/`, in the shape the `tracked-development` 
 
 ## Gates
 
-Every change closes on the gates in `docs/headless-unity.md` §3, run by the agent in batch mode:
+Every change closes on the gates in `docs/headless-unity.md` §3, run by the agent in batch mode (`Tools/gates.sh all` for the first three):
 compile with 0 errors and 0 warnings, EditMode and PlayMode tests green, the `dev` APK for build-affecting changes, a capture for visual ones.
 Results go in the commit message. The device run is the human's.
 

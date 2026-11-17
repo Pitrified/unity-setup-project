@@ -10,7 +10,7 @@ gather additional context before implementing (eg, review relevant docs, load mc
 
 | Task | Doc reference |
 | --- | ----- |
-| Ship controller | [systems/ship-controller.md](../docs/systems/ship-controller.md) |
+| Ship controller | [systems/ship-controller.md](https://github.com/Pitrified/unity-setup-project/blob/8b521a7/docs/systems/ship-controller.md) |
 | Camera controller | [systems/camera-controller.md](../docs/systems/camera-controller.md) |
 | Coding rules | [coding-standards.md](../docs/coding-standards.md) |
 | Project layout / asmdef | [project-structure.md](../docs/project-structure.md) |

@@ -61,7 +61,7 @@ In this project the payload is `Game.Gameplay.GameSaveData`.
 
 ### Used by
 - GameManager (save on pause/quit, load on Continue)
-- The payload type and its version are the game's (`GameSaveData` in `Game.Gameplay`, filled from the ship's state by GameManager)
+- The payload type and its version are the game's (`GameSaveData` in `Game.Gameplay`, filled from the avatar's state by GameManager)
 
 ---
 

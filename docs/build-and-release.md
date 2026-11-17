@@ -268,25 +268,17 @@ adb logcat -s Unity:V            # show only Unity log lines, verbose level
 
 **Terminal 2 - Launch the app:**
 
-First, confirm the exact package name that was installed:
+The package name is `applicationIdentifier` > Android in `ProjectSettings/ProjectSettings.asset`: `com.pitrified.unitysetup` for the guide's sample.
+A new project sets its own before its first build ([bootstrap-new-project.md](bootstrap-new-project.md)); it is permanent once a build is on Play. Confirm it is installed:
 ```bash
-adb shell pm list packages | grep -i unity
-# Example output:
-#   package:com.UnityTechnologies.com.unity.template.urpblank
-#
-# The package name matches applicationIdentifier > Android in
-# ProjectSettings/ProjectSettings.asset (grep "applicationIdentifier" to read it).
-# Before publishing, change it in Edit -> Project Settings -> Player -> Other
-# Settings -> Package Name to your real reverse-DNS name (e.g. com.myorg.artificialpi).
+adb shell pm list packages | grep unitysetup
+# package:com.pitrified.unitysetup
 ```
 
-Then launch with the confirmed package name:
+Then launch it:
 ```bash
 adb shell am start \
-    -n <your-package-name>/com.unity3d.player.UnityPlayerGameActivity
-# Example with the default template name:
-#   adb shell am start \
-#       -n com.UnityTechnologies.com.unity.template.urpblank/com.unity3d.player.UnityPlayerGameActivity
+    -n com.pitrified.unitysetup/com.unity3d.player.UnityPlayerGameActivity
 ```
 
 The activity class is always `com.unity3d.player.UnityPlayerGameActivity` in Unity 6.
@@ -312,11 +304,11 @@ E Unity   : GameManager not found    <- Persistent scene wiring broken
 
 **Test the demo loop manually:**
 1. Tap Play on the Menu screen.
-2. Drive the ship using the on-screen stick.
+2. Drive the avatar using the on-screen stick.
 3. Tap the pause button; confirm the pause overlay appears.
-4. Tap Resume; ship is in the same spot.
+4. Tap Resume; the avatar is in the same spot.
 5. Tap Return to Menu; Menu appears.
-6. Tap Continue; ship is back where you left it.
+6. Tap Continue; the avatar is back where you left it.
 
-No errors in `adb logcat` throughout = Phase 8 complete.
+No errors in `adb logcat` throughout: the build is good.
 

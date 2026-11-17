@@ -1,14 +1,16 @@
-# Project Functional & Technical Specification - v0.2
+# Sample Functional & Technical Specification
 
-> **Status:** Source of truth. Any feature not here is out of scope.
+> **Status:** Source of truth for the guide's sample. Any feature not here is out of scope.
 > **Audience:** Humans + AI agents. Read before generating any code.
+> **For a new project:** keep the shape (locked decisions, lifecycle, scenes, save schema, definition of done) and replace the content; [bootstrap-new-project.md](bootstrap-new-project.md) says when.
 
 ---
 
 ## 1. Overview
 
-A 3D mobile game where the player controls a ship navigating a sea environment.
-This version delivers a **minimal, stable, extensible vertical slice**.
+The guide's sample: a placeholder avatar (a capsule) that the player drives across a ground plane, followed by a chase camera.
+It exists to exercise the generic runtime (boot, scenes, input, save, pause, UI, audio, logging) on a real device, not as a game.
+Patterns from real games built on this runtime are linked from the [root README](../README.md).
 
 Priorities (in order):
 
@@ -29,12 +31,11 @@ Priorities (in order):
 | Backend        | **IL2CPP**, ARM64 only                    | Required for Play Store, best perf     |
 | Input          | **Unity Input System** (`com.unity.inputsystem`) | Future-proof, abstraction-friendly |
 | Movement       | **Kinematic / arcade**                    | Deterministic, no physics instability  |
-| Water          | **Custom URP shader (stylized)**          | Avoid simulation cost                  |
 | Camera         | **Third-person chase**                    | Mobile-friendly, no free look          |
 | Orientation    | **Landscape only (locked)**               | Single layout to design for            |
 | Scenes         | **Multi-scene additive + persistent root** | Clean lifetime separation             |
 | Save           | **JSON file in `Application.persistentDataPath`** | Inspectable, portable           |
-| Build trigger  | **Local script (manual)**                 | No CI in v0.2                          |
+| Build trigger  | **Local script (manual)**                 | No CI                                 |
 
 Anything not listed here is **not decided**; do not introduce silent defaults.
 
@@ -82,11 +83,11 @@ Ownership rules:
 | `Boot`       | Single    | First frame only      | `GameBootstrap` only                   |
 | `Persistent` | Additive  | Whole session         | GameManager, Input, Save, Audio, UIRoot |
 | `Menu`       | Single    | While in menu         | Main menu UI                           |
-| `Game`       | Additive  | While playing         | Ship, sea, island, GameCamera          |
+| `Game`       | Additive  | While playing         | Avatar, ground plane, GameCamera       |
 
 ---
 
-## 6. Game Systems (v0.2)
+## 6. Systems
 
 Each system has a dedicated spec under [systems/](systems/).
 
@@ -96,7 +97,7 @@ Each system has a dedicated spec under [systems/](systems/).
 | [game-manager](systems/game-manager.md)           | State machine, scene coordination      |
 | [scene-loader](systems/scene-loader.md)           | Async additive load/unload             |
 | [input-manager](systems/input-manager.md)         | Input abstraction                      |
-| [ship-controller](systems/ship-controller.md)     | Kinematic player movement              |
+| [avatar-controller](systems/avatar-controller.md) | Kinematic player movement              |
 | [camera-controller](systems/camera-controller.md) | Third-person chase camera              |
 | [save-system](systems/save-system.md)             | JSON persistence                       |
 | [audio-manager](systems/audio-manager.md)         | Music + SFX channels                   |
@@ -105,19 +106,19 @@ Each system has a dedicated spec under [systems/](systems/).
 
 ---
 
-## 7. Controls (v0.2)
+## 7. Controls
 
 | Action     | Touch                              | Editor (keyboard)        |
 | ---------- | ---------------------------------- | ------------------------ |
-| Throttle   | Right-side virtual stick (Y axis)  | `W` / `S`                |
-| Steering   | Right-side virtual stick (X axis)  | `A` / `D`                |
+| Forward / back | Right-side virtual stick (Y axis) | `W` / `S`               |
+| Turn       | Right-side virtual stick (X axis)  | `A` / `D`                |
 | Pause      | Top-left button                    | `Esc`                    |
 
-Single virtual stick is sufficient for v0.2; no twin-stick.
+Single virtual stick is sufficient; no twin-stick.
 
 ---
 
-## 8. UI Surfaces (v0.2)
+## 8. UI Surfaces
 
 - Loading screen (cancel-safe, deterministic min duration 0.5 s to avoid flash)
 - Main menu: **Play**, **Continue** (if save exists), **Quit**
@@ -127,28 +128,28 @@ Single virtual stick is sufficient for v0.2; no twin-stick.
 
 ---
 
-## 9. Persistence (v0.1 schema)
+## 9. Persistence
 
 Stored as `save.json` in `Application.persistentDataPath`:
 
 ```json
 {
-  "version": 2,
+  "version": 3,
   "lastSavedUtc": "2026-04-28T12:00:00Z",
   "payload": {
-    "ship": { "x": 0.0, "y": 0.0, "z": 0.0, "yawDeg": 0.0 }
+    "avatar": { "x": 0.0, "y": 1.0, "z": 0.0, "yawDeg": 0.0 }
   }
 }
 ```
 
 `version` and `lastSavedUtc` are written by the save system; `payload` is `GameSaveData` and `version` is its `CurrentVersion`.
-Version 1 had `ship` at the top level; a version 1 file is reset.
+Version 1 had a `ship` section at the top level and version 2 had it inside `payload`, from when the sample was a ship; a file of either version is reset.
 
 Rules:
 
 - Atomic write: write to `save.json.tmp`, then rename.
 - On unreadable/corrupt file: rename to `save.json.bak`, start fresh, log warning.
-- `version` field is mandatory; mismatched versions trigger reset (no migration in v0.2).
+- `version` field is mandatory; mismatched versions trigger reset (no migration).
 
 ---
 
@@ -184,8 +185,7 @@ The build is demo-ready when **all** of these hold:
 
 - [ ] Cold start to Menu < 5 s on Pixel 7
 - [ ] Menu → Game → Menu loop works repeatedly without leaks
-- [ ] Ship is controllable via touch
-- [ ] Island is reachable
+- [ ] Avatar is controllable via touch
 - [ ] Pause → Resume works
 - [ ] Pause → Menu unloads Game cleanly
 - [ ] Quit + relaunch + Continue restores last position
@@ -198,17 +198,17 @@ The build is demo-ready when **all** of these hold:
 
 1. **M0** - Repo + Unity project + LFS configured, opens cleanly
 2. **M1** - Bootstrap → Menu → empty Game loop runs in editor
-3. **M2** - Ship moves, camera follows, water visible
+3. **M2** - Avatar moves, camera follows
 4. **M3** - Save/load works across sessions
 5. **M4** - First Android device build runs
 6. **M5** - Internal Testing track on Play Console with ≥1 external tester
 
 ---
 
-## 14. Out of Scope for v0.2
+## 14. Out of Scope
 
-Multiplayer · Combat · Realistic water physics · Economy/progression · Cloud
+Multiplayer · Combat · Physics-driven movement · Economy/progression · Cloud
 save · IAP · Ads · Analytics · Localization · Accessibility settings · Controller
 support · Tablets/foldables special layouts.
 
-These are **not** "later"; they are **not allowed to leak** into v0.2 code.
+These are **not** "later"; they are **not allowed to leak** into the sample's code.

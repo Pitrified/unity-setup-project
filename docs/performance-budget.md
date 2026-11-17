@@ -1,7 +1,7 @@
 # Performance Budget
 
 Reference device: **Pixel 7** (mid-range Android, 2022). All numbers are
-targets for v0.2 and tested on-device, not in editor.
+targets for a first release and tested on-device, not in editor.
 
 ---
 
@@ -28,7 +28,7 @@ targets for v0.2 and tested on-device, not in editor.
 | Draw calls              | ≤ 80                  |                          |
 | Tris on screen          | ≤ 150 k               |                          |
 | Real-time lights        | 1 directional         | No additional realtime   |
-| Real-time shadows       | Off in v0.2           | Baked or none            |
+| Real-time shadows       | Off by default        | Baked or none            |
 | Post-processing         | None / minimal        | Color grading at most    |
 
 URP asset (mobile profile) lives in `Assets/Settings/`. Only one URP asset is shipped.
@@ -93,7 +93,7 @@ Tools to standardize on:
 ## 7. Optimization order (when over budget)
 
 1. Reduce draw calls (batching, atlasing, mesh combine).
-2. Reduce overdraw (water plane culling, transparent UI count).
+2. Reduce overdraw (large transparent surfaces, transparent UI count).
 3. Reduce texture memory (lower max size, ASTC block size).
 4. Reduce shader cost (shader graph variants → keyword pruning).
 5. Reduce script CPU (remove allocations, cache lookups).

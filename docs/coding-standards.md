@@ -22,7 +22,7 @@ this doc disagrees with it.
 
 | Construct           | Convention            | Example          |
 | ------------------- | --------------------- | ---------------- |
-| Types, methods      | `PascalCase`          | `ShipController` |
+| Types, methods      | `PascalCase`          | `AvatarController` |
 | Public fields/props | `PascalCase`          | `MaxSpeed`       |
 | Private fields      | `_camelCase`          | `_velocity`      |
 | Locals, params      | `camelCase`           | `throttleInput`  |

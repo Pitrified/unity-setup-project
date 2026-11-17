@@ -104,7 +104,7 @@ event Action<GameState, GameState> StateChanged;   // (previous, next)
 
 ## Constraints
 
-- **No gameplay logic.** No ship, camera, or world references.
+- **No gameplay logic.** One gameplay reference, by design: the avatar it saves and restores (`RegisterAvatar`), since `Game.Core` is the composition root. No camera or world references.
 - **No direct scene API calls.** Everything through SceneLoader.
 - Deterministic state machine: each transition is a single method.
 - No `Update` work beyond polling pause input.
