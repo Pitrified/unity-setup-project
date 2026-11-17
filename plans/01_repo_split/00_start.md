@@ -1,6 +1,6 @@
 ---
-status: in progress
-priority: 1
+status: done
+priority: 0
 description: |
   Split artificial-pi, the naval game, out of this repo into its own repo, artificial-pirate,
   written by a Claude session from a plan and the audit. This repo becomes the Unity guide:
