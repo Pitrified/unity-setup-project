@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 04 - Review the docs and the AI workflow before duplicating
@@ -76,3 +76,4 @@ That was true then, since nothing could compile or test without a person at the 
 - Item 9: Unity `6000.4` is a Supported Update release, not LTS; 6.3 is the current LTS (supported to December 2027) and 6.5 and 6.6 are out, so 6.4 is likely past its support window. The docs that stated "6.4 LTS" or "Unity 6 LTS" as fact now give the version; `functional-specs.md` still says "Unity 6 LTS (6000.0.x)", since the spec is the user's to change. Raised as `00_start.md` Q16.
 - Verification: the compile and PlayMode commands copied verbatim from `headless-unity.md`, run from the repo root, exit 0 with no warnings and 4/4. The done-when's "fresh Claude Code session finds the gates from the docs alone" has not been run: it needs a separate session.
 - `coverage.py` reported the phase 03 `drop` rows as matching nothing; it now counts those as already removed and still fails on any other empty pattern (seen failing on a misspelt copy).
+- 2026-11-17, closed by the user: the verbatim run of the `headless-unity.md` commands from the repo root is accepted in place of a separate fresh session.
