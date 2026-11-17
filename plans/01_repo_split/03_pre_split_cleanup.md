@@ -19,7 +19,7 @@ Context: after [`02_audit.md`](02_audit.md).
 
 - Drop the template leftovers the GUID report shows unreferenced (Q10): `Assets/TutorialInfo/`, `Assets/Readme.asset`, `SampleScene.unity`, `SampleSceneProfile.asset`, with their `.meta` files.
 - Pin `com.coplaydev.unity-mcp` to the commit `packages-lock.json` records (Q11).
-- Set `companyName`, `productName` and `applicationIdentifier` in `ProjectSettings.asset` for the guide (Q8). Edited in the Editor, not by hand, so Unity writes the rest of the file consistently.
+- Set `companyName`, `productName` and `applicationIdentifier` in `ProjectSettings.asset` for the guide (Q8). Set by Unity, not by hand, so it writes the rest of the file consistently: a `PlayerSettings` call from a batch-mode editor method on the box.
 - If Q9 is a: make `SaveSystem` store a versioned payload whose game section is owned by `Game.Gameplay`; update `SaveSystemTests`, `GameManager` and `SaveRestoreTests`.
 - Anything else the audit lists as dead.
 
@@ -29,8 +29,8 @@ Context: after [`02_audit.md`](02_audit.md).
 
 ## Done when
 
-- HUMAN: the Editor opens with 0 errors and 0 warnings, EditMode and PlayMode tests all green in the Test Runner.
-- HUMAN: Boot, Menu, Game, Pause, Resume, Menu, Continue restores the ship, in Play mode.
+- On the box, in batch mode: the project compiles with 0 errors and 0 warnings, EditMode tests green, PlayMode tests green under `xvfb-run ... -force-vulkan`.
+  The PlayMode tests cover Boot, Menu, Game, Pause, Resume, Menu, Continue restoring the ship.
 - The GUID script reports no dangling references.
 
 ## What the implementation found

@@ -21,12 +21,12 @@ Written into the new repo as `plans/01_bootstrap/` with these phases:
 
 - **Baseline.** `git archive` of this repo's `main` at the commit after phase 03, the rows marked `pirate` and `both`. Pull LFS objects first so no pointer file is copied. Name the source commit in the bootstrap `00_start.md`.
 - **Renames** (Q2, Q7, Q8): project folder, `productName`, `applicationIdentifier`, `artificial-pi` to `artificial-pirate` in docs, scripts and `~/.config/<name>/build.env`. `ProjectSettings.asset` edited in the Editor.
-- **Docs.** README, `CLAUDE.md`, instructions and `AGENTS.md` about the game. Generic docs that stay in the guide (AI playbook, MCP guides, dev environment from zero) become links to it on GitHub. A fresh-session note: what a session on a box without Unity can and cannot do.
+- **Docs.** README, `CLAUDE.md`, instructions and `AGENTS.md` about the game. Generic docs that stay in the guide (AI playbook, MCP guides, dev environment from zero) become links to it on GitHub. A fresh-session note: how a session runs Unity headless (batch mode, `xvfb-run ... -force-vulkan` to render) and what stays with a person.
 - **Plans.** Folders from `docs/tracking.md` phases 9 to 13 (Q12), numbered from 02, each linking its source.
 - **Verify.**
   - Link check passes.
-  - HUMAN: clone fresh on the workstation, `git lfs ls-files` lists the binaries, `Tools/setup.sh` runs, the Editor opens with 0 errors and 0 warnings, tests green.
-  - HUMAN: `Tools/build-android.sh dev` builds, the APK installs next to any build from this repo (different id), and the vertical slice plays on the device.
+  - On the box, from a fresh clone: `git lfs ls-files` lists the binaries, `Tools/setup.sh` runs, the project compiles with 0 errors and 0 warnings, EditMode and PlayMode tests green, `Tools/build-android.sh dev` builds with the new id.
+  - HUMAN: the APK installs next to any build from this repo (different id), and the vertical slice plays on the device.
 
 ## Out of scope
 

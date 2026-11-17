@@ -77,20 +77,22 @@ and plan briefs such as `plans/74_zucchetti/00_start.md` (a numbered "what right
 ## Headless
 
 The user's condition on accepting Q1 to Q5 (2026-11-14): the whole method runs headless, with no person at a GUI inside the loop.
-What a search found on 2026-11-14, not yet tried here:
+A search on 2026-11-14 gave the expected answers; the install on 2026-11-17 tried them on the box (box note `~/repos/plans/2026-11-17_00_unity_editor_headless.md`).
+The condition is met.
 
-- **Blender**: `bpy` from PyPI is a Python module with no window. Builders, the probe render, the FBX export and the measuring all run on the box. Settled.
-- **Unity import, tests and checks**: `-batchmode -executeMethod` and `-runTests` need no window and render nothing. The axis and scale check is an EditMode test on the imported mesh's bounds, not a look in the Editor.
-- **Unity capture**: rendering needs a graphics context. With `-nographics` frames come back black. The reported way is `xvfb-run -a Unity -batchmode ...` without `-nographics`, which gives the Editor a virtual X display; older reports needed `-force-opengl` under Xvfb. Nothing found confirms it for Unity 6, so the spike proves it first.
-  Sources: [Unity issue tracker, Camera.Render in batch mode](https://issuetracker.unity3d.com/issues/calling-camera-dot-render-in-headless-mode-batchmode-causes-the-scene-slash-time-to-halt), [Unity forum, Linux headless](https://forum.unity.com/threads/linux-headless-binary-does-not-work.705197/), [Unity 5.3 batchmode on headless Linux](https://discussions.unity.com/t/unity-5-3-seems-to-break-batchmode-nographics-on-headless-linux/610316).
-- **The licence**: a Personal licence has no serial, so it cannot be activated from the command line. It is activated once in Unity Hub on the machine that will run Unity, which writes `~/.local/share/unity3d/Unity/Unity_lic.ulf`; batch mode then reads that file. One GUI step at setup, none per run. The file is bound to the machine.
-  Sources: [Unity manual, managing your licence](https://docs.unity3d.com/2022.2/Documentation/Manual/ManagingYourUnityLicense.html), [GameCI activation](https://game.ci/docs/github/activation).
-- **Where Unity runs**: on this box (Q6), installed by a box-level plan note before the spike. Until then the box has no Unity.
+- **Blender**: `bpy` from PyPI is a Python module with no window. Builders, the probe render, the FBX export and the measuring all run on the box. Settled by construction; the spike runs the first builder.
+- **Unity import, tests and checks**: verified. `-batchmode -nographics -runTests -testPlatform EditMode` ran 114 of 114 tests with no display. The axis and scale check is an EditMode test on the imported mesh's bounds, not a look in the Editor.
+- **Unity capture**: verified with a scratch editor method that renders a cube through a camera into a PNG.
+  - With no X display the editor does not start at all, even in batch mode (`Error opening default X display`), so Xvfb is needed for any run that renders.
+  - `xvfb-run -a -s "-screen 0 1280x1024x24" Unity -batchmode ...` renders, but on Mesa `llvmpipe` (OpenGL Core on the CPU).
+  - Adding `-force-vulkan` renders on the Quadro RTX 3000 (NVIDIA 595.99.02). **The capture command is `xvfb-run ... Unity -batchmode -force-vulkan -executeMethod ...`**, without `-nographics`. PlayMode tests run the same way, 3 of 3.
+- **The licence**: activated once from the terminal, with no GUI: the user ran `unity auth login` and `unity license activate --personal --accept-eula` (Unity CLI 1.0.1). The 2026-11-14 finding that Personal needs the Hub is out of date. Batch runs log `[Licensing::Module] Error: Access token is unavailable` and work regardless.
+- **Where Unity runs**: on this box (Q6), installed 2026-11-17: Unity 6000.4.4f1 at `~/Unity/Hub/Editor/6000.4.4f1/`, with the Android module.
 
 ## Proposed shape, for when it is picked up
 
-0. **Prerequisite, outside this folder**: Unity and Xvfb on the box, by a box-level plan note, approved before running (Q6).
-1. **Pipeline spike, headless end to end**: one trivial builder (a barrel) on the box, FBX into the guide's Unity project, a batch-mode import and an EditMode test of its axes and scale, and one capture under `xvfb-run` through the editor method. Proves the round trip, and that the capture works without a display, before any method is written down. If the capture does not work headless, the spike stops and reports, since the user's condition is not met.
+0. **Prerequisite, outside this folder**: Unity and Xvfb on the box, by a box-level plan note (Q6). Done 2026-11-17; a headless capture already works (see "Headless").
+1. **Pipeline spike, headless end to end**: one trivial builder (a barrel) on the box, FBX into the guide's Unity project, a batch-mode import and an EditMode test of its axes and scale, and one capture of the barrel in the game scene under `xvfb-run ... -force-vulkan` through the editor method. Proves the round trip before any method is written down.
 2. **Method doc and skill**: `docs/building_assets.md` in the guide, the skill and its measure script, the credits record format.
 3. **First real object**, proving the loop end to end against a photograph.
 
@@ -136,3 +138,4 @@ What a search found on 2026-11-14, not yet tried here:
     - The box runs Ubuntu 26.04. Unity's supported Linux list for the 6000.x editors has named older Ubuntu LTS releases, so the editor may run unsupported here. The note checks the current list, and the spike's first result says whether it runs.
     - The editor version is the project's, `6000.4.4f1`, with the Android module (SDK, NDK, OpenJDK) so device builds run here too: the user, 2026-11-17.
     - The Personal licence is activated once in Unity Hub on this box, which needs a GUI once (X forwarding over the SSH session, or a temporary VNC). The resulting licence file is tied to the user's Unity account and lives on a box otherwise kept free of such credentials: the user's call. The note says where the file is and how to revoke it (return the licence from the Hub, or remove the activation from the Unity account).
+    - Done 2026-11-17, and simpler than the above: no Hub and no GUI, the licence was activated from the terminal with the Unity CLI. Results in "Headless".

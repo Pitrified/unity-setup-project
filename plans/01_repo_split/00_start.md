@@ -43,8 +43,12 @@ Both halves are real:
 - Unity `6000.4.4f1`. `applicationIdentifier` is still the Unity template default (`com.UnityTechnologies.com.unity.template.urpblank`), `productName` is `UnitySetupPrpj`, `companyName` is `DefaultCompany`. Nothing has been uploaded to Play, so the id is still free to choose.
 - `Packages/manifest.json` takes the MCP package from `CoplayDev/unity-mcp.git#main`, not pinned, which `docs/mcp-setup.md` and the hard rules ask for.
 - The plans live in `docs/tracking.md` (a checklist by phase) and `scratch/scratch-pad-phNN.md` (per-phase working notes). There is no `plans/` folder before this one.
-- This box has no Unity Editor. Opening the project, the Test Runner and Android builds happen on the workstation with Unity installed.
-  A session here can move files, edit text and C#, and check links; it cannot compile or run anything Unity.
+- This box had no Unity Editor when this was read.
+  Since 2026-11-17 it has Unity 6000.4.4f1 with the Android module, licensed, run headless (box note `~/repos/plans/2026-11-17_00_unity_editor_headless.md`).
+  A session here compiles the project, runs the EditMode and PlayMode tests and builds the `dev` APK in batch mode; rendering needs `xvfb-run ... -batchmode -force-vulkan`.
+  What stays with a person: installing and playing the APK on a device, and anything judged by eye in the Editor.
+- Two repo bugs found by the first run here, fixed on this branch 2026-11-17:
+  `Tools/build-android.sh` never auto-detected the editor (it wrote NUL separators with `echo -n "$p"$'\0'`, which a bash string cannot hold, so it only worked with `UNITY_PATH` set), and `GameBootstrap.cs` raised CS4014 on the fire-and-forget `UnloadSceneAsync`, now an explicit discard.
 
 ## Couplings found while reading
 
@@ -59,12 +63,14 @@ Both halves are real:
 - **Clean before duplicating.** Dead code, template leftovers and couplings are fixed here, once, before the copy.
 - **The new repo is written from a plan that lives in it**, `plans/01_bootstrap/`, numbered from 01.
 - **The guide clean-up is its own feature.** In flutter it started as phase 05 and was superseded by a separate folder. Here it is a draft folder from the start, [`02_guide_rebuild`](../02_guide_rebuild/00_start.md), and this folder ends when the game runs from its own repo.
-- **A fresh-session note** in the new repo saying what to install. Here the note has to say plainly that a headless session cannot run Unity.
+- **A fresh-session note** in the new repo saying what to install. Here the note says how a headless session runs Unity (batch mode, Xvfb and Vulkan for rendering) and what stays with a person.
 
 ## What is different from flutter
 
 - **Assets cannot be rewritten from scratch.** Scenes, prefabs, materials and asmdefs reference each other by the GUIDs in `.meta` files. "Written, not extracted" can only apply to code and docs; the Unity project folder is copied with its `.meta` files intact.
-- **No headless gates.** Flutter had `scripts/check.sh` and CI. Here the gates are human: Editor opens with 0 errors and 0 warnings, Test Runner green, APK on the device. Every phase that changes Unity files has a HUMAN step to close it.
+- **Gates in batch mode on the box, no CI.** Flutter had `scripts/check.sh` and CI.
+  Here a session on the box closes a phase that changes Unity files with: the project compiles with 0 errors and 0 warnings, EditMode and PlayMode tests green, and where it matters the `dev` APK builds.
+  The device run stays a HUMAN step. (Until 2026-11-17 every gate here was human; the box had no Unity.)
 - **LFS.** The copy has to carry LFS objects, not pointer files. The new repo needs `git lfs install` and its own `.gitattributes`, and the push uploads the objects.
 - **The plans convention is new to this repo.** Phase 01 adopts `plans/` here; the old `docs/tracking.md` and `scratch/` stay as history until the guide rebuild decides their place.
 
@@ -132,6 +138,7 @@ The guide rebuild follows in `02_guide_rebuild`.
   - a. fix here before duplicating: the save system stores a generic payload (versioned JSON with a game-owned section type), the ship section lives in `Game.Gameplay`. Both repos start from the clean shape.
   - b. leave it; the new repo keeps it as is and the guide fixes its own copy in `02_guide_rebuild`.
   - Recommended: b, against the flutter precedent. The fix touches the save system, its tests, `GameManager` and the PlayMode restore test, and none of it can be compiled here; doing it in the game repo first and lifting it to the guide later is one Unity session instead of two. Choose a if you will be at the workstation for phase 03 anyway.
+  - Update 2026-11-17: the box now compiles and runs the tests, so the reason for b (no compile here, one Unity session instead of two) no longer holds. Recommended now: a, the flutter precedent, both repos start from the clean shape.
   - NEW_ANS:
 - Q10: Unity template leftovers: `Assets/TutorialInfo/`, `Assets/Readme.asset`, `Assets/Scenes/SampleScene.unity`, `Assets/Settings/SampleSceneProfile.asset`.
   - Recommended: drop them in phase 03 if the audit finds no reference to their GUIDs; this also removes the only LFS file.
@@ -148,4 +155,5 @@ The guide rebuild follows in `02_guide_rebuild`.
   - a. the file work (copy, renames, docs, plans) in a session on this box; you push from g4, open the project on the workstation, run the Test Runner and build the APK.
   - b. the whole phase in a session on the workstation, with Unity MCP, so the session can read the console and run tests itself.
   - Recommended: a for the copy and text, then a short session on the workstation for any compile fix. The rename is mechanical; the Unity checks are yours either way.
+  - Update 2026-11-17: with Unity on the box, a covers the compile, the tests and the `dev` APK too; what is left to you is the push from g4 and the device run. Recommended now: a, with those two as the only HUMAN steps.
   - NEW_ANS:
