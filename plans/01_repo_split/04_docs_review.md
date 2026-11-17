@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 ---
 
 # Phase 04 - Review the docs and the AI workflow before duplicating
@@ -66,3 +66,13 @@ That was true then, since nothing could compile or test without a person at the 
 - A fresh Claude Code session on the box, given only the repo, finds the gates and runs them (EditMode, PlayMode, `dev` APK) from the docs alone.
 
 ## What the implementation found
+
+- 2026-11-17, `2425e1f`. Items 1 to 8 changed as planned; 9 (LTS) only where a doc states a fact, see below.
+- `docs/headless-unity.md` is new: the single place for the batch-mode command, the gate table and the pitfalls; the playbook, testing strategy and instructions point at it rather than repeating commands.
+- `AGENTS.md` repeated the hard rules and had drifted from the instructions file (it still said "touch only files explicitly listed"); it now points at the instructions file instead.
+- `unity-mcp-guide.md` merged into `mcp-setup.md` and removed: two MCP docs, one recommending a server that is not installed (`justinpbarnett/unity-mcp`) and a `.vscode/mcp.json` that never existed. The May comparison of three servers stays in git history.
+- `unity-mcp-best-practices.md` is not split after all: its AudioMixer notes are about `MainMixer`, which is the generic `AudioManager`'s (`both`), not the game's.
+- `dev-environment-setup.md` described an editor helper, **Tools → Load Persistent Scene**, that does not exist (no `MenuItem` in the project), and an APK path the script does not produce; both fixed.
+- Item 9: Unity `6000.4` is a Supported Update release, not LTS; 6.3 is the current LTS (supported to December 2027) and 6.5 and 6.6 are out, so 6.4 is likely past its support window. The docs that stated "6.4 LTS" or "Unity 6 LTS" as fact now give the version; `functional-specs.md` still says "Unity 6 LTS (6000.0.x)", since the spec is the user's to change. Raised as `00_start.md` Q16.
+- Verification: the compile and PlayMode commands copied verbatim from `headless-unity.md`, run from the repo root, exit 0 with no warnings and 4/4. The done-when's "fresh Claude Code session finds the gates from the docs alone" has not been run: it needs a separate session.
+- `coverage.py` reported the phase 03 `drop` rows as matching nothing; it now counts those as already removed and still fails on any other empty pattern (seen failing on a misspelt copy).

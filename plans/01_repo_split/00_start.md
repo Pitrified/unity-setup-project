@@ -10,7 +10,7 @@ description: |
 
 # Split the naval game from the Unity template
 
-Raised 2026-11-14 as a draft. Q1 to Q15 answered 2026-11-17. The phases are in [`tracking.md`](tracking.md).
+Raised 2026-11-14 as a draft. Q1 to Q15 answered 2026-11-17; Q16 open. The phases are in [`tracking.md`](tracking.md).
 
 ## Where this came from
 
@@ -174,3 +174,15 @@ Raised by [`04_docs_review.md`](04_docs_review.md).
   - b. Copilot first, as now, plus the `CLAUDE.md` import.
   - Recommended: a, as in your other repos.
   - ANS: a, the user, 2026-11-17: "we keep the copilot instructions basically only for consistency with other repos. No hacks to support copilot. We aim at claude."
+
+### Third batch (2026-11-17), from phase 04
+
+- Q16: which Unity version?
+  The project is on `6000.4.4f1`, Unity 6.4, a Supported Update release: supported until the next release, and 6.5 and 6.6 are already out.
+  The spec says "Unity 6 LTS (6000.0.x), current LTS, 2-year support window"; the current LTS is 6.3, supported to December 2027.
+  Sources: [Unity 6 support](https://unity.com/releases/unity-6/support), [Unity 6.3 LTS](https://unity.com/blog/unity-6-3-lts-is-now-available), [Unity 6.4 release](https://discussions.unity.com/t/unity-6-4-is-now-available/1713245/1).
+  - a. keep `6000.4.4f1` through the split; artificial-pirate decides its engine version in its own plans, and the guide in `02_guide_rebuild`. The spec line is corrected to the version actually used.
+  - b. move to 6.3 LTS now, before the copy: a downgrade, which Unity does not support for a project; serialized assets written by 6.4 may not load.
+  - c. upgrade to the newest Supported release now, before the copy, so both repos start current.
+  - Recommended: a. The split should not change the engine under the game; an upgrade is its own change with its own gates, and the box can run them. If the game is heading for a long, stable release, the LTS question is the game's.
+  - NEW_ANS:
