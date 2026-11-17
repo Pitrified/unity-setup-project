@@ -17,7 +17,7 @@ Context: after [`02_audit.md`](02_audit.md).
 
 ## Plan
 
-- Drop the template leftovers the GUID report shows unreferenced (Q10): `Assets/TutorialInfo/`, `Assets/Readme.asset`, `SampleScene.unity`, `SampleSceneProfile.asset`, with their `.meta` files.
+- Drop the template leftovers the GUID report shows unreferenced (Q10): `Assets/TutorialInfo/`, `Assets/Readme.asset`, `SampleScene.unity`, `SampleSceneProfile.asset`, with their `.meta` files. `.gitattributes` keeps its LFS rules although no LFS object is left: LFS stays as the pattern for the next binary.
 - Pin `com.coplaydev.unity-mcp` to the commit `packages-lock.json` records (Q11).
 - Set `companyName`, `productName` and `applicationIdentifier` in `ProjectSettings.asset` for the guide (Q8). Set by Unity, not by hand, so it writes the rest of the file consistently: a `PlayerSettings` call from a batch-mode editor method on the box.
 - If Q9 is a: make `SaveSystem` store a versioned payload whose game section is owned by `Game.Gameplay`; update `SaveSystemTests`, `GameManager` and `SaveRestoreTests`.

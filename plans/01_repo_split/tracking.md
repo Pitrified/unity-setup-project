@@ -6,7 +6,7 @@ Brainstorm, current state, decisions and open questions are in [`00_start.md`](0
 
 ## Key decisions
 
-Proposed, pending the answers in `00_start.md`:
+From the answers in `00_start.md` (Q1 to Q15, 2026-11-17):
 
 - **Audit first**, with a script that checks every tracked path is covered.
 - **Clean before duplicating.**
@@ -22,7 +22,8 @@ Proposed, pending the answers in `00_start.md`:
 | 01 | Land phase 6 work, adopt `plans/`  | [`01_land_ph6.md`](01_land_ph6.md)                   | draft  |
 | 02 | Audit                              | [`02_audit.md`](02_audit.md)                         | draft  |
 | 03 | Clean up before duplicating        | [`03_pre_split_cleanup.md`](03_pre_split_cleanup.md) | draft  |
-| 04 | Write artificial-pirate            | [`04_pirate_repo.md`](04_pirate_repo.md)             | draft  |
+| 04 | Review the docs and AI workflow    | [`04_docs_review.md`](04_docs_review.md)             | draft  |
+| 05 | Write artificial-pirate            | [`05_pirate_repo.md`](05_pirate_repo.md)             | draft  |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
 
@@ -33,3 +34,5 @@ Append-only. Newest at the bottom.
 - 2026-11-14 : bootstrapped from the flutter split (`flutter-setup-project` `plans/20_repo_split/`, `27_guide_rebuild`, and `fala-language-tutor` `plans/01_bootstrap/`). Read `main` and `origin/feat/ph6`: 297 tracked files, ph6 unmerged with phases 6 to 8, template `applicationIdentifier`, MCP unpinned, save schema coupled to the ship. Raised Q1 to Q13. Four phases drafted; `02_guide_rebuild` drafted as a sibling.
 - 2026-11-14 : `03_asset_method` drafted as a sibling, from a read of house-renderer's `match-reference` skill and `docs/building_assets.md`. Decided with the user: Blender builders exporting FBX, the industry standard; taken assets under any licence that allows a commercial app with ads. Not a dependency of this folder.
 - 2026-11-17 : Unity 6000.4.4f1 with Android installed and licensed on the box (box note `~/repos/plans/2026-11-17_00_unity_editor_headless.md`). On a scratch clone at `91c71db`: clean compile but one warning, EditMode 114/114, PlayMode 3/3 under `xvfb-run -force-vulkan`, `dev` APK built (70 MB, arm64, template package id). Gates moved from human to batch mode on the box, except the device run; Q9 and Q13 recommendations updated. Fixed on this branch: `Tools/build-android.sh` editor auto-detect (NUL separators via `printf`, `-type f` so a directory named `Unity` cannot match), CS4014 at `GameBootstrap.cs:139` (explicit discard). Verified: auto-detect finds `~/Unity/Hub/Editor/6000.4.4f1/Editor/Unity` with `UNITY_PATH` unset; recompile with 0 warnings, PlayMode 3/3.
+- 2026-11-17 : Q1 to Q13 answered by the user, mostly the recommendations; Q5 unknown, so b, with keystore and `dev` APK checked on the box. Phase 04, docs and AI workflow review, added at the user's request with an assessment (the docs assume a person verifies every change; now the agent can run the gates itself); the copy becomes phase 05. Q14 (MCP's role) and Q15 (which agent) raised. fala's package id left as an open point in fala-language-tutor.
+- 2026-11-17 : Q14 a (batch mode first, MCP the interactive option) and Q15 a (Claude Code first; the Copilot file kept only for consistency, no Copilot workarounds) answered; `04_docs_review.md` updated to match.

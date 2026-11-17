@@ -22,6 +22,7 @@ Here it is a separate folder from the start, picked up after `01_repo_split` is 
 - The sample: a neutral minimal game (a placeholder avatar on a plane) that exercises scenes, input, save, audio, UI and logging, or the ship slice kept as the sample.
 - The save schema, if `01_repo_split` Q9 left it coupled: lift the fix made in artificial-pirate.
 - `docs/tracking.md` and `scratch/`: kept as history, and how the README says so.
+- The template itself, reviewed as `01_repo_split` phase 04 reviews the shared docs: the repo scaffold (`Tools/setup.sh`, the pre-commit hook, `.gitattributes` with its LFS rules kept as a pattern, `.editorconfig`, `Tools/build-android.sh`) and the generic runtime, against "a neat bootstrap plus links to projects implementing a pattern" (Q1 of `01_repo_split`), not a gallery of samples.
 - The docs' shape: setup from zero for a person and for a session running Unity headless; a pattern index; which docs stay generic templates (`copilot-instructions-template.md`, the systems spec format).
 - How a session bootstrapping a new Unity project is meant to use this repo, written down.
 - A headless gate: Unity in batch mode running EditMode tests, whether it is worth a license on a server.

@@ -6,7 +6,7 @@ status: draft
 
 ## Overview
 
-Every tracked file gets a destination, so the copy in phase 04 and the guide rebuild both work from a list rather than from judgement made in the moment.
+Every tracked file gets a destination, so the copy in phase 05 and the guide rebuild both work from a list rather than from judgement made in the moment.
 Same method as the flutter audit, adapted to Unity's asset graph.
 Context: [`00_start.md`](00_start.md), after [`01_land_ph6.md`](01_land_ph6.md).
 

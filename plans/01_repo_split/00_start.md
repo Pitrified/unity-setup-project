@@ -10,7 +10,7 @@ description: |
 
 # Split the naval game from the Unity template
 
-Raised 2026-11-14 as a draft. No phases agreed yet; the proposed phases are in [`tracking.md`](tracking.md).
+Raised 2026-11-14 as a draft. Q1 to Q15 answered 2026-11-17. The phases are in [`tracking.md`](tracking.md).
 
 ## Where this came from
 
@@ -79,7 +79,8 @@ Both halves are real:
 1. Land `feat/ph6` on `main`, so the split starts from the latest work. Adopt `plans/`.
 2. Audit every tracked path: `guide`, `pirate`, `both`, `drop`. Coverage checked by a script.
 3. Clean up here before duplicating: template leftovers, the save schema coupling, the MCP pin, the project naming.
-4. Write `artificial-pirate`: plan first in the new repo, then the copy, the renames, docs, open roadmap phases moved; verified in the Editor and on the device by the user.
+4. Review the shared docs and the AI workflow, so both repos start from the current way of working.
+5. Write `artificial-pirate`: plan first in the new repo, then the copy, the renames, docs, open roadmap phases moved; verified in batch mode on the box, and on the device by the user.
 
 The guide rebuild follows in `02_guide_rebuild`.
 
@@ -96,64 +97,80 @@ The guide rebuild follows in `02_guide_rebuild`.
   - a. same as flutter: the guide is the bootstrap source for future Unity projects, artificial-pirate is the first.
   - b. tidiness only: take cheaper alternative 1 instead.
   - Recommended: a, if a second Unity project is plausible within a year; otherwise b costs a rename and an afternoon.
-  - NEW_ANS:
+  - ANS: a, the user, 2026-11-17: we do the split, same idea as flutter. The template must not grow into an endless gallery of samples: a neat bootstrap, plus links to the projects that implement a pattern worth copying.
 - Q2: the new repo's name and the project's name.
   The docs say `artificial-pi`; the ask says "artificial pirate".
   - a. repo `artificial-pirate`, product name `Artificial Pirate`, docs renamed from `artificial-pi`.
   - b. repo `artificial-pi`, names unchanged.
   - Recommended: a, the full name reads as what it is and the rename is a text substitution done once during the copy.
-  - NEW_ANS:
+  - ANS: a, the user, 2026-11-17.
 - Q3: who creates the GitHub repo, and when?
   This box has no GitHub credentials, and pushes go through your `ssh -A` session from g4.
-  - Recommended: you create `Pitrified/artificial-pirate` empty (no README, no `.gitignore`) before phase 04, and push it from g4; LFS needs to be enabled on it, which is the default for GitHub.
-  - NEW_ANS:
+  - Recommended: you create `Pitrified/artificial-pirate` empty (no README, no `.gitignore`) before phase 05, and push it from g4; LFS needs to be enabled on it, which is the default for GitHub.
+  - ANS: the user creates `Pitrified/artificial-pirate` before phase 05, 2026-11-17.
 - Q4: where does the split start from? `feat/ph6` holds phases 6 to 8 and is not merged.
   - a. you merge `feat/ph6` into `main` first (it fast-forwards), and everything after branches from `main`.
   - b. this folder's branch is cut from `feat/ph6`, which stays unmerged.
   - Recommended: a. `main` is an ancestor, so it is a fast-forward with no conflicts, and the template's history then reads in order.
-  - NEW_ANS:
+  - ANS: a, done by the user from `main` (now `2c0c76b`), 2026-11-17.
 - Q5: the three open HUMAN items of phase 8 (debug keystore gitignored, `dev` APK builds, logcat clean).
   The last commit says an APK was installed once.
   - a. confirmed done: tick them in `docs/tracking.md` during phase 01.
   - b. not all done: they move to the new repo as its first verification.
-  - Recommended: tell me which; if in doubt, b, since phase 04 builds an APK anyway.
-  - NEW_ANS:
+  - Recommended: tell me which; if in doubt, b, since phase 05 builds an APK anyway.
+  - ANS: unknown (the user, 2026-11-17), so b. Checked on the box the same day: `.gitignore` has `keystore/` and `*.keystore` and no keystore is tracked; the `dev` APK builds. Logcat clean needs a device: it moves to phase 05's device run.
 - Q6: git history for the new repo.
   - a. none: copy the tracked files of one commit with `git archive`, as fala-language-tutor did. `.meta` GUIDs survive because they are file content.
   - b. `git filter-repo` on the game's paths, keeping its commits.
   - Recommended: a. The commits that built the game also built the template and live on here; the bootstrap plan names the source commit.
-  - NEW_ANS:
+  - ANS: whatever is clean (the user, 2026-11-17): a, `git archive`, no history.
 - Q7: the Unity project folder name in the new repo, today `UnitySetupPrpj/`.
   - a. rename to `ArtificialPirate/` during the copy, with `Tools/build-android.sh`, `.vscode/` and docs following. Unity regenerates `Library/` on first open; GUIDs do not change.
   - b. keep `UnitySetupPrpj/` and rename later.
   - c. move the project to the repo root.
   - Recommended: a. The typo-like name would follow the game forever, and the first open in the new repo regenerates `Library/` anyway. c changes how `.gitignore` and `Tools/` work and gains little.
-  - NEW_ANS:
+  - ANS: a, the user, 2026-11-17.
 - Q8: the Android `applicationIdentifier`. It is permanent once a build is on Play, and today it is the Unity template's.
   - a. game: `com.pitrified.artificialpirate`; guide: `com.pitrified.unitysetup`, set in phase 03.
   - b. another prefix you already use (fala used `com.fala.app`).
   - Recommended: a, set here in phase 03 for both so neither repo ever builds with the template id; the game's id is then changed once more during the copy.
-  - NEW_ANS:
+  - ANS: a, the user, 2026-11-17. The user also noted fala's `com.fala.app` should probably be `com.pitrified.fala`; left as an open point in fala-language-tutor (untracked draft `plans/18_package_id/`), for the session there.
 - Q9: the save schema coupling. `SaveData` in the generic `Game.Systems` holds `ShipSaveData`.
   - a. fix here before duplicating: the save system stores a generic payload (versioned JSON with a game-owned section type), the ship section lives in `Game.Gameplay`. Both repos start from the clean shape.
   - b. leave it; the new repo keeps it as is and the guide fixes its own copy in `02_guide_rebuild`.
   - Recommended: b, against the flutter precedent. The fix touches the save system, its tests, `GameManager` and the PlayMode restore test, and none of it can be compiled here; doing it in the game repo first and lifting it to the guide later is one Unity session instead of two. Choose a if you will be at the workstation for phase 03 anyway.
   - Update 2026-11-17: the box now compiles and runs the tests, so the reason for b (no compile here, one Unity session instead of two) no longer holds. Recommended now: a, the flutter precedent, both repos start from the clean shape.
-  - NEW_ANS:
+  - ANS: a, fix here before duplicating, the user, 2026-11-17.
 - Q10: Unity template leftovers: `Assets/TutorialInfo/`, `Assets/Readme.asset`, `Assets/Scenes/SampleScene.unity`, `Assets/Settings/SampleSceneProfile.asset`.
   - Recommended: drop them in phase 03 if the audit finds no reference to their GUIDs; this also removes the only LFS file.
-  - NEW_ANS:
+  - ANS: drop them, the user, 2026-11-17. LFS stays as a pattern: `.gitattributes` keeps its LFS rules with no LFS object left, so the next binary (the asset method's FBX) lands in LFS. Git with LFS for binaries is the usual setup for a small Unity team on git; Perforce or Unity Version Control are what larger studios use, not something this repo needs.
 - Q11: the MCP package is taken from `#main` of `CoplayDev/unity-mcp`.
   - Recommended: pin it to the commit in `packages-lock.json` in phase 03, so both repos start reproducible.
-  - NEW_ANS:
+  - ANS: pin it, the user, 2026-11-17.
 - Q12: where do the old diary files go? `docs/tracking.md` phases 0 to 8 and `scratch/` record how both halves were built; phases 9 to 13 are the game's open roadmap.
   - a. history stays here; phases 9 to 13 become plan folders in the new repo (`02_mcp`, `03_performance`, ... or merged where small), each linking back to the source here.
   - b. copy `scratch/` to both.
   - Recommended: a, matching the flutter answer that done folders stay in the source as its history.
-  - NEW_ANS:
-- Q13: who does phase 04, and where?
+  - ANS: a, the user, 2026-11-17.
+- Q13: who does phase 05, and where?
   - a. the file work (copy, renames, docs, plans) in a session on this box; you push from g4, open the project on the workstation, run the Test Runner and build the APK.
   - b. the whole phase in a session on the workstation, with Unity MCP, so the session can read the console and run tests itself.
   - Recommended: a for the copy and text, then a short session on the workstation for any compile fix. The rename is mechanical; the Unity checks are yours either way.
   - Update 2026-11-17: with Unity on the box, a covers the compile, the tests and the `dev` APK too; what is left to you is the push from g4 and the device run. Recommended now: a, with those two as the only HUMAN steps.
-  - NEW_ANS:
+  - ANS: a, the user, 2026-11-17.
+
+### Second batch (2026-11-17), from the docs review
+
+Raised by [`04_docs_review.md`](04_docs_review.md).
+
+- Q14: what is Unity MCP for, now that a session on the box reaches Unity through batch mode?
+  - a. batch mode is the default way in, for both repos: editor scripts by `-executeMethod`, tests, builds, captures, all reproducible and run headless. MCP stays documented as the interactive option on the workstation, when you are at the Editor.
+  - b. MCP stays the main way in, batch mode for gates only.
+  - c. drop MCP from both repos.
+  - Recommended: a. Batch-mode changes are scripts in the repo, reviewable and repeatable; MCP edits are one-off and need an open Editor, which the box does not have.
+  - ANS: a, the user, 2026-11-17: batch mode is the default way into Unity; MCP stays documented as the interactive option at the workstation Editor.
+- Q15: which agent do the instruction files serve?
+  - a. Claude Code first: `CLAUDE.md` importing `.github/copilot-instructions.md` as the single source, wording made client-neutral, Copilot-only rules dropped.
+  - b. Copilot first, as now, plus the `CLAUDE.md` import.
+  - Recommended: a, as in your other repos.
+  - ANS: a, the user, 2026-11-17: "we keep the copilot instructions basically only for consistency with other repos. No hacks to support copilot. We aim at claude."
