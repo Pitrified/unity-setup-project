@@ -9,7 +9,8 @@ A table row is `| `pattern` [`pattern` ...] | destination | reason |`.
 Patterns are fnmatch globs over repo-relative paths (`*` crosses `/`).
 When several patterns match a path, the longest pattern wins; two winners of
 the same length with different destinations are an error.
-Fails on: an unmatched path, a pattern that matches nothing, a tie, an unknown destination.
+Fails on: an unmatched path, a pattern that matches nothing (a `drop` pattern may: its files are gone),
+a tie, an unknown destination.
 """
 
 from __future__ import annotations
@@ -57,9 +58,16 @@ def main() -> int:
             errors.append(f"tie: {path} <- " + ", ".join(f"{p} ({d}, line {n})" for p, d, n in sorted(winners)))
         used.update(p for p, _, _ in hits)
 
-    for pattern, _, n in rows:
-        if pattern not in used:
+    gone = 0
+    for pattern, dest, n in rows:
+        if pattern in used:
+            continue
+        if dest == "drop":
+            gone += 1  # deleted by the cleanup: the row stays as the record
+        else:
             errors.append(f"{table.name}:{n}: pattern matches nothing: {pattern}")
+    if gone:
+        print(f"{gone} drop patterns match nothing: already removed")
 
     for e in errors:
         print(e)

@@ -13,7 +13,7 @@ Split by concern: **what we build**, **how we build it**, **how we ship it**.
 3. [coding-standards.md](coding-standards.md) - **HOW** code is written
 4. [ai-development-playbook.md](ai-development-playbook.md) - **HOW** we work with AI
 5. [dev-environment-setup.md](dev-environment-setup.md) - get it running locally
-6. [tracking.md](tracking.md) - current setup roadmap (start here for action items)
+6. [`plans/`](../plans/) - current work
 
 ---
 
@@ -31,7 +31,9 @@ Split by concern: **what we build**, **how we build it**, **how we ship it**.
 ### AI workflow
 
 - [ai-development-playbook.md](ai-development-playbook.md)
+- [headless-unity.md](headless-unity.md)
 - [mcp-setup.md](mcp-setup.md)
+- [unity-mcp-best-practices.md](unity-mcp-best-practices.md)
 - [copilot-instructions-template.md](copilot-instructions-template.md)
 
 ### Build & release
@@ -53,9 +55,10 @@ Split by concern: **what we build**, **how we build it**, **how we ship it**.
 - [systems/ui-system.md](systems/ui-system.md)
 - [systems/logging.md](systems/logging.md)
 
-### Tracking
+### Plans and history
 
-- [tracking.md](tracking.md) - checklist of what's left to set up / build
+- [`plans/`](../plans/) - current work, one folder per feature
+- [tracking.md](tracking.md) - the setup checklist from before `plans/`, kept as history
 
 ---
 
@@ -84,10 +87,9 @@ Split by concern: **what we build**, **how we build it**, **how we ship it**.
 ## 🔄 Workflow loop
 
 1. Define / update the feature in [functional-specs.md](functional-specs.md) and the relevant `systems/*.md`.
-2. Write a focused prompt (see [ai-development-playbook.md §6](ai-development-playbook.md#6-prompting-pattern)).
-3. Review the diff against the [§7 checklist](ai-development-playbook.md#7-review-checklist-per-ai-diff).
-4. Run tests; verify in Editor and on device.
-5. Commit per [git-workflow.md](git-workflow.md). Update [tracking.md](tracking.md).
+2. Plan it in a `plans/` folder; the agent works it in the loop of [ai-development-playbook.md §3](ai-development-playbook.md#3-the-work-loop).
+3. The agent runs the gates ([headless-unity.md](headless-unity.md)) and commits per [git-workflow.md](git-workflow.md).
+4. A person plays the build on a device.
 
 ---
 

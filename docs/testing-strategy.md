@@ -65,6 +65,7 @@ Run on a physical device:
 - **Arrange / Act / Assert** structure, blank-line separated.
 - One logical assertion per test. Use `Assert.Multiple` if grouping is genuine.
 - No shared mutable state between tests (`[SetUp]` / `[TearDown]` per fixture).
+  PlayMode tests that boot the game call `PlayModeTestReset.DestroyPersistentGameManager()` from `[UnityTearDown]`: the `GameManager` is `DontDestroyOnLoad` and otherwise outlives the test.
 - Test names: `Method_State_ExpectedResult` - e.g. `Save_WhenFileMissing_StartsFresh`.
 - No tests against `Time.deltaTime` real-time; inject a clock or use `UnityEngine.TestTools.Utils`.
 
@@ -74,16 +75,8 @@ Run on a physical device:
 
 In Editor: **Window → General → Test Runner**.
 
-Headless (CI-ready):
-
-```
-unity -batchmode -nographics -projectPath . \
-      -runTests -testPlatform EditMode \
-      -testResults Tools/test-results/editmode.xml \
-      -logFile Tools/test-results/editmode.log
-```
-
-Same with `-testPlatform PlayMode`. Exit code is non-zero on any failure.
+Headless, as the agent runs them: [headless-unity.md §3](headless-unity.md#3-gates).
+PlayMode needs `xvfb-run` and `-force-vulkan`, not `-nographics`. Exit code is non-zero on any failure.
 
 ---
 

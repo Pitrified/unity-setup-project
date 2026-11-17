@@ -1,113 +1,63 @@
-# Unity MCP Setup
+# Unity MCP
 
-The Unity MCP server lets AI agents inspect and modify the open Unity project
-through a structured protocol instead of free-form file edits.
+MCP lets an agent drive an **open Unity Editor**: read the hierarchy and the console, create and change GameObjects, set serialized fields, enter Play mode.
+It is the interactive option, for when a person is at the Editor on a workstation.
+The agent's default way into Unity is batch mode ([headless-unity.md](headless-unity.md)), which needs no open Editor and leaves an editor script in the repo instead of a one-off edit.
 
----
-
-## 1. What MCP gives us
-
-- Read scene/prefab hierarchy and serialized fields
-- Create/destroy GameObjects, attach components
-- Set serialized field values
-- Trigger Editor methods (build, enter play mode, run tests)
-- Read console logs
-
-What MCP **does not** replace:
-
-- Reading `docs/` (still required)
-- Source control (still required: commit before MCP edits)
-- Visual review in the Editor (still required after each scene change)
+Use MCP when the change is easier to see than to script: placing and tuning objects in a scene with a person watching, reading a live console during Play mode.
 
 ---
 
-## 2. Server choice
+## 1. Server
 
-Use a maintained community server. Recommended candidates (pick one,
-document the choice in `tracking.md`):
+**MCP for Unity** by CoplayDev (MIT), package `com.coplaydev.unity-mcp`, pinned in `Packages/manifest.json` to commit `b92c05a2`.
+Do not move the pin without a plan; an unpinned Git URL changes under you.
 
-- `justinpbarnett/unity-mcp` - popular, broad coverage
-- `CoderGamester/mcp-unity` - alternative, similar feature set
-
-Whichever is chosen, **pin a specific version**. Do not auto-update.
+The Unity package starts an HTTP server inside the Editor; the client connects to it.
+It was chosen in May 2026 over Unity's own `com.unity.ai.assistant` (pre-release then) and IvanMurzak's Unity-MCP (stdio binary, in-game tools this project does not need) for its tool coverage. That comparison is in this file's git history.
 
 ---
 
-## 3. Install steps (high level)
+## 2. Setup
 
-1. Add the chosen MCP package to `Packages/manifest.json` via Git URL,
-   pinned to a tag/commit.
-2. Open Unity once so it imports the package.
-3. Enable the MCP window/menu the package adds; confirm the listening port.
-4. Configure the client (VS Code) to connect - see §4.
+1. Open the project in the Editor. The package is already in the manifest.
+2. **Window → MCP for Unity → Start Server**. It listens on `localhost:8080`; the status turns green. Restart it after the Editor restarts, or enable auto-start in the panel.
+3. Register it with Claude Code, once per machine:
+   ```
+   claude mcp add --transport http unityMCP http://localhost:8080/mcp
+   ```
+   The panel's client dropdown can also write this configuration.
+4. Check: ask the agent to list the root GameObjects of `Boot.unity` and compare with the Hierarchy.
 
-The exact package URL goes in `tracking.md` once decided.
-
----
-
-## 4. VS Code / Copilot client config
-
-`.vscode/mcp.json` in the repo root:
-
-```json
-{
-  "servers": {
-    "unity": {
-      "type": "stdio",
-      "command": "<path-or-launcher-from-package-readme>",
-      "args": []
-    }
-  }
-}
-```
-
-(Exact `command`/`args` come from the chosen package's README. The file is
-committed so every contributor uses the same wiring.)
-
-Do **not** put secrets in `.vscode/mcp.json`.
+Start the Editor and the server before the agent session, so the tools are there when it connects.
+The project path must have no spaces.
 
 ---
 
-## 5. Operational rules
+## 3. Rules
 
-These rules are non-negotiable for any MCP-driven session:
+1. **Clean working tree** before any MCP scene or prefab edit, so `git checkout` undoes it.
+2. **One scene or prefab per step**, checked in the Hierarchy before the next.
+3. **PlayMode tests after** any scene or prefab change, before committing ([headless-unity.md §3](headless-unity.md#3-gates), or the Test Runner).
+4. **Read the scene YAML diff** before committing. If it is incomprehensible, revert and redo the change as an editor script.
+5. A change worth keeping as a repeatable step becomes an editor script, not an MCP sequence.
 
-1. **Working tree clean** before granting MCP scene/prefab access. Commit or stash first.
-2. **One scene per turn.** If a request would touch >1 scene or prefab, split it.
-3. **Editor is open and visible** during MCP edits - watch the hierarchy change.
-4. **Run PlayMode smoke test** after any scene/prefab edit, before committing.
-5. **Diff scene YAML** before committing (`git diff Assets/Scenes/*.unity`). If it
-   is incomprehensible, revert and re-do manually.
-6. **Never run MCP against `main`** during a release; cut a `feat/` branch.
+MCP must not:
 
----
+- change `ProjectSettings/` or `Packages/`;
+- delete or bulk-rename scenes, prefabs or assets;
+- touch `keystore/`, `build.env`, `Tools/build-android.sh`.
 
-## 6. What MCP must not do
-
-- Modify `ProjectSettings/`
-- Modify anything under `Packages/`
-- Delete scenes or prefabs
-- Bulk-rename assets
-- Touch `keystore/`, `*.env`, `Tools/build-android.sh`
-
-If the agent attempts any of the above, halt the session and revert.
+Session lessons (debugging loop, AudioMixer, recovery after a crash) are in [unity-mcp-best-practices.md](unity-mcp-best-practices.md).
 
 ---
 
-## 7. Failure modes & recovery
+## 4. Failure modes
 
-| Symptom                              | Recovery                                         |
-| ------------------------------------ | ------------------------------------------------ |
-| Scene opens but is empty             | `git checkout -- Assets/Scenes/<name>.unity`     |
-| Component refs broken (yellow icons) | Revert scene; re-do edit one component at a time |
-| Editor hangs during MCP op           | Kill Editor, `git status` to assess damage       |
-| `.meta` files show in diff for moved assets | Expected; commit them with the move        |
-
----
-
-## 8. Verification checklist (after MCP setup)
-
-- [ ] MCP package pinned in `Packages/manifest.json`
-- [ ] `.vscode/mcp.json` present and committed
-- [ ] Copilot Chat shows the `unity` MCP server as connected
-- [ ] Smoke prompt works: ask the agent "list root GameObjects in Boot scene" and verify the answer matches the actual hierarchy
+| Symptom | Recovery |
+| ------- | -------- |
+| Tools missing in the agent | Server not started, or the Editor recompiled and stopped it: Start Server, then reconnect the client |
+| `curl http://localhost:8080/mcp` fails | Same; check the panel status |
+| Scene opens empty | `git checkout -- <scene>` |
+| Component references broken | Revert the scene, redo one component at a time |
+| Editor hangs during an MCP call | Kill the Editor, `git status` to see what changed |

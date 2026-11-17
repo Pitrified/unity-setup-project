@@ -1,10 +1,10 @@
 # Unity MCP Best Practices (Session Learnings)
 
-Project-specific guidance distilled from real MCP runs in this repository.
+Guidance distilled from real MCP runs in this repository, for interactive sessions at the Editor.
+The agent's default way into Unity is batch mode ([headless-unity.md](headless-unity.md)); the debugging loop and the runtime validation below apply there too.
 Use this with:
 - [docs/ai-development-playbook.md](ai-development-playbook.md)
 - [docs/mcp-setup.md](mcp-setup.md)
-- [docs/unity-mcp-guide.md](unity-mcp-guide.md)
 
 ## 1. Session control and pacing
 
@@ -88,7 +88,7 @@ For this project/session, these patterns mattered:
 - Play Mode smoke test
 - Console clean check
 
-5. Document outcome in scratch/tracking notes.
+5. Document the outcome in the current plan file.
 
 ## 6. Recovery folders after crash
 
@@ -112,4 +112,4 @@ This keeps the MCP flow synchronized and prevents acting on stale assumptions.
 4. Validate immediately (state + console).
 5. For gameplay-affecting assets, validate with runtime APIs and Play Mode.
 6. If instability appears, stop expanding scope and shift to recovery pattern.
-7. Record outcomes in scratch docs before moving to next phase.
+7. Record outcomes in the current plan file before moving to the next phase.

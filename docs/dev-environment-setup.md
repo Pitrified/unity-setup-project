@@ -7,7 +7,7 @@ Zero → working local Android build in **under one hour**, without surprises.
 Mental model:
 
 ```
-clone → install Unity 6 LTS via Hub → open → run on device
+clone → install Unity 6 via Hub → open → run on device
 ```
 
 ---
@@ -17,7 +17,7 @@ clone → install Unity 6 LTS via Hub → open → run on device
 | Tool              | Version                    | Notes                                  |
 | ----------------- | -------------------------- | -------------------------------------- |
 | Unity Hub         | latest                     | [Linux install guide](https://docs.unity.com/en-us/hub/install-hub-linux) |
-| Unity Editor      | **6000.4.4f1** (Unity 6.4 LTS) | Exact patch version in `ProjectSettings/ProjectVersion.txt` |
+| Unity Editor      | **6000.4.4f1** (Unity 6.4, a Supported Update release, not LTS) | Exact patch version in `ProjectSettings/ProjectVersion.txt` |
 | Android Build Support module | matching editor   | Install via Hub; see §9 for full module list |
 | Android SDK + NDK | bundled with module        | Use Unity-bundled, do not mix with Android Studio's SDK unless you know what you're doing |
 | OpenJDK           | bundled with module        |                                        |
@@ -31,7 +31,7 @@ VS Code extensions - install by ID via VS Code Quick Open (`Ctrl+P` → `ext ins
 
 - `ms-dotnettools.csdevkit` - C# Dev Kit
 - `VisualStudioToolsForUnity.vstuc` - Unity (**not** the deprecated "Unity (by Unity Technologies)" marketplace listing)
-- GitHub Copilot + Copilot Chat (install from Marketplace UI)
+- Claude Code, the agent ([ai-development-playbook.md](ai-development-playbook.md)); its VS Code extension is optional
 - `EditorConfig.EditorConfig` - EditorConfig for VS Code
 
 ---
@@ -72,8 +72,7 @@ Expected on first open:
 2. Press Play.
 3. Bootstrap → Persistent → Menu → Game flow runs.
 
-If you opened `Game.unity` directly, use the editor helper
-**Tools → Load Persistent Scene** (provided in `Game.Editor` asmdef) before pressing Play.
+Play from `Boot.unity`. `Game.unity` opened on its own has no Persistent scene, so nothing is wired.
 
 ---
 
@@ -96,7 +95,7 @@ Per-build:
 
 ```
 ./Tools/build-android.sh dev
-adb install -r Build/dev.apk
+adb install -r UnitySetupPrpj/Build/dev/artificial-pi-dev.apk
 adb logcat -s Unity:V
 ```
 
@@ -104,11 +103,11 @@ adb logcat -s Unity:V
 
 ## 7. Validation checklist (run after setup)
 
-- [ ] `git lfs ls-files` lists at least one asset
+- [ ] `git lfs install` has run (`git lfs ls-files` may list nothing: no binary asset is tracked yet)
 - [ ] Unity opens with 0 errors
 - [ ] EditMode tests run and pass: **Window → General → Test Runner → Run All**
 - [ ] Editor Play loop reaches Game scene
-- [ ] `./Tools/build-android.sh dev` produces `Build/dev.apk`
+- [ ] `./Tools/build-android.sh dev` produces `UnitySetupPrpj/Build/dev/artificial-pi-dev.apk`
 - [ ] APK installs and launches on device
 - [ ] `adb logcat -s Unity:V` shows no `[Error]` lines during one demo loop
 

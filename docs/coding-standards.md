@@ -6,7 +6,7 @@ Lightweight C# rules. Enforced by `.editorconfig` + Unity warnings + reviewer.
 
 ## 1. Style
 
-- C# language version: default for Unity 6 LTS (currently C# 9, do not enable preview features).
+- C# language version: default for Unity 6 (currently C# 9, do not enable preview features).
 - Indentation: 4 spaces, no tabs.
 - Newlines: LF (enforced via `.gitattributes`).
 - Trailing whitespace forbidden; file ends with single newline.

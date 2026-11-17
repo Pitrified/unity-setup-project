@@ -2,141 +2,89 @@
 
 ## 1. Philosophy
 
-> **AI writes ~80-90% of the code. The human enforces architecture, scope, and correctness.**
+> **The agent writes the change and proves it. The human decides what to build and anything that cannot be undone.**
 
-Non-negotiables:
-
-- AI generates → human reads the diff → human runs it.
-- Architecture decisions live in [functional-specs.md](functional-specs.md). AI does not change them.
-- Small atomic changes. No "while I'm here" refactors.
-
----
-
-## 2. Tooling stack
-
-| Tool                                | Purpose                                  |
-| ----------------------------------- | ---------------------------------------- |
-| VS Code                             | Editor                                   |
-| GitHub Copilot (Chat + Agent mode)  | Primary AI assistant                     |
-| Unity MCP Server                    | Lets the agent read/write Unity project state - see [mcp-setup.md](mcp-setup.md) |
-| `.github/copilot-instructions.md`   | Repo-wide AI instructions (auto-loaded)  |
-| `AGENTS.md` (repo root)             | Entry point for OpenAI/Claude/etc agents |
+- The agent works from a plan, implements, runs the gates in [headless-unity.md](headless-unity.md), fixes what fails, and commits only on green.
+- A gate the agent has not run is not passed; "looks right" is not a result. A check never seen failing is an assumption, not a gate.
+- The human answers the questions the plan raises, decides architecture and scope ([functional-specs.md](functional-specs.md) wins over the agent), plays the build on a device, and does everything irreversible or outward-facing: pushes, signing, Play Console.
+- Small atomic commits. No "while I'm here" refactors.
 
 ---
 
-## 3. Repository AI configuration files
+## 2. Tooling
 
-Create and keep current:
-
-```
-<repo>/
-├── .github/
-│   └── copilot-instructions.md     # auto-injected into Copilot prompts
-├── .vscode/
-│   └── mcp.json                    # MCP server registrations
-├── AGENTS.md                       # agent-agnostic onboarding
-└── docs/                           # what humans + AI read
-```
-
-`copilot-instructions.md` and `AGENTS.md` should be **short** (≤ 100 lines each)
-and link into `docs/` rather than duplicating content. A starter is in
-[copilot-instructions-template.md](copilot-instructions-template.md).
+| Tool | Purpose |
+| ---- | ------- |
+| Claude Code | The agent |
+| `CLAUDE.md` | Imports `.github/copilot-instructions.md`, the single source of repo instructions (the file keeps its name for consistency with the other repos) |
+| `AGENTS.md` | Short entry point for other agents, pointing at the same docs |
+| `plans/` | One folder per feature, in the `tracked-development` shape; `python3 Tools/plans.py list` and `check` |
+| Unity in batch mode | The agent's way into Unity: compile, tests, builds, captures, editor scripts. See [headless-unity.md](headless-unity.md) |
+| Unity MCP | The interactive option when a person is at the Editor on a workstation. See [mcp-setup.md](mcp-setup.md) |
 
 ---
 
-## 4. MCP integration
+## 3. The work loop
 
-The Unity MCP server gives the agent Editor capabilities:
-
-- Read scene/prefab hierarchy
-- Create GameObjects, attach components, set serialized fields
-- Trigger Editor methods (build, play, test)
-
-**Risks:** scene/prefab corruption, hidden side effects, irreversible asset
-changes.
-
-**Mitigations (mandatory):**
-
-1. **Commit before any MCP-driven scene edit.** Treat scenes as binary; rely on git to revert.
-2. **One system at a time.** Never let the agent touch multiple scenes/prefabs in a single turn.
-3. **Open Unity and visually verify** every scene change before committing.
-4. **Run PlayMode tests** after any scene/prefab change.
-5. **Forbid mass operations** (delete, rename, restructure) without explicit human-issued prompt.
-
-Setup details: [mcp-setup.md](mcp-setup.md).
+1. **Plan.** Non-trivial work gets a folder under `plans/` with its questions, phases and done-when. The human says when planning ends and execution starts.
+2. **Review the phase** against the code before touching it: read the files it names, check its claims, add what is missing.
+3. **Implement**, inside the phase. Scope comes from the plan, not from a list of files in a chat message.
+4. **Run the gates** that apply (§4). On a failure, find the cause and fix it; do not weaken the test.
+5. **Commit** on green, one concern per commit, the gate results in the message.
+6. **Record** what the phase found in its plan file and the tracking log.
+7. **Stop and ask** when a decision is not obvious from the plan, the spec or the code: a product choice, a version, a name the user will see, anything with a cost to undo. State the options and a recommendation, and continue with what does not depend on it.
 
 ---
 
-## 5. AI usage levels
+## 4. Gates
 
-| Level | Scope                       | Review cost | Notes                          |
-| ----- | --------------------------- | ----------- | ------------------------------ |
-| 1     | Pure C# scripts             | Low         | Default mode                   |
-| 2     | System wiring (asmdefs, DI) | Medium      | Verify with `dotnet build`     |
-| 3     | Scene/prefab edits via MCP  | High        | Commit-first, test after       |
-| 4     | Build/release scripts       | High        | Run on a throwaway build first |
+| Change | Gates |
+| ------ | ----- |
+| Any C# or asset change | Compile with 0 errors and 0 warnings, EditMode tests, PlayMode tests |
+| Build settings, player settings, packages, Android | Also the `dev` APK |
+| Anything visual (materials, shaders, lighting, models, UI layout) | Also a capture, compared against the reference or against a before image |
+| New behaviour | A test that fails before the change and passes after |
 
----
-
-## 6. Prompting pattern
-
-Always include three blocks:
-
-```
-## Context
-Unity 6 LTS, URP, mobile, kinematic movement, no physics.
-Architecture: see docs/functional-specs.md and the relevant systems/*.md.
-
-## Task
-<one concrete change>
-
-## Constraints
-- Touch only files: <list>
-- No new dependencies
-- Match existing naming + asmdef boundaries
-```
-
-Anti-patterns:
-
-- "Improve the code" / "Make it better" → too vague, will hallucinate scope.
-- "Implement the whole save system" → too large, split per public method.
-- Pasting a stack trace with no context → ask AI to ask clarifying questions first.
+Commands, and the pitfalls, are in [headless-unity.md](headless-unity.md).
+The device run (install, play, `adb logcat -s Unity:V` clean) is the human's.
 
 ---
 
-## 7. Review checklist (per AI diff)
+## 5. Changing Unity assets
 
-Before accepting:
+- Prefer an editor script run in batch mode over a hand edit of scene, prefab or settings YAML: it is repeatable, and Unity writes the file consistently ([headless-unity.md §4](headless-unity.md#4-changing-assets-without-the-editor)).
+- Read the YAML diff before committing.
+- `ProjectSettings/` changes go through `PlayerSettings` or the relevant API, and only when the plan calls for them.
+- When deleting an asset, check its GUID is referenced by nothing.
 
-- [ ] Touches only the files in scope
-- [ ] No new packages / using directives without reason
-- [ ] No `Find*`, `Resources.Load`, `OnGUI`, magic numbers
-- [ ] Compiles (`dotnet build` on the asmdef, or full Unity recompile)
-- [ ] Existing tests pass; new behavior has at least one test
-- [ ] No secrets, keystores, or `.env` content committed
+With MCP at the workstation, the same holds, plus: a clean working tree before any MCP scene edit, one scene or prefab per step, and the PlayMode tests after. See [mcp-setup.md](mcp-setup.md).
 
 ---
 
-## 8. When AI is wrong
+## 6. Review before commit
 
-- Do **not** keep re-prompting on the same failed approach. Ask for an alternative.
-- If the agent contradicts `functional-specs.md`, the spec wins. Update the spec **only** as a deliberate human decision.
-- If a generated change is hard to understand in <2 minutes, reject it and ask for a smaller version.
+The agent reviews its own diff in a fresh pass:
 
----
-
-## 9. What AI must not do (this project)
-
-- Edit `ProjectSettings/*.asset` without explicit instruction.
-- Add Asset Store packages, third-party SDKs, analytics, or ads.
-- Touch `keystore.*`, signing config, Play Console metadata.
-- Run `git push --force`, delete branches, or rewrite history.
-- Run `git add -A` blindly; always stage explicitly.
+- [ ] Inside the plan phase; nothing unrelated changed
+- [ ] No new packages or SDKs without the plan saying so
+- [ ] Hard rules in `.github/copilot-instructions.md` hold
+- [ ] Gates run and green, results in the commit message
+- [ ] New behaviour has a test
+- [ ] No secrets, keystores or `build.env` content
 
 ---
 
-## 10. Long-term evolution (post v0.2)
+## 7. When the agent is wrong
 
-- Promote local build script to GitHub Actions CI.
-- Add Unity Test Runner to CI (EditMode + PlayMode on Linux runner).
-- Add an AI changelog: every accepted AI diff appended to `docs/changelog.md`.
+- Do not repeat a failed approach. Find the cause, or try a different one.
+- If a change contradicts [functional-specs.md](functional-specs.md), the spec wins; changing the spec is the human's decision.
+- If a doc and the code disagree, the code is the fact and the doc is the bug: say so and fix the doc.
+
+---
+
+## 8. What the agent must not do
+
+- Add Asset Store packages, third-party SDKs, analytics or ads without the plan saying so.
+- Touch `keystore.*`, signing config, `build.env`, Play Console metadata.
+- Push, force-push, delete branches, or rewrite history.
+- Stage blindly: no `git add -A` over the whole repo; stage the paths the change is about.
