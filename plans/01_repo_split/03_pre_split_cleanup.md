@@ -1,5 +1,5 @@
 ---
-status: draft
+status: done
 ---
 
 # Phase 03 - Clean up before duplicating
@@ -37,3 +37,11 @@ Context: after [`02_audit.md`](02_audit.md).
 - The GUID script reports no dangling references.
 
 ## What the implementation found
+
+- 2026-11-17, all in batch mode on the box; each commit closed on EditMode 114/114, PlayMode green and no compiler warnings.
+- `453cba9` MCP pinned to `b92c05a2`, the commit `packages-lock.json` already resolved; no package change.
+- `2b9d161` PlayMode tests shared the `DontDestroyOnLoad` `GameManager` across tests and passed only in their alphabetical order; the new overlay test, sorting first, broke the loop test. A `[UnityTearDown]` per fixture destroys it.
+- `78df44a` overlay moved into `Persistent.unity` (PlayMode test added, 4/4); volume profile cleared on both URP assets (captures before and after differ only by the animated water, the same as two captures with no change); leftovers and the template's project-wide input actions deleted; no reference left to any deleted GUID; no LFS object left. companyName `Pitrified`, productName `Unity Setup` (my choice, not raised: nothing had named the guide), Android id `com.pitrified.unitysetup`.
+- `ed02a2f` Q9 a: `ISaveSystem` is `Load<T>(version)` / `Save<T>(payload, version)` around an envelope the save system owns; `GameSaveData` and `ShipSaveData` live in `Game.Gameplay`, payload version 2, a version 1 file resets. `Game.Systems` has no mention of the ship.
+- Copying a warm `Library/` from another clone gave "referenced script is missing" for every scene component in PlayMode; a fresh import fixed it. Do not copy `Library/` between clones.
+- `dev` APK built with `UNITY_PATH` unset: the script found the editor, the APK is `com.pitrified.unitysetup`, label "Unity Setup", `arm64-v8a`, 73 MB. An interrupted build leaves `Assets/Resources/PerformanceTestRun*.json` behind (the performance test package's build step); delete it if a build is killed.
