@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 05 - Verify
@@ -20,3 +20,4 @@ status: in progress
   `Tools/gates.sh all` from an empty `Library/`: the first-import rerun fired as designed, then compile 0 warnings, EditMode 114/114, PlayMode 4/4;
   `dev` APK 70 MB, `com.pitrified.unitysetup`, `Unity Setup`, `arm64-v8a`. The APK is copied to `UnitySetup/Build/dev/` in the working repo for the phone.
 - Open: the HUMAN device run.
+- 2026-11-18, device run by the user: "Works". Two requests from it, done in [`06_device_polish.md`](06_device_polish.md): a general menu title, and landmarks so movement shows.

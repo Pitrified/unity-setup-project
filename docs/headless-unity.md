@@ -72,6 +72,7 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 
 - Write an editor method (`EditorSceneManager`, `AssetDatabase`, `SerializedObject`, `PlayerSettings`) and run it with `-executeMethod`.
 - A one-off migration lives in an `Editor` folder while it runs and is deleted before the commit; the plan log records what it did.
+  Name it for what it does (`PlaceLandmarks`), never for a plan or phase: source files do not mention plans, temporary ones included.
 - Read the YAML diff before committing: a change should touch what it meant to and nothing else.
 - After deleting an asset, check that nothing references its GUID: `git grep <guid>` over the project, excluding `.meta` files.
 - Rename a script or asset with its `.meta` (`git mv` both), so the GUID and every reference to it survive.
@@ -87,5 +88,6 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 - **An interrupted build** leaves `Assets/Resources/PerformanceTestRun*.json` behind (the performance test package's build step). Delete it; a finished build removes it itself.
 - **PlayMode tests that boot the game** must destroy the `DontDestroyOnLoad` `GameManager` in teardown (`PlayModeTestReset`), or the next test waits on the old instance.
 - **Animated shaders** (anything using `_Time`, such as a water shader) make two captures differ even with no change. Compare a change against a control pair of captures, not against zero.
+- **The first `Camera.Render()` after opening a scene** in an editor method comes out without its realtime light: surfaces show ambient only and look near black. Render twice and keep the second frame.
 - **`DISPLAY` set but not usable**: a session over SSH can inherit `DISPLAY=:0` from a desktop it cannot open, and Unity then fails with "Error opening default X display". Run under `xvfb-run` regardless, as `gates.sh` does.
 - **A RAM-backed `/tmp`**: Ubuntu 25.10 and later mount `/tmp` as a tmpfs with a per-user quota. A project clone there fills RAM, and Unity's package import fails with error -122 (`EDQUOT`). Keep projects and their `Library/` on disk.

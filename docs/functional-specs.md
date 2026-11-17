@@ -83,7 +83,7 @@ Ownership rules:
 | `Boot`       | Single    | First frame only      | `GameBootstrap` only                   |
 | `Persistent` | Additive  | Whole session         | GameManager, Input, Save, Audio, UIRoot |
 | `Menu`       | Single    | While in menu         | Main menu UI                           |
-| `Game`       | Additive  | While playing         | Avatar, ground plane, GameCamera       |
+| `Game`       | Additive  | While playing         | Avatar, ground plane, green blobs as landmarks, GameCamera |
 
 ---
 

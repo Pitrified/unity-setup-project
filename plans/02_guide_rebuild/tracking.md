@@ -20,7 +20,8 @@ From `00_start.md` Q1 to Q10, 2026-11-17, all as recommended:
 | 02 | Folder and names         | [`02_rename.md`](02_rename.md)           | done    |
 | 03 | Template review          | [`03_template.md`](03_template.md)       | done    |
 | 04 | Docs                     | [`04_docs.md`](04_docs.md)               | done    |
-| 05 | Verify                   | [`05_verify.md`](05_verify.md)           | in progress |
+| 05 | Verify                   | [`05_verify.md`](05_verify.md)           | done    |
+| 06 | Polish from the device run | [`06_device_polish.md`](06_device_polish.md) | in progress |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
 
@@ -35,3 +36,5 @@ Append-only. Newest at the bottom.
 - 2026-11-17 : phase 03 - hook fixed (two bugs seen first), `Tools/gates.sh`, setup and build scripts use the project's editor version, fonts in LFS; the same in artificial-pirate on `fix/template_from_guide` (`f6c487e`).
 - 2026-11-17 : phase 04 - root README with the pattern index, `bootstrap-new-project.md`, the sample's spec and systems docs, generic release docs, `gates.sh` and new pitfalls in `headless-unity.md`, template deleted. Link check back to the 8 old diary links.
 - 2026-11-18 : phase 05 box checks green in a fresh clone, `gates.sh all` from an empty `Library/` included. Waiting on the device run.
+- 2026-11-18 : phase 05 done: the user ran the `dev` APK on the phone, works, and pushed. Phase 06 added from the device run: menu title, green blobs as landmarks.
+- 2026-11-18 : phase 06 - menu title and 40 green blobs; the first editor render after opening a scene is unlit, which made earlier captures look dark. Gates green, APK built; waiting on the phone.

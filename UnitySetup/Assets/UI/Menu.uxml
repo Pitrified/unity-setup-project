@@ -10,7 +10,7 @@
     <ui:VisualElement name="menu-root" class="menu-root">
         <ui:VisualElement name="safe-area-container" class="safe-area-container">
             <ui:VisualElement class="menu-panel">
-                <ui:Label class="menu-title" text="Artificial Pi" />
+                <ui:Label class="menu-title" text="Unity Setup" />
                 <ui:Button name="btn-play"     class="menu-btn" text="New Game" />
                 <ui:Button name="btn-continue" class="menu-btn" text="Continue" />
                 <ui:Button name="btn-quit"     class="menu-btn menu-btn--quit" text="Quit" />
