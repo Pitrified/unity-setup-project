@@ -41,6 +41,10 @@ namespace Game.Tests.PlayMode
             Time.captureDeltaTime = 0f;
         }
 
+        /// <summary>Destroys the DontDestroyOnLoad GameManager so the next test boots fresh.</summary>
+        [UnityTearDown]
+        public IEnumerator UnityTearDown() => PlayModeTestReset.DestroyPersistentGameManager();
+
         // ------------------------------------------------------------------ tests
 
         /// <summary>
