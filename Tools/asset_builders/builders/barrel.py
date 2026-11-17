@@ -4,7 +4,7 @@ Defaults from a 225 l Bordeaux barrique (about 0.95 m long, 0.56 m across the
 heads, 0.72 m at the bilge); see docs/building_assets.md for how they were chosen.
 The staves are flat faces around the barrel with sharp seams between them and a
 smooth curve along their length, which is how the staves read at a distance
-without a texture. One mesh, two material slots: Wood and Iron.
+without a texture. One mesh, three material slots: Wood, Iron and Cork.
 """
 
 from __future__ import annotations
@@ -17,15 +17,18 @@ PARAMS = {
     "height": 0.95,            # m, head to head including the chimes
     "head_diameter": 0.56,     # m, outer, at the ends of the staves
     "bilge_diameter": 0.72,    # m, outer, at the middle
-    "staves": 24,              # flat faces around
+    "staves": 28,              # flat faces around; a barrique has 28 to 32
     "rings": 12,               # segments along the height
     "chime": 0.025,            # m, how far the staves stand beyond the heads
     "stave_thickness": 0.025,  # m, seen at the rims
-    "hoops": [0.05, 0.2, 0.36, 0.64, 0.8, 0.95],  # band centres, fraction of the height
-    "hoop_width": 0.04,        # m
+    "hoops": [0.03, 0.11, 0.30, 0.70, 0.89, 0.97],  # band centres, fraction of the height: three at each end
+    "hoop_width": 0.055,       # m, galvanised bands on a barrique
     "hoop_thickness": 0.006,   # m, how far a band stands off the staves
+    "bung_radius": 0.025,      # m, the cork in the bung hole at the bilge
+    "bung_height": 0.015,      # m, how far the cork stands out
     "wood_rgb": [0.45, 0.28, 0.15],  # probe preview only; Unity has its own material
     "iron_rgb": [0.16, 0.16, 0.17],
+    "cork_rgb": [0.62, 0.48, 0.30],
 }
 
 
@@ -51,6 +54,27 @@ def _ring(radius: float, z: float, n: int) -> list[tuple[float, float, float]]:
     return [(radius * math.sin(2 * math.pi * i / n), -radius * math.cos(2 * math.pi * i / n), z) for i in range(n)]
 
 
+def _bung(params: dict, verts: list, faces: list, face_mat: list, sharp_pairs: set) -> None:
+    """A cork as an 8-sided cylinder along -Y at mid height, sunk into the stave and standing out."""
+    segments = 8
+    r = params["bung_radius"]
+    z = params["height"] / 2
+    y_in = -(radius_at(params, 0.5) - 0.01)
+    y_out = -(radius_at(params, 0.5) + params["bung_height"])
+    inner = len(verts)
+    for y in (y_in, y_out):
+        verts.extend((r * math.cos(2 * math.pi * i / segments), y, z + r * math.sin(2 * math.pi * i / segments))
+                     for i in range(segments))
+    outer = inner + segments
+    for i in range(segments):
+        j = (i + 1) % segments
+        faces.append((inner + i, inner + j, outer + j, outer + i))
+        face_mat.append(2)
+        sharp_pairs.add((min(outer + i, outer + j), max(outer + i, outer + j)))
+    faces.append(tuple(outer + i for i in range(segments)))
+    face_mat.append(2)
+
+
 def build(params: dict) -> None:
     """Make the barrel as one mesh object named Barrel, origin at the base centre."""
     n = params["staves"]
@@ -63,6 +87,12 @@ def build(params: dict) -> None:
     faces: list[tuple[int, ...]] = []
     face_mat: list[int] = []
     sharp_pairs: set[tuple[int, int]] = set()
+
+    def sharp_ring(a: int) -> None:
+        """Mark the n edges around a ring sharp, so a band reads flat with crisp edges."""
+        for i in range(n):
+            j = (i + 1) % n
+            sharp_pairs.add((min(a + i, a + j), max(a + i, a + j)))
 
     def add_ring(radius: float, z: float) -> int:
         start = len(verts)
@@ -112,6 +142,11 @@ def build(params: dict) -> None:
         bridge(base0, band0, 1, sharp_sides=False)
         bridge(band0, band1, 1, sharp_sides=False)
         bridge(band1, base1, 1, sharp_sides=False)
+        sharp_ring(band0)
+        sharp_ring(band1)
+
+    # The bung: a short cork cylinder through the stave facing -Y, at the bilge.
+    _bung(params, verts, faces, face_mat, sharp_pairs)
 
     mesh = bpy.data.meshes.new("Barrel")
     mesh.from_pydata(verts, [], faces)
@@ -127,6 +162,7 @@ def build(params: dict) -> None:
         sharp.data[edge.index].value = edge_sharp
     mesh.materials.append(_material("Wood", params["wood_rgb"], 0.0))
     mesh.materials.append(_material("Iron", params["iron_rgb"], 0.6))
+    mesh.materials.append(_material("Cork", params["cork_rgb"], 0.0))
 
     obj = bpy.data.objects.new("Barrel", mesh)
     bpy.context.scene.collection.objects.link(obj)

@@ -7,7 +7,7 @@ namespace Game.Tests.EditMode
     /// <summary>
     /// Checks the barrel as Unity imports it from Tools/asset_builders/builders/barrel.py:
     /// the size the builder's parameters give, the pivot at the base, upright, scale 1,
-    /// and the builder's two material slots mapped to the project materials
+    /// and the builder's three material slots mapped to the project materials
     /// (docs/building_assets.md, "The Unity side").
     /// </summary>
     public sealed class BarrelModelTests
@@ -44,10 +44,25 @@ namespace Game.Tests.EditMode
         [Test]
         public void Pivot_IsAtBaseCentre()
         {
-            Bounds bounds = WorldBounds();
-            Assert.AreEqual(0f, bounds.min.y, PivotTolerance, "The base sits at y 0");
-            Assert.AreEqual(0f, bounds.center.x, PivotTolerance, "Centred on X");
-            Assert.AreEqual(0f, bounds.center.z, PivotTolerance, "Centred on Z");
+            Assert.AreEqual(0f, WorldBounds().min.y, PivotTolerance, "The base sits at y 0");
+
+            // The centre of the base ring, not of the bounds: the bung stands out on one side.
+            Matrix4x4 toModel = _model.transform.worldToLocalMatrix * _filter.transform.localToWorldMatrix;
+            Vector3 sum = Vector3.zero;
+            int count = 0;
+            foreach (Vector3 v in _filter.sharedMesh.vertices)
+            {
+                Vector3 p = toModel.MultiplyPoint3x4(v);
+                if (p.y < PivotTolerance)
+                {
+                    sum += p;
+                    count++;
+                }
+            }
+            Assert.That(count, Is.GreaterThan(0), "The model has vertices at its base");
+            Vector3 centre = sum / count;
+            Assert.AreEqual(0f, centre.x, PivotTolerance, "The base is centred on X");
+            Assert.AreEqual(0f, centre.z, PivotTolerance, "The base is centred on Z");
         }
 
         [Test]
@@ -67,7 +82,7 @@ namespace Game.Tests.EditMode
         {
             var renderer = _filter.GetComponent<MeshRenderer>();
             string[] paths = System.Array.ConvertAll(renderer.sharedMaterials, AssetDatabase.GetAssetPath);
-            CollectionAssert.AreEquivalent(new[] { "Assets/Art/M_Wood.mat", "Assets/Art/M_Iron.mat" }, paths);
+            CollectionAssert.AreEquivalent(new[] { "Assets/Art/M_Wood.mat", "Assets/Art/M_Iron.mat", "Assets/Art/M_Cork.mat" }, paths);
         }
 
         private Bounds WorldBounds()

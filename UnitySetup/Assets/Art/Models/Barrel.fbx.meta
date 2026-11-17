@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Cork
+    second: {fileID: 2100000, guid: fe5c4004a8e419943ba96dc498aacf3d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Iron
     second: {fileID: 2100000, guid: 221fb29691dcae00ea0a4fb981de4a5d, type: 2}
   - first:

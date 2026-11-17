@@ -1,0 +1,5 @@
+{"neutral": "hoop",
+ "reference": {"path": "references/barrel/barriques.jpg",
+               "patches": {"hoop": [674, 420, 692, 460], "wood": [712, 420, 760, 460]}},
+ "render": {"patches": {"hoop": [400, 152, 460, 166], "wood": [400, 220, 460, 300]}},
+ "capture": "-captureEye 2.0,0.55,5.4 -captureTarget 2.5,0.47,7 -captureFov 35 (Barrel1 in Game.unity)"}
