@@ -12,6 +12,7 @@ Proposed, pending the answers in `00_start.md`:
 - **Clean before duplicating**, as far as it can be done without compiling here.
 - **The Unity project is copied, not rewritten**: `.meta` GUIDs carry every reference between assets.
 - **The guide rebuild is its own folder**, `02_guide_rebuild`; this folder ends when the game runs from its own repo.
+- **Building assets from a reference photograph is its own folder**, [`03_asset_method`](../03_asset_method/00_start.md). artificial-pirate gets the method when that folder lands; its pirate-specific findings stay in that repo.
 - **Unity checks are human steps.** This box has no Unity Editor; each phase that changes Unity files closes on a check in the Editor or on the device.
 
 ## Phases
@@ -30,3 +31,4 @@ Status values: draft / planned / in progress / done / superseded / discarded.
 Append-only. Newest at the bottom.
 
 - 2026-11-14 : bootstrapped from the flutter split (`flutter-setup-project` `plans/20_repo_split/`, `27_guide_rebuild`, and `fala-language-tutor` `plans/01_bootstrap/`). Read `main` and `origin/feat/ph6`: 297 tracked files, ph6 unmerged with phases 6 to 8, template `applicationIdentifier`, MCP unpinned, save schema coupled to the ship. Raised Q1 to Q13. Four phases drafted; `02_guide_rebuild` drafted as a sibling.
+- 2026-11-14 : `03_asset_method` drafted as a sibling, from a read of house-renderer's `match-reference` skill and `docs/building_assets.md`. Decided with the user: Blender builders exporting FBX, the industry standard; taken assets under any licence that allows a commercial app with ads. Not a dependency of this folder.

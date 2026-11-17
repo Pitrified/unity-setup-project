@@ -33,6 +33,7 @@ Written into the new repo as `plans/01_bootstrap/` with these phases:
 - New gameplay. The game behaves as it does here.
 - Rebuilding this repo into the guide: `02_guide_rebuild`.
 - CI or a headless Unity gate; a candidate for the guide.
+- The asset-building method, `03_asset_method`; artificial-pirate copies it from the guide when it lands, and keeps its own findings doc for the ship.
 
 ## Done when
 
