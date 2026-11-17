@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 03 - Template review
@@ -30,3 +30,4 @@ The repo scaffold, read as what a new project copies.
 - **`Tools/setup.sh`**: the adb path hardcoded `6000.4.4f1` (now from `ProjectVersion.txt`); a "will be created in Phase 8" message; and nothing checked the `unityyamlmerge` merge driver that `.gitattributes` names, which is per-user git config (now a warning pointing at `docs/git-workflow.md`).
 - **`.gitattributes`**: fonts (`*.ttf`, `*.otf`) added to the LFS rules. The rest is fine: LF everywhere, Unity YAML as text with the merge driver, the usual binaries in LFS.
 - Read and fine as they are: `.gitignore` (Unity folders at any depth, secrets, IDE files), `.editorconfig`, `.vscode/settings.json`.
+- artificial-pirate: the same hook, `gates.sh`, `setup.sh`, `build-android.sh` and `.gitattributes` (names substituted, diffed against its `main` to show only these changes), plus a `gates.sh` line in its `headless-unity.md` and instructions; branch `fix/template_from_guide`, `f6c487e`. `gates.sh all` green there (0 warnings, 114/114, 4/4); the hook seen failing on a staged `Library/` file.
