@@ -4,17 +4,17 @@ namespace Game.Gameplay
     using Game.Systems;
 
     /// <summary>
-    /// Kinematic ship controller. Moves the Transform directly; no Rigidbody or physics queries.
+    /// Kinematic avatar controller. Moves the Transform directly; no Rigidbody or physics queries.
     /// Reads movement input from an injected <see cref="IInputManager"/> each frame.
     /// </summary>
-    public sealed class ShipController : MonoBehaviour
+    public sealed class AvatarController : MonoBehaviour
     {
         private const float DriftWarnDistanceSq = 10000f * 10000f;
 
-        [SerializeField] private SO_ShipTuning _tuning;
+        [SerializeField] private SO_AvatarTuning _tuning;
 
-        /// <summary>World-space Y position the ship is locked to (sea surface). Constant in v0.2.</summary>
-        [SerializeField] private float _seaSurfaceY = 0f;
+        /// <summary>World-space Y position the avatar is locked to (ground plane). Constant in v0.2.</summary>
+        [SerializeField] private float _groundY = 0f;
 
         private IInputManager _input;
         private Transform _transform;
@@ -58,13 +58,13 @@ namespace Game.Gameplay
         {
             if (float.IsNaN(throttle) || float.IsInfinity(throttle))
             {
-                Log.Warn(LogCat.Gameplay, "ShipController: invalid throttle {0}, clamping to 0", throttle);
+                Log.Warn(LogCat.Gameplay, "AvatarController: invalid throttle {0}, clamping to 0", throttle);
                 throttle = 0f;
             }
 
             if (float.IsNaN(steering) || float.IsInfinity(steering))
             {
-                Log.Warn(LogCat.Gameplay, "ShipController: invalid steering {0}, clamping to 0", steering);
+                Log.Warn(LogCat.Gameplay, "AvatarController: invalid steering {0}, clamping to 0", steering);
                 steering = 0f;
             }
 
@@ -73,25 +73,25 @@ namespace Game.Gameplay
         }
 
         /// <summary>
-        /// Instantly places the ship at <paramref name="position"/> facing <paramref name="yawDeg"/>.
+        /// Instantly places the avatar at <paramref name="position"/> facing <paramref name="yawDeg"/>.
         /// Called by SaveSystem on load. Resets accumulated speed and steering.
         /// </summary>
         public void Teleport(Vector3 position, float yawDeg)
         {
             if (_transform == null)
                 _transform = transform;
-            _transform.position = new Vector3(position.x, _seaSurfaceY, position.z);
+            _transform.position = new Vector3(position.x, _groundY, position.z);
             _transform.rotation = Quaternion.Euler(0f, yawDeg, 0f);
             _currentSpeed = 0f;
             _smoothedSteering = 0f;
         }
 
-        /// <summary>Returns a snapshot of the ship's current world position and yaw.</summary>
-        public ShipState GetState()
+        /// <summary>Returns a snapshot of the avatar's current world position and yaw.</summary>
+        public AvatarState GetState()
         {
             if (_transform == null)
                 _transform = transform;
-            return new ShipState(_transform.position, _transform.eulerAngles.y);
+            return new AvatarState(_transform.position, _transform.eulerAngles.y);
         }
 
         // ------------------------------------------------------------------ internal (testable)
@@ -119,14 +119,14 @@ namespace Game.Gameplay
 
             Vector3 pos = _transform.position;
             pos += _transform.forward * (_currentSpeed * dt);
-            pos.y = _seaSurfaceY;
+            pos.y = _groundY;
             _transform.position = pos;
 
             _transform.Rotate(Vector3.up, _tuning.YawRateDeg * _smoothedSteering * dt);
 
             if (pos.sqrMagnitude > DriftWarnDistanceSq)
             {
-                Log.Warn(LogCat.Gameplay, "ShipController: position drifted beyond +-10 km from origin");
+                Log.Warn(LogCat.Gameplay, "AvatarController: position drifted beyond +-10 km from origin");
             }
         }
     }

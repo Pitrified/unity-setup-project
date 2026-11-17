@@ -1,13 +1,13 @@
-// PlayMode test: save → reload scene → Continue restores ship position.
+// PlayMode test: save → reload scene → Continue restores avatar position.
 //
 // Flow:
 //   1. Boot → Menu → StartNewGameAsync → Playing          (save deleted by StartNewGame)
-//   2. Teleport ship to a known far-away position
+//   2. Teleport avatar to a known far-away position
 //   3. ReturnToMenuAsync                                   (PersistCurrentState runs first,
 //                                                          before Game scene unloads)
 //   4. ContinueAsync → Game scene reloaded fresh
-//   5. GameSceneWiring.Start() → RegisterShip() reads save → Teleport(savedPos, savedYaw)
-//   6. Assert new ship instance is at the saved position
+//   5. GameSceneWiring.Start() → RegisterAvatar() reads save → Teleport(savedPos, savedYaw)
+//   6. Assert new avatar instance is at the saved position
 //
 // The test writes a real save file to Application.persistentDataPath.
 // Each run starts with StartNewGameAsync which deletes any prior save,
@@ -26,7 +26,7 @@ namespace Game.Tests.PlayMode
 
     /// <summary>
     /// PlayMode test verifying that the save-and-restore cycle correctly
-    /// persists and rehydrates the ship's world position and yaw.
+    /// persists and rehydrates the avatar's world position and yaw.
     /// </summary>
     public sealed class SaveRestoreTests
     {
@@ -62,13 +62,13 @@ namespace Game.Tests.PlayMode
         // ------------------------------------------------------------------ test
 
         /// <summary>
-        /// Teleports the ship to a known position, returns to Menu (which triggers a save),
+        /// Teleports the avatar to a known position, returns to Menu (which triggers a save),
         /// then continues (which reloads the Game scene and restores the position from save).
-        /// Asserts the freshly loaded ship is within <see cref="PosEpsilon"/> metres of the
+        /// Asserts the freshly loaded avatar is within <see cref="PosEpsilon"/> metres of the
         /// saved location and within <see cref="YawEpsilon"/> degrees of the saved yaw.
         /// </summary>
         [UnityTest]
-        public IEnumerator SaveReloadContinue_RestoresShipPosition()
+        public IEnumerator SaveReloadContinue_RestoresAvatarPosition()
         {
             // ---- Arrange: boot to Playing (StartNewGameAsync deletes any prior save) ---- //
 
@@ -81,17 +81,19 @@ namespace Game.Tests.PlayMode
 
             yield return WaitForState(GameState.Playing);
 
-            // One frame so that GameSceneWiring.Start() runs and RegisterShip() wires
-            // _activeShip into GameManager before we move it.
+            // One frame so that GameSceneWiring.Start() runs and RegisterAvatar() wires
+            // _activeAvatar into GameManager before we move it.
             yield return null;
 
-            ShipController[] ships =
-                Object.FindObjectsByType<ShipController>(FindObjectsInactive.Exclude);
-            Assert.AreEqual(1, ships.Length, "Exactly one ShipController must exist in the Game scene");
+            AvatarController[] avatars =
+                Object.FindObjectsByType<AvatarController>(FindObjectsInactive.Exclude);
+            Assert.AreEqual(1, avatars.Length, "Exactly one AvatarController must exist in the Game scene");
 
             // ---- Act: teleport to known position then return to Menu (triggers save) ---- //
 
-            ships[0].Teleport(SavedPos, SavedYaw);
+            avatars[0].Teleport(SavedPos, SavedYaw);
+            // Teleport keeps the avatar on its ground height, so the saved position is read back.
+            Vector3 expectedPos = avatars[0].transform.position;
 
             var returnTask = GameManager.Instance.ReturnToMenuAsync();
             while (!returnTask.IsCompleted)
@@ -101,7 +103,7 @@ namespace Game.Tests.PlayMode
             Assert.IsTrue(GameManager.Instance.SaveSystem.HasSave,
                 "A save file must exist after ReturnToMenuAsync");
 
-            // ---- Act: Continue → Game scene reloaded → RegisterShip restores position ---- //
+            // ---- Act: Continue → Game scene reloaded → RegisterAvatar restores position ---- //
 
             var continueTask = GameManager.Instance.ContinueAsync();
             while (!continueTask.IsCompleted)
@@ -109,26 +111,26 @@ namespace Game.Tests.PlayMode
 
             yield return WaitForState(GameState.Playing);
 
-            // One frame so that GameSceneWiring.Start() runs and RegisterShip() teleports
-            // the freshly spawned ship to the saved coordinates.
+            // One frame so that GameSceneWiring.Start() runs and RegisterAvatar() teleports
+            // the freshly spawned avatar to the saved coordinates.
             yield return null;
 
             // ---- Assert ---- //
 
-            ShipController[] restoredShips =
-                Object.FindObjectsByType<ShipController>(FindObjectsInactive.Exclude);
-            Assert.AreEqual(1, restoredShips.Length,
-                "Exactly one ShipController must exist after scene reload");
+            AvatarController[] restoredAvatars =
+                Object.FindObjectsByType<AvatarController>(FindObjectsInactive.Exclude);
+            Assert.AreEqual(1, restoredAvatars.Length,
+                "Exactly one AvatarController must exist after scene reload");
 
-            ShipController restored = restoredShips[0];
+            AvatarController restored = restoredAvatars[0];
 
-            float posDelta = Vector3.Distance(restored.transform.position, SavedPos);
+            float posDelta = Vector3.Distance(restored.transform.position, expectedPos);
             float yawDelta = Mathf.Abs(Mathf.DeltaAngle(restored.transform.eulerAngles.y, SavedYaw));
 
             Assert.That(posDelta, Is.LessThan(PosEpsilon),
-                $"Ship position must be restored to {SavedPos} (actual={restored.transform.position}, delta={posDelta:F4} m)");
+                $"Avatar position must be restored to {expectedPos} (actual={restored.transform.position}, delta={posDelta:F4} m)");
             Assert.That(yawDelta, Is.LessThan(YawEpsilon),
-                $"Ship yaw must be restored to {SavedYaw} deg (actual={restored.transform.eulerAngles.y:F4}, delta={yawDelta:F4} deg)");
+                $"Avatar yaw must be restored to {SavedYaw} deg (actual={restored.transform.eulerAngles.y:F4}, delta={yawDelta:F4} deg)");
         }
 
         // ------------------------------------------------------------------ helpers

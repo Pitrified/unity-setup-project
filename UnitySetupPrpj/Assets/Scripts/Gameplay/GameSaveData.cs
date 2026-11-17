@@ -1,8 +1,8 @@
 namespace Game.Gameplay
 {
-    /// <summary>Saved ship position and heading.</summary>
+    /// <summary>Saved avatar position and heading.</summary>
     [System.Serializable]
-    public struct ShipSaveData
+    public struct AvatarSaveData
     {
         /// <summary>World-space X position.</summary>
         public float x;
@@ -28,10 +28,11 @@ namespace Game.Gameplay
         /// Payload schema version, passed to the save system on every load and save.
         /// Increment on any breaking field change; a mismatch resets the save.
         /// 2: the payload moved inside the save system's envelope (1 had the ship at the top level).
+        /// 3: the ship's section became the avatar's, when the game moved to artificial-pirate.
         /// </summary>
-        public const int CurrentVersion = 2;
+        public const int CurrentVersion = 3;
 
-        /// <summary>Ship state at the time of save.</summary>
-        public ShipSaveData ship;
+        /// <summary>Avatar state at the time of save.</summary>
+        public AvatarSaveData avatar;
     }
 }

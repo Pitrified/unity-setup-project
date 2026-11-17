@@ -477,46 +477,46 @@ namespace Game.Tests.EditMode
             Assert.IsNull(GameManager.Instance);
         }
 
-        // ------------------------------------------------------------------ RegisterShip / save-restore
+        // ------------------------------------------------------------------ RegisterAvatar / save-restore
 
         [Test]
-        public void RegisterShip_WithExistingSave_Teleports_Ship_To_SavedPosition()
+        public void RegisterAvatar_WithExistingSave_Teleports_Avatar_To_SavedPosition()
         {
-            var shipGo = new UnityEngine.GameObject("Ship");
-            var ship   = shipGo.AddComponent<Game.Gameplay.ShipController>();
+            var avatarGo = new UnityEngine.GameObject("Avatar");
+            var avatar   = avatarGo.AddComponent<Game.Gameplay.AvatarController>();
 
             var stored = new Game.Gameplay.GameSaveData
             {
-                ship = new Game.Gameplay.ShipSaveData { x = 10f, y = 0f, z = 20f, yawDeg = 45f },
+                avatar = new Game.Gameplay.AvatarSaveData { x = 10f, y = 0f, z = 20f, yawDeg = 45f },
             };
             _fakeSave.SetStored(stored);
             _fakeSave.HasSave = true;
 
-            _gm.RegisterShip(ship);
+            _gm.RegisterAvatar(avatar);
 
-            Game.Gameplay.ShipState state = ship.GetState();
+            Game.Gameplay.AvatarState state = avatar.GetState();
             Assert.AreEqual(10f,  state.Position.x, 1e-4f);
             Assert.AreEqual(20f,  state.Position.z, 1e-4f);
             Assert.AreEqual(45f,  state.YawDeg,     1e-4f);
 
-            UnityEngine.Object.DestroyImmediate(shipGo);
+            UnityEngine.Object.DestroyImmediate(avatarGo);
         }
 
         [Test]
-        public void RegisterShip_WithNoSave_DoesNotMoveShip()
+        public void RegisterAvatar_WithNoSave_DoesNotMoveAvatar()
         {
-            var shipGo = new UnityEngine.GameObject("Ship");
-            var ship   = shipGo.AddComponent<Game.Gameplay.ShipController>();
+            var avatarGo = new UnityEngine.GameObject("Avatar");
+            var avatar   = avatarGo.AddComponent<Game.Gameplay.AvatarController>();
             _fakeSave.HasSave = false;
 
-            _gm.RegisterShip(ship);
+            _gm.RegisterAvatar(avatar);
 
-            // Ship should remain at the default position (origin).
-            Game.Gameplay.ShipState state = ship.GetState();
+            // Avatar should remain at the default position (origin).
+            Game.Gameplay.AvatarState state = avatar.GetState();
             Assert.AreEqual(0f, state.Position.x, 1e-4f);
             Assert.AreEqual(0f, state.Position.z, 1e-4f);
 
-            UnityEngine.Object.DestroyImmediate(shipGo);
+            UnityEngine.Object.DestroyImmediate(avatarGo);
         }
 
         [Test]

@@ -1,4 +1,4 @@
-// EditMode tests for Game.Gameplay.ShipController
+// EditMode tests for Game.Gameplay.AvatarController
 // Run via Window > General > Test Runner > EditMode
 namespace Game.Tests.EditMode
 {
@@ -8,23 +8,23 @@ namespace Game.Tests.EditMode
     using Game.Gameplay;
 
     [TestFixture]
-    public sealed class ShipControllerTests
+    public sealed class AvatarControllerTests
     {
         private GameObject _go;
-        private ShipController _controller;
-        private SO_ShipTuning _tuning;
+        private AvatarController _controller;
+        private SO_AvatarTuning _tuning;
 
-        // SO_ShipTuning defaults: MaxSpeed=8, Acceleration=4, ReverseFactor=0.3,
+        // SO_AvatarTuning defaults: MaxSpeed=8, Acceleration=4, ReverseFactor=0.3,
         //                         YawRateDeg=60, SteeringResponseLerp=6
 
         [SetUp]
         public void SetUp()
         {
-            _go = new GameObject("Ship");
-            _controller = _go.AddComponent<ShipController>();
+            _go = new GameObject("Avatar");
+            _controller = _go.AddComponent<AvatarController>();
 
-            _tuning = ScriptableObject.CreateInstance<SO_ShipTuning>();
-            var tuningField = typeof(ShipController).GetField(
+            _tuning = ScriptableObject.CreateInstance<SO_AvatarTuning>();
+            var tuningField = typeof(AvatarController).GetField(
                 "_tuning",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             tuningField.SetValue(_controller, _tuning);
@@ -46,7 +46,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(float.NaN, 0f);
             _controller.Tick(1f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.IsFalse(float.IsNaN(state.Position.z), "Position.z must not be NaN");
             Assert.AreEqual(0f, state.Position.z, 0.001f, "NaN throttle must produce zero movement");
         }
@@ -57,7 +57,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(0f, float.NaN);
             _controller.Tick(1f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.IsFalse(float.IsNaN(state.YawDeg), "YawDeg must not be NaN");
             Assert.AreEqual(0f, state.YawDeg, 0.001f, "NaN steering must produce zero yaw change");
         }
@@ -68,7 +68,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(float.PositiveInfinity, 0f);
             _controller.Tick(1f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.IsFalse(float.IsInfinity(state.Position.z), "Position.z must not be Infinity");
             Assert.AreEqual(0f, state.Position.z, 0.001f, "Infinity throttle must produce zero movement");
         }
@@ -79,7 +79,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(0f, float.NegativeInfinity);
             _controller.Tick(1f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.IsFalse(float.IsInfinity(state.YawDeg), "YawDeg must not be Infinity");
             Assert.AreEqual(0f, state.YawDeg, 0.001f, "Infinity steering must produce zero yaw change");
         }
@@ -105,7 +105,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(2f, 0f);
             _controller.Tick(100f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.AreEqual(800f, state.Position.z, 0.001f,
                 "Throttle 2 must be clamped to 1, giving the same position as throttle 1");
         }
@@ -116,7 +116,7 @@ namespace Game.Tests.EditMode
             _controller.SetInput(-2f, 0f);
             _controller.Tick(100f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.AreEqual(-240f, state.Position.z, 0.001f,
                 "Throttle -2 must be clamped to -1, giving the same position as throttle -1");
         }
@@ -151,9 +151,9 @@ namespace Game.Tests.EditMode
         {
             _controller.Teleport(new Vector3(10f, 99f, 20f), 90f);
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.AreEqual(10f, state.Position.x, 0.001f);
-            Assert.AreEqual(0f, state.Position.y, 0.001f, "Y must be locked to sea surface (0)");
+            Assert.AreEqual(0f, state.Position.y, 0.001f, "Y must be locked to the ground plane (0)");
             Assert.AreEqual(20f, state.Position.z, 0.001f);
             Assert.AreEqual(90f, state.YawDeg, 0.001f);
         }
@@ -161,14 +161,14 @@ namespace Game.Tests.EditMode
         [Test]
         public void Teleport_ResetsAccumulatedSpeed()
         {
-            // Build up speed then teleport; after one zero-dt tick the ship must not have moved.
+            // Build up speed then teleport; after one zero-dt tick the avatar must not have moved.
             _controller.SetInput(1f, 0f);
-            _controller.Tick(10f); // ship is now moving fast
+            _controller.Tick(10f); // avatar is now moving fast
 
             _controller.Teleport(new Vector3(5f, 0f, 5f), 0f);
             _controller.Tick(0f); // zero-dt: should not move
 
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.AreEqual(5f, state.Position.x, 0.001f);
             Assert.AreEqual(5f, state.Position.z, 0.001f);
         }
@@ -179,7 +179,7 @@ namespace Game.Tests.EditMode
         [Test]
         public void GetState_DefaultPosition_IsOrigin()
         {
-            ShipState state = _controller.GetState();
+            AvatarState state = _controller.GetState();
             Assert.AreEqual(Vector3.zero, state.Position);
             Assert.AreEqual(0f, state.YawDeg, 0.001f);
         }

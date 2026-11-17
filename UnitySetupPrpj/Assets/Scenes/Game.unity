@@ -335,7 +335,7 @@ GameObject:
   - component: {fileID: 627648271}
   - component: {fileID: 627648270}
   m_Layer: 0
-  m_Name: Sea
+  m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -366,7 +366,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 26054643a9ee213b29b220cce28d6c9b, type: 2}
+  - {fileID: 2100000, guid: 22a62b672a4223feba6633d1c902d869, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -525,17 +525,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 800319960}
   m_CullTransparentMesh: 1
---- !u!114 &876271250 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6889234294984935923, guid: a1ca1613c0bd5e6ac9476a8bfe603fdd, type: 3}
-  m_PrefabInstance: {fileID: 2907944713319663924}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d482e55da14e4be8db0200c16396d22a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.ShipController
 --- !u!1 &1007081533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1010,7 +999,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8878724640efb25108ebcd6763da5907, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Core::Game.Core.GameSceneWiring
-  _ship: {fileID: 876271250}
+  _avatar: {fileID: 2907944713319663925}
   _camera: {fileID: 1007081538}
 --- !u!4 &1575283269
 Transform:
@@ -1106,63 +1095,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1705800024}
   m_CullTransparentMesh: 1
---- !u!1001 &2211304569076458299
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2796645958812393493, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_Name
-      value: Island
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3939166016513269386, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 14c6a8fb9a5b08405ac6ec7cd05f7d57, type: 3}
 --- !u!1001 &2907944713319663924
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1213,13 +1145,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4700440681567757610, guid: a1ca1613c0bd5e6ac9476a8bfe603fdd, type: 3}
       propertyPath: m_Name
-      value: Ship
+      value: Avatar
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a1ca1613c0bd5e6ac9476a8bfe603fdd, type: 3}
+--- !u!114 &2907944713319663925 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6889234294984935923, guid: a1ca1613c0bd5e6ac9476a8bfe603fdd, type: 3}
+  m_PrefabInstance: {fileID: 2907944713319663924}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d482e55da14e4be8db0200c16396d22a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.AvatarController
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1229,6 +1172,5 @@ SceneRoots:
   - {fileID: 2907944713319663924}
   - {fileID: 1007081536}
   - {fileID: 1575283269}
-  - {fileID: 2211304569076458299}
   - {fileID: 1194384201}
   - {fileID: 1170078903}

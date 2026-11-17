@@ -29,7 +29,7 @@ namespace Game.Tests.EditMode
                 BindingFlags.NonPublic | BindingFlags.Instance);
             tuningField.SetValue(_camera, _tuning);
 
-            _targetGo = new GameObject("Ship");
+            _targetGo = new GameObject("Avatar");
         }
 
         [TearDown]

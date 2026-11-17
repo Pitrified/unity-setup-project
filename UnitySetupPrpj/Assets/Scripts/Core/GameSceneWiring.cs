@@ -5,13 +5,13 @@ namespace Game.Core
     using Game.Gameplay;
 
     /// <summary>
-    /// Wires Game scene components (ShipController, CameraController) with Persistent scene
+    /// Wires Game scene components (AvatarController, CameraController) with Persistent scene
     /// systems (InputManager). Place this on any root object in Game.unity and assign
     /// the serialized references in the Inspector.
     /// </summary>
     public sealed class GameSceneWiring : MonoBehaviour
     {
-        [SerializeField] private ShipController _ship;
+        [SerializeField] private AvatarController _avatar;
         [SerializeField] private CameraController _camera;
 
         private void Start()
@@ -19,30 +19,30 @@ namespace Game.Core
             var gm = GameManager.Instance;
             if (gm == null)
             {
-                Log.Warn(LogCat.Gameplay, "GameSceneWiring: GameManager.Instance is null - ship/camera not wired");
+                Log.Warn(LogCat.Gameplay, "GameSceneWiring: GameManager.Instance is null - avatar/camera not wired");
                 return;
             }
 
-            if (_ship == null)
+            if (_avatar == null)
             {
-                Log.Warn(LogCat.Gameplay, "GameSceneWiring: ShipController not assigned");
+                Log.Warn(LogCat.Gameplay, "GameSceneWiring: AvatarController not assigned");
             }
             else
             {
-                _ship.Inject(gm.InputManager);
-                gm.RegisterShip(_ship);
-                Log.Info(LogCat.Gameplay, "GameSceneWiring: ShipController injected with InputManager");
+                _avatar.Inject(gm.InputManager);
+                gm.RegisterAvatar(_avatar);
+                Log.Info(LogCat.Gameplay, "GameSceneWiring: AvatarController injected with InputManager");
             }
 
             if (_camera == null)
             {
                 Log.Warn(LogCat.Gameplay, "GameSceneWiring: CameraController not assigned");
             }
-            else if (_ship != null)
+            else if (_avatar != null)
             {
-                _camera.SetTarget(_ship.transform);
+                _camera.SetTarget(_avatar.transform);
                 _camera.SnapToTarget();
-                Log.Info(LogCat.Gameplay, "GameSceneWiring: CameraController wired to ship");
+                Log.Info(LogCat.Gameplay, "GameSceneWiring: CameraController wired to avatar");
             }
         }
     }

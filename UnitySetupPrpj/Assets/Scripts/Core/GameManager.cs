@@ -54,7 +54,7 @@ namespace Game.Core
 
         // ------------------------------------------------------------------ active scene refs
 
-        private ShipController _activeShip;
+        private AvatarController _activeAvatar;
 
         // ------------------------------------------------------------------ initializer
 
@@ -88,23 +88,23 @@ namespace Game.Core
 
         /// <summary>
         /// Called by <see cref="GameSceneWiring"/> when the Game scene loads.
-        /// Stores the active ship reference and restores saved position if a save exists.
+        /// Stores the active avatar reference and restores saved position if a save exists.
         /// </summary>
-        public void RegisterShip(ShipController ship)
+        public void RegisterAvatar(AvatarController avatar)
         {
-            _activeShip = ship;
-            if (ship == null)
+            _activeAvatar = avatar;
+            if (avatar == null)
                 return;
 
             if (SaveSystem != null && SaveSystem.HasSave)
             {
                 GameSaveData data = SaveSystem.Load<GameSaveData>(GameSaveData.CurrentVersion);
-                ship.Teleport(
-                    new UnityEngine.Vector3(data.ship.x, data.ship.y, data.ship.z),
-                    data.ship.yawDeg);
+                avatar.Teleport(
+                    new UnityEngine.Vector3(data.avatar.x, data.avatar.y, data.avatar.z),
+                    data.avatar.yawDeg);
                 Log.Info(LogCat.Boot,
-                    "RegisterShip: restored position ({0:F1}, {1:F1}, {2:F1}) yaw {3:F1}.",
-                    data.ship.x, data.ship.y, data.ship.z, data.ship.yawDeg);
+                    "RegisterAvatar: restored position ({0:F1}, {1:F1}, {2:F1}) yaw {3:F1}.",
+                    data.avatar.x, data.avatar.y, data.avatar.z, data.avatar.yawDeg);
             }
         }
 
@@ -187,7 +187,7 @@ namespace Game.Core
             }
 
             PersistCurrentState();
-            _activeShip = null;                         // Game scene is about to unload
+            _activeAvatar = null;                         // Game scene is about to unload
             UISystem?.HideScreen(ScreenId.Pause);       // clear any lingering pause overlay
             InputManager?.SetEnabled(true);             // restore input for Menu scene
             TransitionTo(GameState.Loading);
@@ -337,7 +337,7 @@ namespace Game.Core
         }
 
         /// <summary>
-        /// Captures the current ship state and writes it to the save file.
+        /// Captures the current avatar state and writes it to the save file.
         /// Silently skips if <see cref="SaveSystem"/> is not yet assigned.
         /// </summary>
         private void PersistCurrentState()
@@ -349,10 +349,10 @@ namespace Game.Core
             {
                 GameSaveData data = SaveSystem.Load<GameSaveData>(GameSaveData.CurrentVersion);
 
-                if (_activeShip != null)
+                if (_activeAvatar != null)
                 {
-                    ShipState state = _activeShip.GetState();
-                    data.ship = new ShipSaveData
+                    AvatarState state = _activeAvatar.GetState();
+                    data.avatar = new AvatarSaveData
                     {
                         x      = state.Position.x,
                         y      = state.Position.y,

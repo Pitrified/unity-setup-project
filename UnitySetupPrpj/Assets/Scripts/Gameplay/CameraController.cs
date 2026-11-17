@@ -31,7 +31,7 @@ namespace Game.Gameplay
 
         /// <summary>
         /// Sets the Transform the camera will follow.
-        /// Call this after the Game scene loads and the ship is ready.
+        /// Call this after the Game scene loads and the avatar is ready.
         /// Pass <c>null</c> to detach.
         /// </summary>
         public void SetTarget(Transform target)

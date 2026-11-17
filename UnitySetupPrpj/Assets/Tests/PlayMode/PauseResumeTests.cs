@@ -1,8 +1,8 @@
-// PlayMode test: pause → resume preserves ship transform.
+// PlayMode test: pause → resume preserves avatar transform.
 //
-// The ship spawns at zero speed and receives no input during the test.
+// The avatar spawns at zero speed and receives no input during the test.
 // PauseGame() disables InputManager (returns default MovementInput = 0,0);
-// with zero throttle and zero steering ShipController.Tick() produces no
+// with zero throttle and zero steering AvatarController.Tick() produces no
 // position or rotation change, so transform must be bitwise identical before
 // and after the pause window.
 //
@@ -19,7 +19,7 @@ namespace Game.Tests.PlayMode
 
     /// <summary>
     /// PlayMode tests verifying that the pause/resume cycle does not alter
-    /// the ship's world transform.
+    /// the avatar's world transform.
     /// </summary>
     public sealed class PauseResumeTests
     {
@@ -49,12 +49,12 @@ namespace Game.Tests.PlayMode
 
         /// <summary>
         /// Boots into the Game scene, pauses, advances <see cref="PauseFrames"/> frames,
-        /// resumes, then asserts the ship's position and yaw are unchanged.
+        /// resumes, then asserts the avatar's position and yaw are unchanged.
         /// Verifies that disabling input during pause is sufficient to keep the
-        /// kinematic ship stationary.
+        /// kinematic avatar stationary.
         /// </summary>
         [UnityTest]
-        public IEnumerator PauseResume_ShipTransformPreserved()
+        public IEnumerator PauseResume_AvatarTransformPreserved()
         {
             // ---- Arrange: boot to Playing ---- //
 
@@ -68,16 +68,16 @@ namespace Game.Tests.PlayMode
             yield return WaitForState(GameState.Playing);
 
             // One extra frame so that Start() callbacks on Game scene objects have run
-            // (GameSceneWiring.Start wires InputManager into the ship).
+            // (GameSceneWiring.Start wires InputManager into the avatar).
             yield return null;
 
-            ShipController[] ships =
-                Object.FindObjectsByType<ShipController>(FindObjectsInactive.Exclude);
-            Assert.AreEqual(1, ships.Length, "Exactly one ShipController must exist in the Game scene");
+            AvatarController[] avatars =
+                Object.FindObjectsByType<AvatarController>(FindObjectsInactive.Exclude);
+            Assert.AreEqual(1, avatars.Length, "Exactly one AvatarController must exist in the Game scene");
 
-            ShipController ship = ships[0];
-            Vector3 positionBefore = ship.transform.position;
-            float   yawBefore      = ship.transform.eulerAngles.y;
+            AvatarController avatar = avatars[0];
+            Vector3 positionBefore = avatar.transform.position;
+            float   yawBefore      = avatar.transform.eulerAngles.y;
 
             // ---- Act: pause, hold, resume ---- //
 
@@ -94,13 +94,13 @@ namespace Game.Tests.PlayMode
 
             // ---- Assert: transform unchanged ---- //
 
-            float positionDelta = Vector3.Distance(ship.transform.position, positionBefore);
-            float yawDelta      = Mathf.Abs(Mathf.DeltaAngle(ship.transform.eulerAngles.y, yawBefore));
+            float positionDelta = Vector3.Distance(avatar.transform.position, positionBefore);
+            float yawDelta      = Mathf.Abs(Mathf.DeltaAngle(avatar.transform.eulerAngles.y, yawBefore));
 
             Assert.That(positionDelta, Is.LessThan(Epsilon),
-                $"Ship position must be unchanged after pause/resume (delta={positionDelta:F6} m)");
+                $"Avatar position must be unchanged after pause/resume (delta={positionDelta:F6} m)");
             Assert.That(yawDelta, Is.LessThan(Epsilon),
-                $"Ship yaw must be unchanged after pause/resume (delta={yawDelta:F6} deg)");
+                $"Avatar yaw must be unchanged after pause/resume (delta={yawDelta:F6} deg)");
         }
 
         // ------------------------------------------------------------------ helpers

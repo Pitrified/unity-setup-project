@@ -3,12 +3,12 @@ namespace Game.Gameplay
     using UnityEngine;
 
     /// <summary>
-    /// Designer-tunable data for the ship kinematic model.
-    /// Create an instance via Assets > Create > artificial-pi > Ship Tuning
-    /// and assign it to the ShipController on PF_Ship.
+    /// Designer-tunable data for the avatar kinematic model.
+    /// Create an instance via Assets > Create > artificial-pi > Avatar Tuning
+    /// and assign it to the AvatarController on PF_Avatar.
     /// </summary>
-    [CreateAssetMenu(menuName = "artificial-pi/Ship Tuning", fileName = "SO_ShipTuning")]
-    public sealed class SO_ShipTuning : ScriptableObject
+    [CreateAssetMenu(menuName = "artificial-pi/Avatar Tuning", fileName = "SO_AvatarTuning")]
+    public sealed class SO_AvatarTuning : ScriptableObject
     {
         [SerializeField] private float _maxSpeed = 8f;
         [SerializeField] private float _acceleration = 4f;
