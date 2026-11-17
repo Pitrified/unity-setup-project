@@ -136,7 +136,7 @@ namespace Game.Core
             Log.Info(LogCat.Boot, "Handoff complete. Requesting Boot scene unload.");
 
             // Fire-and-forget: this GameObject is destroyed when Boot unloads.
-            SceneManager.UnloadSceneAsync(SceneNames.Boot);
+            _ = SceneManager.UnloadSceneAsync(SceneNames.Boot);
         }
 
         // ------------------------------------------------------------------ fatal-error handling

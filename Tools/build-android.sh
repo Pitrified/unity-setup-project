@@ -89,15 +89,15 @@ if [[ -z "$UNITY_BIN" ]]; then
     done < <(find \
         "$HOME/Unity/Hub/Editor" \
         /Applications/Unity/Hub/Editor \
-        -name "Unity" -o -name "Unity.app" \
+        \( -name "Unity" -type f \) -o -name "Unity.app" \
         2>/dev/null \
         | sort -rV \
         | while IFS= read -r p; do
             # macOS .app → Contents/MacOS/Unity
             if [[ "$p" == *.app ]]; then
-                echo -n "$p/Contents/MacOS/Unity"$'\0'
+                printf '%s\0' "$p/Contents/MacOS/Unity"
             else
-                echo -n "$p"$'\0'
+                printf '%s\0' "$p"
             fi
           done)
 fi
