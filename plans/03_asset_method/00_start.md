@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 priority: 0
 description: |
   A method, and a skill, for building good-looking game objects from a real-world photograph:
@@ -12,7 +12,7 @@ comment: |
 
 # Building assets from a reference
 
-Draft, raised 2026-11-14 while planning [`01_repo_split`](../01_repo_split/00_start.md). No phases agreed.
+Raised 2026-11-14 while planning [`01_repo_split`](../01_repo_split/00_start.md). Picked up 2026-11-18, unsupervised overnight, on the user's go: "Do asset method to polish the skills a bit. All unsupervised, pick a few pictures on the internet, select the references, iterate. Commit." Phases in [`tracking.md`](tracking.md).
 
 ## Where this came from
 
