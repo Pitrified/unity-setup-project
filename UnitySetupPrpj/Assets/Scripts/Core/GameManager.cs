@@ -98,7 +98,7 @@ namespace Game.Core
 
             if (SaveSystem != null && SaveSystem.HasSave)
             {
-                SaveData data = SaveSystem.Load();
+                GameSaveData data = SaveSystem.Load<GameSaveData>(GameSaveData.CurrentVersion);
                 ship.Teleport(
                     new UnityEngine.Vector3(data.ship.x, data.ship.y, data.ship.z),
                     data.ship.yawDeg);
@@ -347,7 +347,7 @@ namespace Game.Core
 
             try
             {
-                SaveData data = SaveSystem.Load();
+                GameSaveData data = SaveSystem.Load<GameSaveData>(GameSaveData.CurrentVersion);
 
                 if (_activeShip != null)
                 {
@@ -361,7 +361,7 @@ namespace Game.Core
                     };
                 }
 
-                SaveSystem.Save(data);
+                SaveSystem.Save(data, GameSaveData.CurrentVersion);
             }
             catch (Exception ex)
             {

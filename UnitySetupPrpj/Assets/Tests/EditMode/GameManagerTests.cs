@@ -45,17 +45,16 @@ namespace Game.Tests.EditMode
 
     internal sealed class FakeSaveSystem : ISaveSystem
     {
-        private SaveData _stored = SaveData.CreateDefault();
+        private object _stored;
 
         public bool HasSave { get; set; }
-        public SaveData LastSaved => _stored;
 
-        public SaveData Load() => _stored;
-        public void Save(SaveData data) { _stored = data; HasSave = true; }
+        public T Load<T>(int version) where T : new() => _stored is T stored ? stored : new T();
+        public void Save<T>(T payload, int version) { _stored = payload; HasSave = true; }
         public void DeleteSave() { HasSave = false; }
 
         /// <summary>Pre-seeds stored data without marking HasSave.</summary>
-        public void SetStored(SaveData data) => _stored = data;
+        public void SetStored<T>(T payload) => _stored = payload;
     }
 
     internal sealed class FakeInputManager : IInputManager
@@ -486,8 +485,10 @@ namespace Game.Tests.EditMode
             var shipGo = new UnityEngine.GameObject("Ship");
             var ship   = shipGo.AddComponent<Game.Gameplay.ShipController>();
 
-            var stored = SaveData.CreateDefault();
-            stored.ship = new ShipSaveData { x = 10f, y = 0f, z = 20f, yawDeg = 45f };
+            var stored = new Game.Gameplay.GameSaveData
+            {
+                ship = new Game.Gameplay.ShipSaveData { x = 10f, y = 0f, z = 20f, yawDeg = 45f },
+            };
             _fakeSave.SetStored(stored);
             _fakeSave.HasSave = true;
 

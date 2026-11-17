@@ -7,9 +7,20 @@ namespace Game.Tests.EditMode
     using UnityEngine;
     using Game.Systems;
 
+    /// <summary>A payload the save system knows nothing about, standing in for a game's.</summary>
+    [System.Serializable]
+    internal struct TestPayload
+    {
+        public int score;
+        public Vector3 position;
+        public string name;
+    }
+
     [TestFixture]
     public sealed class SaveSystemTests
     {
+        private const int Version = 3;
+
         private string _tempDir;
         private GameObject _go;
         private SaveSystem _sys;
@@ -47,7 +58,7 @@ namespace Game.Tests.EditMode
         [Test]
         public void HasSave_ReturnsTrue_AfterSave()
         {
-            _sys.Save(SaveData.CreateDefault());
+            _sys.Save(new TestPayload(), Version);
 
             Assert.IsTrue(_sys.HasSave);
         }
@@ -56,64 +67,52 @@ namespace Game.Tests.EditMode
         // Load - happy path
 
         [Test]
-        public void Load_ReturnsCurrentVersion_WhenNoFileExists()
+        public void Load_ReturnsNewPayload_WhenNoFileExists()
         {
-            SaveData result = _sys.Load();
+            TestPayload result = _sys.Load<TestPayload>(Version);
 
-            Assert.AreEqual(SaveData.CurrentVersion, result.version);
+            Assert.AreEqual(0, result.score);
+            Assert.AreEqual(0f, result.position.x);
+            Assert.IsNull(result.name);
         }
 
         [Test]
-        public void Load_ReturnsZeroShipData_WhenNoFileExists()
+        public void Load_AfterSave_RoundTrips_Payload()
         {
-            SaveData result = _sys.Load();
+            var data = new TestPayload { score = 7, position = new Vector3(1.5f, 0f, -3.2f), name = "a" };
 
-            Assert.AreEqual(0f, result.ship.x);
-            Assert.AreEqual(0f, result.ship.y);
-            Assert.AreEqual(0f, result.ship.z);
-            Assert.AreEqual(0f, result.ship.yawDeg);
-        }
+            _sys.Save(data, Version);
+            TestPayload loaded = _sys.Load<TestPayload>(Version);
 
-        [Test]
-        public void Load_AfterSave_RoundTrips_ShipPosition()
-        {
-            var data = SaveData.CreateDefault();
-            data.ship = new ShipSaveData { x = 1.5f, y = 0f, z = -3.2f, yawDeg = 90f };
-
-            _sys.Save(data);
-            SaveData loaded = _sys.Load();
-
-            Assert.AreEqual(1.5f,  loaded.ship.x,      1e-4f);
-            Assert.AreEqual(0f,    loaded.ship.y,      1e-4f);
-            Assert.AreEqual(-3.2f, loaded.ship.z,      1e-4f);
-            Assert.AreEqual(90f,   loaded.ship.yawDeg, 1e-4f);
+            Assert.AreEqual(7, loaded.score);
+            Assert.AreEqual(1.5f,  loaded.position.x, 1e-4f);
+            Assert.AreEqual(-3.2f, loaded.position.z, 1e-4f);
+            Assert.AreEqual("a", loaded.name);
         }
 
         // ------------------------------------------------------------------
-        // Save - metadata stamping
+        // Save - envelope stamping
 
         [Test]
-        public void Save_StampsCurrentVersion()
+        public void Save_StampsCallerVersion()
         {
-            _sys.Save(SaveData.CreateDefault());
-            SaveData loaded = _sys.Load();
+            _sys.Save(new TestPayload(), Version);
 
-            Assert.AreEqual(SaveData.CurrentVersion, loaded.version);
+            Assert.AreEqual(Version, ReadEnvelope().version);
         }
 
         [Test]
         public void Save_StampsLastSavedUtc_NonEmpty()
         {
-            _sys.Save(SaveData.CreateDefault());
-            SaveData loaded = _sys.Load();
+            _sys.Save(new TestPayload(), Version);
 
-            Assert.IsFalse(string.IsNullOrEmpty(loaded.lastSavedUtc));
+            Assert.IsFalse(string.IsNullOrEmpty(ReadEnvelope().lastSavedUtc));
         }
 
         [Test]
         public void Save_LeavesNoTempFile()
         {
-            _sys.Save(SaveData.CreateDefault());
+            _sys.Save(new TestPayload(), Version);
 
             Assert.IsFalse(File.Exists(Path.Combine(_tempDir, "save.json.tmp")));
         }
@@ -122,13 +121,13 @@ namespace Game.Tests.EditMode
         // Load - corrupt file
 
         [Test]
-        public void Load_ReturnsDefault_OnCorruptFile()
+        public void Load_ReturnsNewPayload_OnCorruptFile()
         {
             File.WriteAllText(Path.Combine(_tempDir, "save.json"), "CORRUPT_DATA");
 
-            SaveData result = _sys.Load();
+            TestPayload result = _sys.Load<TestPayload>(Version);
 
-            Assert.AreEqual(SaveData.CurrentVersion, result.version);
+            Assert.AreEqual(0, result.score);
         }
 
         [Test]
@@ -136,7 +135,7 @@ namespace Game.Tests.EditMode
         {
             File.WriteAllText(Path.Combine(_tempDir, "save.json"), "CORRUPT_DATA");
 
-            _sys.Load();
+            _sys.Load<TestPayload>(Version);
 
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "save.json.bak")));
         }
@@ -146,7 +145,7 @@ namespace Game.Tests.EditMode
         {
             File.WriteAllText(Path.Combine(_tempDir, "save.json"), "CORRUPT_DATA");
 
-            _sys.Load();
+            _sys.Load<TestPayload>(Version);
 
             Assert.IsFalse(File.Exists(Path.Combine(_tempDir, "save.json")));
         }
@@ -155,25 +154,35 @@ namespace Game.Tests.EditMode
         // Load - version mismatch
 
         [Test]
-        public void Load_ReturnsDefault_OnVersionMismatch()
+        public void Load_ReturnsNewPayload_OnVersionMismatch()
         {
-            // Write a save with an unknown future version.
-            var stale = new SaveData { version = 99, ship = default, lastSavedUtc = string.Empty };
-            File.WriteAllText(Path.Combine(_tempDir, "save.json"), JsonUtility.ToJson(stale));
+            _sys.Save(new TestPayload { score = 5 }, Version + 1);
 
-            SaveData result = _sys.Load();
+            TestPayload result = _sys.Load<TestPayload>(Version);
 
-            Assert.AreEqual(SaveData.CurrentVersion, result.version);
+            Assert.AreEqual(0, result.score);
         }
 
         [Test]
         public void Load_CreatesBackup_OnVersionMismatch()
         {
-            var stale = new SaveData { version = 99, ship = default, lastSavedUtc = string.Empty };
-            File.WriteAllText(Path.Combine(_tempDir, "save.json"), JsonUtility.ToJson(stale));
+            _sys.Save(new TestPayload { score = 5 }, Version + 1);
 
-            _sys.Load();
+            _sys.Load<TestPayload>(Version);
 
+            Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "save.json.bak")));
+        }
+
+        [Test]
+        public void Load_ResetsFileWithoutEnvelope()
+        {
+            // A file from before the envelope: version at the top level, no payload.
+            File.WriteAllText(Path.Combine(_tempDir, "save.json"),
+                "{\"version\":1,\"ship\":{\"x\":1.0,\"y\":0.0,\"z\":2.0,\"yawDeg\":3.0},\"lastSavedUtc\":\"\"}");
+
+            TestPayload result = _sys.Load<TestPayload>(Version);
+
+            Assert.AreEqual(0, result.score);
             Assert.IsTrue(File.Exists(Path.Combine(_tempDir, "save.json.bak")));
         }
 
@@ -183,7 +192,7 @@ namespace Game.Tests.EditMode
         [Test]
         public void DeleteSave_RemovesFile()
         {
-            _sys.Save(SaveData.CreateDefault());
+            _sys.Save(new TestPayload(), Version);
             Assert.IsTrue(_sys.HasSave);
 
             _sys.DeleteSave();
@@ -203,18 +212,21 @@ namespace Game.Tests.EditMode
         [Test]
         public void Save_Twice_SecondDataWins()
         {
-            var first = SaveData.CreateDefault();
-            first.ship = new ShipSaveData { x = 10f, yawDeg = 45f };
-            _sys.Save(first);
+            _sys.Save(new TestPayload { score = 10 }, Version);
+            _sys.Save(new TestPayload { score = 99 }, Version);
 
-            var second = SaveData.CreateDefault();
-            second.ship = new ShipSaveData { x = 99f, yawDeg = 180f };
-            _sys.Save(second);
+            TestPayload loaded = _sys.Load<TestPayload>(Version);
 
-            SaveData loaded = _sys.Load();
+            Assert.AreEqual(99, loaded.score);
+        }
 
-            Assert.AreEqual(99f,  loaded.ship.x,      1e-4f);
-            Assert.AreEqual(180f, loaded.ship.yawDeg, 1e-4f);
+        // ------------------------------------------------------------------
+        // helpers
+
+        private SaveEnvelope<TestPayload> ReadEnvelope()
+        {
+            string json = File.ReadAllText(Path.Combine(_tempDir, "save.json"));
+            return JsonUtility.FromJson<SaveEnvelope<TestPayload>>(json);
         }
     }
 }

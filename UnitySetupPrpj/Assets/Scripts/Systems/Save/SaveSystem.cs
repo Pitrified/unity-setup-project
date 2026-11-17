@@ -39,47 +39,53 @@ namespace Game.Systems
         public bool HasSave => File.Exists(SavePath);
 
         /// <inheritdoc/>
-        public SaveData Load()
+        public T Load<T>(int version) where T : new()
         {
             if (!File.Exists(SavePath))
             {
                 Log.Info(LogCat.Save, "No save file found, returning defaults.");
-                return SaveData.CreateDefault();
+                return new T();
             }
 
             try
             {
                 string json = File.ReadAllText(SavePath);
-                SaveData data = JsonUtility.FromJson<SaveData>(json);
+                SaveEnvelope<T> envelope = JsonUtility.FromJson<SaveEnvelope<T>>(json);
 
-                if (data.version != SaveData.CurrentVersion)
+                if (envelope == null)
+                    throw new InvalidDataException("save file is empty");
+
+                if (envelope.version != version)
                 {
                     Log.Warn(LogCat.Save, "Save version mismatch (got {0}, expected {1}), resetting.",
-                        data.version, SaveData.CurrentVersion);
+                        envelope.version, version);
                     BackupAndReset();
-                    return SaveData.CreateDefault();
+                    return new T();
                 }
 
-                return data;
+                return envelope.payload == null ? new T() : envelope.payload;
             }
             catch (Exception ex)
             {
                 Log.Warn(LogCat.Save, "Save file corrupt ({0}), resetting.", ex.Message);
                 BackupAndReset();
-                return SaveData.CreateDefault();
+                return new T();
             }
         }
 
         /// <inheritdoc/>
-        public void Save(SaveData data)
+        public void Save<T>(T payload, int version)
         {
-            // Stamp version and timestamp before writing; caller fills in ship data.
-            data.version = SaveData.CurrentVersion;
-            data.lastSavedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture);
+            var envelope = new SaveEnvelope<T>
+            {
+                version      = version,
+                lastSavedUtc = DateTime.UtcNow.ToString("O", CultureInfo.InvariantCulture),
+                payload      = payload,
+            };
 
             try
             {
-                string json = JsonUtility.ToJson(data);
+                string json = JsonUtility.ToJson(envelope);
                 File.WriteAllText(TempPath, json);
 
                 // File.Replace requires the destination to already exist.

@@ -133,11 +133,16 @@ Stored as `save.json` in `Application.persistentDataPath`:
 
 ```json
 {
-  "version": 1,
-  "ship": { "x": 0.0, "y": 0.0, "z": 0.0, "yawDeg": 0.0 },
-  "lastSavedUtc": "2026-04-28T12:00:00Z"
+  "version": 2,
+  "lastSavedUtc": "2026-04-28T12:00:00Z",
+  "payload": {
+    "ship": { "x": 0.0, "y": 0.0, "z": 0.0, "yawDeg": 0.0 }
+  }
 }
 ```
+
+`version` and `lastSavedUtc` are written by the save system; `payload` is `GameSaveData` and `version` is its `CurrentVersion`.
+Version 1 had `ship` at the top level; a version 1 file is reset.
 
 Rules:
 

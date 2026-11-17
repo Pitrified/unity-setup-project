@@ -10,7 +10,7 @@ Single-file JSON persistence for the player session. Schema in
 ## Responsibilities
 
 - Read/write `save.json` from `Application.persistentDataPath`
-- Validate schema version
+- Validate the caller's schema version
 - Provide a clean `HasSave` check for the menu's Continue button
 
 ---
@@ -26,12 +26,14 @@ Single-file JSON persistence for the player session. Schema in
 
 ```
 bool HasSave { get; }
-SaveData Load()                  // returns default if no/corrupt save
-void Save(SaveData data)         // atomic
+T Load<T>(int version)           // new T() if no file, corrupt, or another version
+void Save<T>(T payload, int version)  // atomic
 void DeleteSave()                // for debug + future "new game" flow
 ```
 
-`SaveData` is a plain serializable struct matching the schema.
+The file is an envelope the save system owns, `{ version, lastSavedUtc, payload }`, around a payload type the game owns.
+The save system knows nothing about the payload: the game passes its type and its schema version on every call.
+In this project the payload is `Game.Gameplay.GameSaveData`.
 
 ---
 
@@ -59,7 +61,7 @@ void DeleteSave()                // for debug + future "new game" flow
 
 ### Used by
 - GameManager (save on pause/quit, load on Continue)
-- ShipController (provides `SaveData.ship` snapshot)
+- The payload type and its version are the game's (`GameSaveData` in `Game.Gameplay`, filled from the ship's state by GameManager)
 
 ---
 
