@@ -98,6 +98,27 @@ namespace Game.Tests.PlayMode
                 "Exactly one GameManager instance must exist after the loop");
         }
 
+        /// <summary>
+        /// The debug overlay lives in the Persistent scene, so it is available on
+        /// every screen after boot (functional spec: F1 or a three-finger tap).
+        /// </summary>
+        [UnityTest]
+        public IEnumerator Boot_DebugOverlayIsInPersistentScene()
+        {
+            yield return SceneManager.LoadSceneAsync(SceneNames.Boot, LoadSceneMode.Single);
+            yield return WaitForState(GameState.Menu);
+
+            Scene persistent = SceneManager.GetSceneByName(SceneNames.Persistent);
+            Assert.IsTrue(persistent.isLoaded, "Persistent scene must be loaded after boot");
+
+            int overlays = 0;
+            foreach (GameObject root in persistent.GetRootGameObjects())
+                overlays += root.GetComponentsInChildren<Game.Systems.DebugOverlayController>(true).Length;
+
+            Assert.AreEqual(1, overlays,
+                "Exactly one DebugOverlayController must be in the Persistent scene");
+        }
+
         // ------------------------------------------------------------------ helpers
 
         /// <summary>
