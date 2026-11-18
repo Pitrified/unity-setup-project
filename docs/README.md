@@ -54,6 +54,7 @@ The instructions themselves are `.github/copilot-instructions.md`, imported by `
 - [systems/input-manager.md](systems/input-manager.md)
 - [systems/avatar-controller.md](systems/avatar-controller.md) - the sample's
 - [systems/camera-controller.md](systems/camera-controller.md)
+- [systems/water.md](systems/water.md) - waves, buoyancy, ripples, shore
 - [systems/save-system.md](systems/save-system.md)
 - [systems/audio-manager.md](systems/audio-manager.md)
 - [systems/ui-system.md](systems/ui-system.md)

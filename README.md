@@ -5,7 +5,7 @@ It is not a gallery of samples; a pattern is linked from the project that uses i
 
 ## What is here
 
-- `UnitySetup/` - the Unity project (`6000.4.4f1`, URP, IL2CPP, ARM64): a generic runtime (boot, persistent systems scene, scene loading, input, save, audio, UI Toolkit screens, logging and a debug overlay) and a placeholder sample over it, a capsule avatar on a ground plane with a chase camera, so every system runs on a device.
+- `UnitySetup/` - the Unity project (`6000.4.4f1`, URP, IL2CPP, ARM64): a generic runtime (boot, persistent systems scene, scene loading, input, save, audio, UI Toolkit screens, logging and a debug overlay) and a placeholder sample over it, a capsule avatar on an island with a chase camera, so every system runs on a device; and water around the island ([`docs/systems/water.md`](docs/systems/water.md)): waves that floating barrels and buoys ride, shore foam, ripples from a sample cannon's splashes.
 - `Tools/` - `setup.sh` once per machine, `gates.sh` for the checks, `build-android.sh dev|profile|release`, the pre-commit hook, `plans.py`, and `asset_builders/`: Blender scripts that build the sample's barrel and crate, exported as FBX ([`docs/building_assets.md`](docs/building_assets.md), skill `.claude/skills/build-asset/`).
 - `docs/` - start at [`docs/README.md`](docs/README.md).
 - `plans/` - this repo's own work, one folder per feature.

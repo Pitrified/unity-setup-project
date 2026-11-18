@@ -13,7 +13,8 @@ namespace Game.Editor
     /// Batch mode, under xvfb-run on Linux, without -nographics:
     /// <c>-executeMethod Game.Editor.SceneCapture.CaptureFromCommandLine -captureOut shot.png
     /// [-captureScene Assets/Scenes/Game.unity] [-captureEye x,y,z -captureTarget x,y,z]
-    /// [-captureFov 50] [-captureSize 960x540] [-captureGreyCard x,y,z]</c>.
+    /// [-captureFov 50] [-captureSize 960x540] [-captureGreyCard x,y,z] [-captureBudget]</c>.
+    /// <c>-captureBudget</c> logs the triangles and material slots in view, for the performance budget.
     /// A grey card is a temporary 50% grey square at a point, facing the camera, lit like the scene:
     /// the neutral patch for measuring a palette when the scene has nothing white or grey.
     /// </summary>
@@ -75,6 +76,10 @@ namespace Game.Editor
             }
 
             Render(camera, width, height, output);
+            if (System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-captureBudget") >= 0)
+            {
+                LogBudget(camera, scene);
+            }
             if (card != null)
             {
                 Object.DestroyImmediate(card.GetComponent<MeshRenderer>().sharedMaterial);
@@ -108,6 +113,52 @@ namespace Game.Editor
             File.WriteAllBytes(output, image.EncodeToPNG());
             Object.DestroyImmediate(image);
             target.Release();
+        }
+
+        /// <summary>
+        /// Counts what the camera sees, for docs/performance-budget.md: triangles of every enabled
+        /// renderer whose bounds are in view, and its material slots, which is the draw count before
+        /// batching (an upper bound). The Editor's own render counters stay at 0 for a render made
+        /// from a script in batch mode, so this counts from the scene instead.
+        /// </summary>
+        private static void LogBudget(Camera camera, Scene scene)
+        {
+            Plane[] frustum = GeometryUtility.CalculateFrustumPlanes(camera);
+            long triangles = 0;
+            int draws = 0;
+            int renderers = 0;
+            var all = new System.Collections.Generic.List<Renderer>();
+            foreach (GameObject root in scene.GetRootGameObjects())
+            {
+                all.AddRange(root.GetComponentsInChildren<Renderer>(false));
+            }
+            foreach (Renderer renderer in all)
+            {
+                if (!renderer.enabled || !GeometryUtility.TestPlanesAABB(frustum, renderer.bounds))
+                {
+                    continue;
+                }
+                Mesh mesh = null;
+                if (renderer is SkinnedMeshRenderer skinned)
+                {
+                    mesh = skinned.sharedMesh;
+                }
+                else if (renderer.TryGetComponent(out MeshFilter filter))
+                {
+                    mesh = filter.sharedMesh;
+                }
+                if (mesh == null)
+                {
+                    continue;
+                }
+                renderers++;
+                for (int sub = 0; sub < mesh.subMeshCount; sub++)
+                {
+                    triangles += mesh.GetIndexCount(sub) / 3;
+                }
+                draws += renderer.sharedMaterials.Length;
+            }
+            Debug.Log($"SceneCapture: budget {renderers} renderers in view, {triangles} triangles, {draws} material slots (draws before batching)");
         }
 
         private static GameObject MakeGreyCard(Vector3 at, Vector3 eye)

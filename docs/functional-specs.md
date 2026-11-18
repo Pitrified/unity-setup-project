@@ -83,7 +83,7 @@ Ownership rules:
 | `Boot`       | Single    | First frame only      | `GameBootstrap` only                   |
 | `Persistent` | Additive  | Whole session         | GameManager, Input, Save, Audio, UIRoot |
 | `Menu`       | Single    | While in menu         | Main menu UI                           |
-| `Game`       | Additive  | While playing         | Avatar, ground plane, green blobs as landmarks, GameCamera |
+| `Game`       | Additive  | While playing         | Avatar, island with green blobs, sea with floating barrels, crates and buoys, a sample cannon, GameCamera |
 
 ---
 
@@ -99,6 +99,7 @@ Each system has a dedicated spec under [systems/](systems/).
 | [input-manager](systems/input-manager.md)         | Input abstraction                      |
 | [avatar-controller](systems/avatar-controller.md) | Kinematic player movement              |
 | [camera-controller](systems/camera-controller.md) | Third-person chase camera              |
+| [water](systems/water.md)                         | Waves, floating, ripples, shore        |
 | [save-system](systems/save-system.md)             | JSON persistence                       |
 | [audio-manager](systems/audio-manager.md)         | Music + SFX channels                   |
 | [ui-system](systems/ui-system.md)                 | UI Toolkit roots, safe area, scaling   |
