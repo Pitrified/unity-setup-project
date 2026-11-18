@@ -10,6 +10,7 @@ namespace Game.Core
     using UnityEngine.InputSystem;
     using UnityEngine.InputSystem.LowLevel;
     using UnityEngine.InputSystem.OnScreen;
+    using UnityEngine.Profiling;
     using UnityEngine.SceneManagement;
     using UnityEngine.UIElements;
     using Game.Systems;
@@ -21,6 +22,9 @@ namespace Game.Core
     /// with everything on, then with each component type disabled in turn, writes what each one
     /// accounts for; then the same with a simulated finger circling on the on-screen stick (touch
     /// input is where a phone allocates and a desktop run does not); writes it all and quits.
+    /// Runs on the phone's quality level, so the renderer is the one measured on the phone.
+    /// The loads (boot, menu, the Game scene) are recorded by the Profiler into
+    /// <c>&lt;file&gt;.profile.raw</c>, for <c>Game.Editor.ProfileCaptureReport</c> to say what allocated in them.
     /// See docs/systems/logging.md, "Diagnostics report".
     /// </summary>
     public sealed class AllocationScan : MonoBehaviour
@@ -31,6 +35,9 @@ namespace Game.Core
         private const int WaitFrames = 1800;
 
         private const float DragRadius = 60f;
+
+        /// <summary>The quality level the phone runs; a desktop player starts on PC's, whose renderer this project strips for Android.</summary>
+        private const string PhoneQuality = "Mobile";
 
         private string _output;
         private bool _dragging;
@@ -46,9 +53,19 @@ namespace Game.Core
             }
             // A desktop player pauses without focus, and a headless run never has it.
             Application.runInBackground = true;
+            int phone = System.Array.IndexOf(QualitySettings.names, PhoneQuality);
+            if (phone >= 0)
+            {
+                QualitySettings.SetQualityLevel(phone, true);
+            }
             var go = new GameObject("AllocationScan");
             DontDestroyOnLoad(go);
             go.AddComponent<AllocationScan>()._output = args[index + 1];
+
+            // From here to the end of the Game scene's load: the frames that allocate the most.
+            Profiler.logFile = args[index + 1] + ".profile";
+            Profiler.enableBinaryLog = true;
+            Profiler.enabled = true;
         }
 
         private IEnumerator Start()
@@ -66,6 +83,9 @@ namespace Game.Core
             {
                 yield return null;
             }
+            Profiler.enabled = false;
+            Profiler.enableBinaryLog = false;
+            Profiler.logFile = "";
 
             var report = new StringBuilder();
             report.Append("allocation scan: ").Append(MeasureFrames).Append(" frames a step, ")
