@@ -1,6 +1,7 @@
 namespace Game.Systems
 {
     using System;
+    using System.IO;
     using UnityEngine;
     using UnityEngine.Profiling;
 
@@ -30,6 +31,9 @@ namespace Game.Systems
         private const int MemoryBins = 4096;   // 0 to 4 GB
         private const int HeapBins = 2048;     // 0 to 2 GB
         private const float BytesPerMb = 1024f * 1024f;
+
+        /// <summary>Seconds between writes of the kept report.</summary>
+        internal const float SaveInterval = 30f;
 
         /// <summary>One second of the per-second series.</summary>
         internal struct Second
@@ -62,6 +66,8 @@ namespace Game.Systems
         private int _secondFrames;
         private float _secondSumMs;
         private float _secondMaxMs;
+        private DiagnosticsFiles _files;
+        private float _nextSave;
 
         /// <summary>The build stamp this report names.</summary>
         public SO_BuildInfo Build => _build;
@@ -79,16 +85,60 @@ namespace Game.Systems
         /// <summary>Sets the build stamp (tests, and the scene step that places the recorder).</summary>
         internal void UseBuild(SO_BuildInfo build) => _build = build;
 
+        /// <summary>The previous session's kept report, or null when there is none.</summary>
+        public string PreviousReport => Guard(() => Files.ReadPrevious(), "reading the previous report");
+
+        /// <summary>Writes the kept report now (the panel, and tests).</summary>
+        public void SaveNow(bool detailed)
+        {
+            string report = BuildReport(detailed);
+            Guard(() => { Files.WriteCurrent(report); return report; }, "writing the report");
+        }
+
+        /// <summary>Keeps the reports in <paramref name="folder"/> instead of the default (tests).</summary>
+        internal void UseFolder(string folder) => _files = new DiagnosticsFiles(folder);
+
+        private DiagnosticsFiles Files => _files ??= new DiagnosticsFiles(Path.Combine(Application.persistentDataPath, "diagnostics"));
+
         private void OnEnable()
         {
             _gcAtStart = GC.CollectionCount(0);
             _secondStart = Time.realtimeSinceStartup;
+            _nextSave = Time.realtimeSinceStartup + SaveInterval;
             Application.logMessageReceived += OnLogMessage;
+            Guard(() => { Files.Rotate(); return string.Empty; }, "keeping the last session's report");
         }
 
         private void OnDisable()
         {
             Application.logMessageReceived -= OnLogMessage;
+        }
+
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused)
+            {
+                SaveNow(detailed: true);
+            }
+        }
+
+        private void OnApplicationQuit()
+        {
+            SaveNow(detailed: true);
+        }
+
+        /// <summary>Runs a file step; a failure is a warning, never an exception in the game.</summary>
+        private static string Guard(Func<string> step, string what)
+        {
+            try
+            {
+                return step();
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+                Log.Warn(LogCat.Save, "Diagnostics: {0} failed: {1}", what, e.Message);
+                return null;
+            }
         }
 
         private void Update()
@@ -98,6 +148,11 @@ namespace Game.Systems
             if (now - _secondStart >= 1f)
             {
                 RecordSecond(now, Profiler.GetTotalAllocatedMemoryLong() / BytesPerMb, GC.GetTotalMemory(false) / BytesPerMb);
+            }
+            if (now >= _nextSave)
+            {
+                _nextSave = now + SaveInterval;
+                SaveNow(detailed: false);
             }
         }
 

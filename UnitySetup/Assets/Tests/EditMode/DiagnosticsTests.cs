@@ -71,6 +71,40 @@ namespace Game.Tests.EditMode
         }
 
         [Test]
+        public void Files_RotateTheLastSessionToPrevious()
+        {
+            string folder = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "diagnostics-test-" + Guid.NewGuid().ToString("N"));
+            try
+            {
+                var files = new DiagnosticsFiles(folder);
+                Assert.IsNull(files.ReadPrevious(), "no previous session yet");
+                files.WriteCurrent("session one, first");
+                files.WriteCurrent("session one, last");
+                files.Rotate();
+                Assert.AreEqual("session one, last", files.ReadPrevious(), "the last write of the last session");
+                Assert.IsFalse(System.IO.File.Exists(files.CurrentPath), "the new session starts without a report");
+                files.WriteCurrent("session two");
+                files.Rotate();
+                Assert.AreEqual("session two", files.ReadPrevious(), "a rotation replaces the older previous");
+            }
+            finally
+            {
+                if (System.IO.Directory.Exists(folder))
+                {
+                    System.IO.Directory.Delete(folder, true);
+                }
+            }
+        }
+
+        [Test]
+        public void Share_WithoutAShareSheet_WritesTheFile()
+        {
+            string path = System.IO.Path.Combine(Application.persistentDataPath, "diagnostics", "shared.txt");
+            new PlatformDiagnosticsExport().Share("Diagnostics", "the report");
+            Assert.AreEqual("the report", System.IO.File.ReadAllText(path));
+        }
+
+        [Test]
         public void Report_HasHeaderStatsProblemsAndLogInOrder()
         {
             var go = new GameObject("Recorder");
