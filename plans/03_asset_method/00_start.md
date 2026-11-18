@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 priority: 0
 description: |
   A method, and a skill, for building good-looking game objects from a real-world photograph:
