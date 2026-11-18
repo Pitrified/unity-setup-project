@@ -1,5 +1,5 @@
 ---
-status: draft
+status: in progress
 priority: 0
 description: |
   An in-app diagnostics report a person can copy or share from the phone, with no adb and no
@@ -30,7 +30,7 @@ Raised 2026-11-18 by the user, after the water APK: "add a log dump section in t
 
 - **One report, two parts, as abyss**:
   - header: app and version (`Application.version`, version code), build (commit and time, stamped by `BuildPipeline`), development or release, device model, OS, CPU, memory, GPU and graphics API, screen size, DPI and refresh rate, quality level and target frame rate, time since start, game state and scene;
-  - a blank line, then the lines: `seconds text`, the newest 500: every log entry the build compiles (Info and up in Development, Warn and Error in Release), and a **summary every 5 s**: fps average and 1% low, frame time, memory in use, game state; plus what a system chooses to add (the water: floaters and ripple impulses in the last 5 s).
+  - then statistics, exceptions and the log lines, as revised under Q5.
 - **Export without adb**:
   - **Copy**: to the clipboard (`GUIUtility.systemCopyBuffer`, works on Android).
   - **Share**: Android's share sheet with the report as text (`Intent.ACTION_SEND` through `AndroidJavaObject`, no plugin, no permission): save it to Files or Drive, or send it to a chat.
@@ -44,21 +44,31 @@ Raised 2026-11-18 by the user, after the water APK: "add a log dump section in t
   - a. all builds: Release testers are the ones without adb; Release lines are warnings, errors and the summaries, no Info.
   - b. Development builds only, like the overlay.
   - Recommended: a. It costs a ring of strings and a summary every 5 s; the person who most needs it is a tester on a Play Store build.
+  - ANS: the recommendation, the user, 2026-11-18.
 - Q2: where is it opened?
   - a. a Diagnostics button on the main menu and the pause screen.
   - b. inside the debug overlay (three-finger tap).
   - c. both.
   - Recommended: a. A three-finger tap is undiscoverable and the overlay is Development-only; a button in two screens a person already visits needs no explanation.
+  - ANS: the recommendation, the user, 2026-11-18.
 - Q3: export routes.
   - a. Copy, Share and the kept file with the previous session (above).
   - b. Copy only, as abyss.
   - Recommended: a. Copy covers pasting here; Share covers a long report or a crash; the kept file covers "it crashed, now what".
+  - ANS: the recommendation, the user, 2026-11-18.
 - Q4: stamp the commit and build time into the app?
   - Recommended: yes. `BuildPipeline` writes them into a settings asset the report reads (no `Resources.Load`); a report that does not say which build it came from is half a report.
+  - ANS: the recommendation, the user, 2026-11-18.
 - Q5: the summary period and ring size.
-  - Recommended: every 5 s, 500 lines: about 40 minutes of summaries, or less when events are busy; a report of 500 lines is about 40 kB, fine for the clipboard and a chat.
+  - First recommendation: a summary every 5 s in a 500-line ring, about 40 kB.
+  - The user, 2026-11-18: "40kb seems a lot, we can keep the detailed logs on request, and just print descriptive statistics like min/max/mean/median/quantiles on useful data (memory, fps, whatever?) maybe if some exceptions happen, we copy them as well even if not in the 500 last lines then 500 lines of usual logs? how long would that be?"
+  - Measured the same day in an 8 s capture run: the game logs 16 lines from boot into play, all events, about 43 characters each (about 50 bytes with the timestamp); a pause or menu round trip adds about 5. The 40 kB was the periodic summaries.
+  - Revised: the default report is the header (~1 kB), **statistics** per metric for the session and the last minute (min, p05, median, mean, p95, max of frame time and fps, memory in use, managed heap, GC collections, frames over 33 ms; ~1 kB), **exceptions** kept apart so the ring never pushes them out (distinct ones with count, first and last time, message, top stack frames; at most 10), and the **last 500 log lines** (events only: an hour or more of play, in practice the session). Typical 3 to 6 kB, worst about 30 kB. **"Copy detailed"** adds the per-second series of the last 10 minutes (about 25 kB).
+  - Statistics from fixed histograms (frame time in 0.5 ms bins, memory in 1 MB bins): constant memory, no per-frame allocation, quantiles to half a millisecond. The per-second series is a fixed 600-sample ring.
+  - ANS: the revised design, the user's own proposal, 2026-11-18.
 - Q6: artificial-pirate.
   - Recommended: built here first; that repo copies it when it wants, like the water.
+  - ANS: the recommendation, the user, 2026-11-18.
 
 ## Phases, once answered
 
@@ -66,6 +76,10 @@ Raised 2026-11-18 by the user, after the water APK: "add a log dump section in t
 2. **Export**: clipboard, Android share intent, the kept file and the previous session; behind an interface for tests.
 3. **Panel**: the Diagnostics button and panel on the menu and pause screens.
 4. **Verify**: gates, APK; HUMAN on the phone: Copy, Share, Previous session after a forced quit, a paste here.
+
+## Also found
+
+- The capture run logged `[WARN][Boot] Quality level 'mobile' not found; keeping current level.`: boot asks for a quality level the project does not define (its levels are named otherwise). A fix belongs in phase 1, since the report would show it on every launch.
 
 ## Out of scope
 
