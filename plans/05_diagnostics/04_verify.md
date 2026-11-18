@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 04 - Verify
@@ -24,3 +24,4 @@ status: in progress
   - **A real finding**: 8 GC collections in 57 s, the heap climbing from 9.5 to 14.5 MB between them: something allocates every frame, against the project's rule. Not chased yet; the next step is measuring per-frame allocation by system (`GC.GetAllocatedBytesForCurrentThread` around each `Update` in a PlayMode run, or the Profiler's GC Alloc column at the workstation). The debug overlay, which formats its text ten times a second even while hidden, is the first suspect, not a finding.
   - The display reports 60 Hz on a 120 Hz panel because the game targets 60 fps; consistent.
 - Still open, HUMAN: force-quit during play, relaunch, Previous session.
+- 2026-11-18, done by the user: force quit during play, relaunch, Previous session pasted here: the report Android's pause wrote (detailed, 13.7 s, `state Paused` after `OS pause received while playing`). Copy, Share and Previous session all work on the phone.

@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 priority: 0
 description: |
   An in-app diagnostics report a person can copy or share from the phone, with no adb and no

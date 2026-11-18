@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 ---
 
 # Phase 05 - Per-frame allocations
@@ -28,4 +28,7 @@ The first phone report showed 8 GC collections in 57 s, the managed heap climbin
 - **What the phone's numbers say instead**: the heap's median (9.5 MB) equals its 5th percentile, so it sat flat most of the session rather than sawtoothing as a per-frame allocation would make it; the 8 collections count from boot, through two scene loads that allocate heavily; the heap was highest at the end, when the panel opened (building the report and laying out its 40-line preview allocates).
 - **So the report now measures it on the device**: `gc alloc kB` per frame, from the Profiler's counter, in the statistics (development builds), and "Copy detailed" gives the heap second by second, which shows when it grows.
 - The Linux builds rewrote four settings files for desktop (URP prefiltering, Standalone batching, a Connect flag); restored from git. Documented in `BuildLinuxDevPlayer` and `headless-unity.md`, with the other pitfalls of this phase.
-- Open: the next phone report, plain and detailed, with some play on the stick.
+- 2026-11-18, **a second phone report** (the same `a330c66` build): the previous session's kept report, after a force quit during play.
+  The heap stayed at 9.2 to 9.6 MB for the whole 13.7 s session; the per-second series shows it flat at about 10 MB from 5.7 to 11.7 s of play at a steady 60 fps. All 5 collections fell in the first ~6 s (boot, menu, loading the Game scene), where the only slow frames are too (316 ms at 3.6 s, 100 ms at 5.7 s).
+  With the Linux player's 64 B a frame, the conclusion: **gameplay does not allocate per frame; the collections are loads (and, in the first report, opening the panel)**. Nothing to fix in the game.
+- Open, deferred by the user ("do that check later"): a report from the new APK, whose `gc alloc kB` row measures per-frame allocation on the device, after some steering on the stick.
