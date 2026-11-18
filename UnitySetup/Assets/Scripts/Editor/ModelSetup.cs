@@ -9,7 +9,8 @@ namespace Game.Editor
     /// static prop, and each material slot of the FBX mapped to the project material
     /// <c>Assets/Art/M_&lt;slot&gt;.mat</c> (URP Lit, created grey if missing). The mapping is
     /// stored in the model's .meta, so a rebuilt FBX keeps it. See docs/building_assets.md.
-    /// Batch mode: <c>-executeMethod Game.Editor.ModelSetup.SetUpFromCommandLine -modelPath Assets/Art/Models/X.fbx</c>.
+    /// Batch mode: <c>-executeMethod Game.Editor.ModelSetup.SetUpFromCommandLine -modelPath Assets/Art/Models/X.fbx [-colliders]</c>;
+    /// <c>-colliders</c> generates mesh colliders at import, for ground and other static collision.
     /// </summary>
     public static class ModelSetup
     {
@@ -26,12 +27,12 @@ namespace Game.Editor
                 EditorApplication.Exit(2);
                 return;
             }
-            bool ok = SetUp(path);
+            bool ok = SetUp(path, System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-colliders") >= 0);
             EditorApplication.Exit(ok ? 0 : 1);
         }
 
         /// <summary>Applies the import settings and material mapping to the model at <paramref name="path"/>.</summary>
-        public static bool SetUp(string path)
+        public static bool SetUp(string path, bool colliders = false)
         {
             if (AssetImporter.GetAtPath(path) is not ModelImporter importer)
             {
@@ -46,6 +47,7 @@ namespace Game.Editor
             importer.animationType = ModelImporterAnimationType.None;
             importer.isReadable = false;
             importer.importNormals = ModelImporterNormals.Import;
+            importer.addCollider = colliders;
             importer.globalScale = 1f;
             importer.useFileScale = true;
             importer.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;

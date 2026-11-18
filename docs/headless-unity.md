@@ -79,6 +79,7 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 - A one-off migration lives in an `Editor` folder while it runs and is deleted before the commit; the plan log records what it did.
   Name it for what it does (`PlaceLandmarks`), never for a plan or phase: source files do not mention plans, temporary ones included.
 - Read the YAML diff before committing: a change should touch what it meant to and nothing else.
+- An asset created and then followed by a reimport in the same method can leave the method holding a replaced object, which saves as `{fileID: 0}`. Load it again from its path just before assigning it.
 - After deleting an asset, check that nothing references its GUID: `git grep <guid>` over the project, excluding `.meta` files.
 - Rename a script or asset with its `.meta` (`git mv` both), so the GUID and every reference to it survive.
 - A renamed serialized field loses its value at the next save of each scene or prefab that set it. Add `[FormerlySerializedAs("oldName")]` before that save, or set the field again through `SerializedObject`.
