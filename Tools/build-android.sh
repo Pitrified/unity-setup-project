@@ -150,6 +150,11 @@ info "Artifact: $ARTIFACT"
 info ""
 
 # ── Invoke Unity in batchmode ─────────────────────────────────────────────────
+# Gradle packages the APK incrementally, rewriting the previous one in place and leaving the
+# space of replaced entries behind: after a few builds the file was 18 MB larger than its
+# contents. Removing its last output makes it write the APK fresh; code and assets stay cached.
+rm -rf "$PROJECT_DIR"/Library/Bee/Android/Prj/*/Gradle/launcher/build/outputs
+
 info "Starting Unity build…"
 UNITY_EXIT=0
 "$UNITY_BIN" \
