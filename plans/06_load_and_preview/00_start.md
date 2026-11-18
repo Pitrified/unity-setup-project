@@ -1,5 +1,5 @@
 ---
-status: in progress
+status: done
 priority: 0
 description: |
   Two leftovers of the diagnostics work: find what allocates about 5 MB of managed memory on each
@@ -23,9 +23,9 @@ From [`05_diagnostics/03_panel.md`](../05_diagnostics/03_panel.md): the statisti
 
 ## Decisions
 
-- **Measure in a development player with the Profiler log, then read it in the Editor.** The Editor's own play mode allocates about 150 kB a frame, too noisy to attribute; the Linux development player (`BuildLinuxDevPlayer`) is clean. The player writes a Profiler capture (`-profiler-enable -profiler-log-file`), and an Editor tool reads it in batch mode (`ProfilerDriver.LoadProfile`, `RawFrameDataView`) and sums `GC.Alloc` samples under their parent markers for the frames that load a scene. That names the code that allocates, which disabling components cannot do for a load.
+- **Measure in a development player with the Profiler log, then read it in the Editor.** The Editor's own play mode allocates about 150 kB a frame, too noisy to attribute; the Linux development player (`BuildLinuxDevPlayer`) is clean. The player writes a Profiler capture (the allocation scan turns on `Profiler.enableBinaryLog` for the loads), and an Editor tool reads it in batch mode (`ProfilerDriver.LoadProfile`, `HierarchyFrameDataView`) and sums `GC.Alloc` samples under their parent markers for the frames that load a scene. That names the code that allocates, which disabling components cannot do for a load.
 - **Fix only what is the game's own and cheap to fix.** Unity's deserialisation and UI Toolkit setup stay; they are recorded in the docs as the expected cost of a load.
-- **The font: Liberation Mono Regular** (SIL Open Font License 1.1, 320 kB), shipped with its licence text, as a UI Toolkit font asset used only by the preview label. A desktop-only font on the box is not in the build, so the file is copied into the project.
+- **The font: Liberation Mono Regular** (SIL Open Font License 1.1, 320 kB), shipped with its licence text, used only by the preview label. A desktop-only font on the box is not in the build, so the file is copied into the project.
 
 ## Phases
 

@@ -47,10 +47,12 @@
     margin-bottom: 20px;
 }
 
+/* Monospace, spaces kept: the report's statistics are columns. */
 .diag-preview {
     color: rgb(215, 215, 215);
     font-size: 22px;
-    white-space: normal;
+    -unity-font-definition: url("Fonts/LiberationMono-Regular.ttf");
+    white-space: pre-wrap;
 }
 
 .diag-buttons {
