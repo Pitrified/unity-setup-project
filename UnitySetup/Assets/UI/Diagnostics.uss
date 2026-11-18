@@ -1,0 +1,75 @@
+/* Diagnostics.uss
+   The diagnostics panel. Reference resolution 1920x1080 landscape, like Pause.uss;
+   buttons >= 96 px tall (>= 48 dp on a 2x-density phone).
+*/
+
+.diag-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.safe-area-container {
+    flex-grow: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.diag-panel {
+    background-color: rgba(20, 20, 28, 0.96);
+    border-radius: 16px;
+    padding: 36px;
+    width: 1600px;
+    height: 900px;
+}
+
+.diag-title {
+    color: rgb(255, 255, 255);
+    font-size: 48px;
+    -unity-font-style: bold;
+    margin-bottom: 8px;
+}
+
+.diag-status {
+    color: rgb(160, 220, 170);
+    font-size: 30px;
+    margin-bottom: 16px;
+}
+
+.diag-preview-scroll {
+    flex-grow: 1;
+    background-color: rgba(0, 0, 0, 0.45);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.diag-preview {
+    color: rgb(215, 215, 215);
+    font-size: 22px;
+    white-space: normal;
+}
+
+.diag-buttons {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.diag-btn {
+    height: 96px;
+    flex-grow: 1;
+    margin-left: 8px;
+    margin-right: 8px;
+    font-size: 30px;
+    color: rgb(255, 255, 255);
+    background-color: rgb(55, 75, 105);
+    border-radius: 10px;
+    border-width: 0;
+}
+
+.diag-btn--close {
+    background-color: rgb(90, 60, 60);
+}

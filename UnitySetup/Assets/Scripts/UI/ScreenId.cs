@@ -8,5 +8,8 @@ namespace Game.UI
 
         /// <summary>Pause overlay (owned by the Persistent scene).</summary>
         Pause,
+
+        /// <summary>The diagnostics report panel (Copy, Share, Previous session).</summary>
+        Diagnostics,
     }
 }

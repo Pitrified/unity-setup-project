@@ -13,6 +13,7 @@
                 <ui:Label class="pause-title" text="Paused" />
                 <ui:Button name="btn-resume"         class="pause-btn" text="Resume" />
                 <ui:Button name="btn-return-to-menu" class="pause-btn" text="Main Menu" />
+                <ui:Button name="btn-diagnostics"    class="pause-btn" text="Diagnostics" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

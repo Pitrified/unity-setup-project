@@ -47,7 +47,9 @@ What a person copies or shares off the phone with no adb (`plans/05_diagnostics/
   - problems; the log ring, `seconds level category text`;
   - detailed only: the per-second series (frames, mean and max frame time, memory, heap) of the last 10 minutes.
 - Size: a few kB typical (a launch into play logs about 15 lines); the detailed series adds about 40 bytes a second.
-- Read one without a phone: `REPORT_OUT=<file>` with the PlayMode `DiagnosticsReportTests`.
+- **Opened** from a Diagnostics button on the main menu and the pause screen (`ScreenId.Diagnostics`, `DiagnosticsPanel`): Copy (the report to the clipboard), Copy detailed (with the series), Share (the detailed report to Android's share sheet: save to Files or Drive, send to a chat), Previous session (the last session's kept report to the clipboard), Close.
+- **Kept on the phone**: `persistentDataPath/diagnostics/current.txt` every 30 s and on pause and quit; `previous.txt` is the session before, so a crash's report can still be copied after a relaunch.
+- Read one without a phone: `REPORT_OUT=<file>` with the PlayMode `DiagnosticsReportTests`; a picture of the panel: `PANEL_CAPTURE=<file.png>` with `DiagnosticsPanelTests`.
 
 ---
 

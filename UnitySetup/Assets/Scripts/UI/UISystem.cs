@@ -18,19 +18,25 @@ namespace Game.UI
         private const string SafeAreaContainerName  = "safe-area-container";
         private const string BtnResumeName          = "btn-resume";
         private const string BtnReturnToMenuName    = "btn-return-to-menu";
+        private const string BtnDiagnosticsName     = "btn-diagnostics";
 
         // --------------------------------------------------------------------- serialized
 
         [SerializeField] private UIDocument _loadingDocument;
         [SerializeField] private UIDocument _pauseDocument;
+        [SerializeField] private UIDocument _diagnosticsDocument;
+        [SerializeField] private DiagnosticsRecorder _diagnosticsRecorder;
 
         // --------------------------------------------------------------------- private state
 
         private VisualElement _loadingRoot;
         private VisualElement _pauseRoot;
+        private VisualElement _diagnosticsRoot;
+        private DiagnosticsPanel _diagnostics;
 
         private bool _loadingVisible;
         private bool _pauseVisible;
+        private bool _diagnosticsVisible;
 
         private Rect       _lastSafeArea;
         private Vector2Int _lastScreenSize;
@@ -44,7 +50,10 @@ namespace Game.UI
         public event Action OnReturnToMenuRequested;
 
         /// <inheritdoc/>
-        public bool IsAnyOverlayOpen => _loadingVisible || _pauseVisible;
+        public bool IsAnyOverlayOpen => _loadingVisible || _pauseVisible || _diagnosticsVisible;
+
+        /// <summary>The diagnostics panel, for tests.</summary>
+        internal DiagnosticsPanel Diagnostics => _diagnostics;
 
         // --------------------------------------------------------------------- Unity lifecycle
 
@@ -52,11 +61,18 @@ namespace Game.UI
         {
             _loadingRoot = BindDocument(_loadingDocument, "Loading");
             _pauseRoot   = BindDocument(_pauseDocument,   "Pause");
+            _diagnosticsRoot = BindDocument(_diagnosticsDocument, "Diagnostics");
 
             RegisterPauseButtons();
+            if (_diagnosticsRoot != null)
+            {
+                _diagnostics = new DiagnosticsPanel(_diagnosticsRoot, _diagnosticsRecorder, new PlatformDiagnosticsExport());
+                _diagnostics.CloseRequested += () => HideScreen(ScreenId.Diagnostics);
+            }
 
             SetVisible(_loadingRoot, false);
             SetVisible(_pauseRoot,   false);
+            SetVisible(_diagnosticsRoot, false);
 
             _lastSafeArea   = Screen.safeArea;
             _lastScreenSize = new Vector2Int(Screen.width, Screen.height);
@@ -107,6 +123,11 @@ namespace Game.UI
                     _pauseVisible = true;
                     Log.Info(LogCat.UI, "Pause screen shown.");
                     break;
+                case ScreenId.Diagnostics:
+                    _diagnostics?.Refresh();
+                    SetVisible(_diagnosticsRoot, true);
+                    _diagnosticsVisible = true;
+                    break;
                 default:
                     Log.Warn(LogCat.UI, "ShowScreen: ScreenId {0} is not handled by UISystem.", id);
                     break;
@@ -121,6 +142,10 @@ namespace Game.UI
                 case ScreenId.Pause:
                     SetVisible(_pauseRoot, false);
                     _pauseVisible = false;
+                    break;
+                case ScreenId.Diagnostics:
+                    SetVisible(_diagnosticsRoot, false);
+                    _diagnosticsVisible = false;
                     break;
                 default:
                     Log.Warn(LogCat.UI, "HideScreen: ScreenId {0} is not handled by UISystem.", id);
@@ -163,6 +188,10 @@ namespace Game.UI
             Button btnMenu = _pauseRoot.Q<Button>(BtnReturnToMenuName);
             if (btnMenu != null)
                 btnMenu.clicked += () => OnReturnToMenuRequested?.Invoke();
+
+            Button btnDiagnostics = _pauseRoot.Q<Button>(BtnDiagnosticsName);
+            if (btnDiagnostics != null)
+                btnDiagnostics.clicked += () => ShowScreen(ScreenId.Diagnostics);
         }
 
         private static void SetVisible(VisualElement element, bool visible)

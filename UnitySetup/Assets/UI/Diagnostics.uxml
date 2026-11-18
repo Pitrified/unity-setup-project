@@ -1,0 +1,25 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Style src="Diagnostics.uss" />
+    <!--
+        The diagnostics report a person copies or shares off the phone (docs/systems/logging.md).
+        Wired by DiagnosticsPanel through UISystem; shown above the pause screen.
+    -->
+    <ui:VisualElement name="diagnostics-overlay" class="diag-overlay">
+        <ui:VisualElement name="safe-area-container" class="safe-area-container">
+            <ui:VisualElement class="diag-panel">
+                <ui:Label class="diag-title" text="Diagnostics" />
+                <ui:Label name="diag-status" class="diag-status" text="" />
+                <ui:ScrollView name="diag-preview-scroll" class="diag-preview-scroll" mode="Vertical">
+                    <ui:Label name="diag-preview" class="diag-preview" text="" />
+                </ui:ScrollView>
+                <ui:VisualElement class="diag-buttons">
+                    <ui:Button name="btn-diag-copy"     class="diag-btn" text="Copy" />
+                    <ui:Button name="btn-diag-detailed" class="diag-btn" text="Copy detailed" />
+                    <ui:Button name="btn-diag-share"    class="diag-btn" text="Share" />
+                    <ui:Button name="btn-diag-previous" class="diag-btn" text="Previous session" />
+                    <ui:Button name="btn-diag-close"    class="diag-btn diag-btn--close" text="Close" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
