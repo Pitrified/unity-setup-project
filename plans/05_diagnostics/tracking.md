@@ -19,7 +19,7 @@ From `00_start.md`, 2026-11-18:
 | 01 | Recorder and report         | [`01_report.md`](01_report.md)         | done    |
 | 02 | Export                      | [`02_export.md`](02_export.md)         | done    |
 | 03 | Panel                       | [`03_panel.md`](03_panel.md)           | done    |
-| 04 | Verify                      | [`04_verify.md`](04_verify.md)         | planned |
+| 04 | Verify                      | [`04_verify.md`](04_verify.md)         | in progress |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
 
@@ -31,3 +31,4 @@ Append-only. Newest at the bottom.
 - 2026-11-18 : phase 01 - recorder, report, build stamp, 500-line ring in every build; quality-name bug fixed; the lost-reference pitfall's real cause (OpenScene unloads assets) found. A real report is 1.9 kB. Gates green.
 - 2026-11-18 : phase 02 - copy, Android share intent, kept current and previous reports; files seen rotating on the box. Gates green.
 - 2026-11-18 : phase 03 - the Diagnostics panel on the menu and pause screens, tested with a fake exporter, pictured through a render-texture panel. Gates green.
+- 2026-11-18 : phase 04 - fresh clone green; the APK carries its commit and the build leaves git clean. Waiting on the phone: copy, share, previous session, a paste here.
