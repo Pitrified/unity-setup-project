@@ -168,7 +168,19 @@ namespace Game.Editor
         {
             Debug.Log($"[BuildPipeline] Starting '{mode}' build → {opts.locationPathName}");
 
-            BuildReport  report  = UnityEditor.BuildPipeline.BuildPlayer(opts);
+            // The diagnostics report names the build it came from; the stamp goes back to
+            // "editor" afterwards so a build leaves no change in git.
+            StampBuildInfo(GitDescribe(), DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"), mode,
+                PlayerSettings.Android.bundleVersionCode);
+            BuildReport report;
+            try
+            {
+                report = UnityEditor.BuildPipeline.BuildPlayer(opts);
+            }
+            finally
+            {
+                StampBuildInfo("editor", "", "editor", 0);
+            }
             BuildSummary summary = report.summary;
 
             if (summary.result == BuildResult.Succeeded)
@@ -183,6 +195,55 @@ namespace Game.Editor
                     + $"{summary.totalErrors} error(s). See build log for details.";
                 Debug.LogError(message);
                 throw new BuildFailedException(message);
+            }
+        }
+
+        private const string BuildInfoPath = "Assets/Settings/SO_BuildInfo.asset";
+
+        private static void StampBuildInfo(string commit, string builtAtUtc, string kind, int versionCode)
+        {
+            var info = AssetDatabase.LoadAssetAtPath<Game.Systems.SO_BuildInfo>(BuildInfoPath);
+            if (info == null)
+            {
+                Debug.LogWarning($"[BuildPipeline] No build info at {BuildInfoPath}; the diagnostics report will not name the build.");
+                return;
+            }
+            info.Stamp(commit, builtAtUtc, kind, versionCode);
+            EditorUtility.SetDirty(info);
+            AssetDatabase.SaveAssets();
+        }
+
+        /// <summary>The short commit hash, with "+dirty" when the work tree has changes; "unknown" without git.</summary>
+        private static string GitDescribe()
+        {
+            string hash = RunGit("rev-parse --short HEAD");
+            if (string.IsNullOrEmpty(hash))
+            {
+                return "unknown";
+            }
+            string status = RunGit("status --porcelain");
+            return string.IsNullOrEmpty(status) ? hash : hash + "+dirty";
+        }
+
+        private static string RunGit(string arguments)
+        {
+            try
+            {
+                var start = new System.Diagnostics.ProcessStartInfo("git", arguments)
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Directory.GetCurrentDirectory(),
+                };
+                using var process = System.Diagnostics.Process.Start(start);
+                string output = process.StandardOutput.ReadToEnd().Trim();
+                process.WaitForExit();
+                return process.ExitCode == 0 ? output : null;
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                return null; // no git on this machine
             }
         }
 

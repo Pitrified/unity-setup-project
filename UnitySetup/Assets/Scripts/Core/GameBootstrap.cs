@@ -18,7 +18,7 @@ namespace Game.Core
         // ------------------------------------------------------------------ constants
 
         /// <summary>Name of the quality level applied at startup.</summary>
-        private const string MobileQualityName = "mobile";
+        private const string MobileQualityName = "Mobile"; // as named in ProjectSettings/QualitySettings.asset
 
         // ------------------------------------------------------------------ fatal-error state
 

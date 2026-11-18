@@ -111,19 +111,19 @@ namespace Game.Tests.EditMode
         // Ring buffer wraps correctly at capacity
 
         [Test]
-        public void RingBuffer_WrapsAt20_RetainsNewest20()
+        public void RingBuffer_WrapsAtCapacity_RetainsNewest()
         {
-            for (int i = 0; i < 25; i++)
+            int total = Log.RingCapacity + 5;
+            for (int i = 0; i < total; i++)
                 Log.Info(LogCat.Build, "msg {0}", i);
 
-            var buf = new LogEntry[20];
+            var buf = new LogEntry[Log.RingCapacity];
             int count = Log.GetRecentEntries(buf);
 
-            Assert.AreEqual(20, count);
-            // Oldest retained entry is msg 5 (25 total - 20 capacity = 5 dropped)
-            StringAssert.Contains("5", buf[0].Text);
-            // Newest is msg 24
-            StringAssert.Contains("24", buf[19].Text);
+            Assert.AreEqual(Log.RingCapacity, count);
+            // The five oldest were dropped: the first kept is msg 5, the newest msg total-1.
+            Assert.AreEqual("msg 5", buf[0].Text);
+            Assert.AreEqual($"msg {total - 1}", buf[count - 1].Text);
         }
 
         // ------------------------------------------------------------------
@@ -139,10 +139,10 @@ namespace Game.Tests.EditMode
             int count = Log.GetRecentEntries(buf);
 
             Assert.AreEqual(3, count);
-            // Should be the oldest 3 of the 10 written (oldest-first order)
-            StringAssert.Contains("0", buf[0].Text);
-            StringAssert.Contains("1", buf[1].Text);
-            StringAssert.Contains("2", buf[2].Text);
+            // The newest 3 of the 10 written, oldest of them first
+            Assert.AreEqual("m7", buf[0].Text);
+            Assert.AreEqual("m8", buf[1].Text);
+            Assert.AreEqual("m9", buf[2].Text);
         }
 
         // ------------------------------------------------------------------

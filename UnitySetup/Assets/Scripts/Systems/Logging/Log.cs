@@ -47,13 +47,15 @@ namespace Game.Systems
         public static Action OnDebugSkipLoading;
 #endif
 
-        private const int RingCapacity = 20;
+        /// <summary>
+        /// Lines the ring keeps, in every build: what the diagnostics report shows (docs/systems/logging.md).
+        /// Release keeps warnings and errors only, since Verbose and Info are compiled out there.
+        /// </summary>
+        internal const int RingCapacity = 500;
 
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
         private static readonly LogEntry[] _ring = new LogEntry[RingCapacity];
         private static int _ringHead;
         private static int _ringCount;
-#endif
 
         // ------------------------------------------------------------------ public API
 
@@ -96,24 +98,23 @@ namespace Game.Systems
         // ------------------------------------------------------------------ overlay read
 
         /// <summary>
-        /// Copies the most recent log entries (oldest first) into <paramref name="dest"/>.
-        /// Returns the number of entries written. No allocation.
+        /// Copies the newest log entries into <paramref name="dest"/>, oldest of them first:
+        /// as many as fit, or as the ring holds. Returns the number written. No allocation.
         /// </summary>
         internal static int GetRecentEntries(LogEntry[] dest)
         {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
             int count = Math.Min(_ringCount, dest.Length);
             for (int i = 0; i < count; i++)
             {
-                // (_ringHead - _ringCount) is the oldest slot; adding RingCapacity keeps it positive.
-                int idx = (_ringHead - _ringCount + i + RingCapacity) % RingCapacity;
+                // (_ringHead - count) is the oldest of the newest `count`; adding RingCapacity keeps it positive.
+                int idx = (_ringHead - count + i + RingCapacity) % RingCapacity;
                 dest[i] = _ring[idx];
             }
             return count;
-#else
-            return 0;
-#endif
         }
+
+        /// <summary>Number of entries the ring holds now, up to <see cref="RingCapacity"/>.</summary>
+        internal static int Count => _ringCount;
 
         // ------------------------------------------------------------------ testing
 
@@ -131,12 +132,10 @@ namespace Game.Systems
 
         private static void Append(LogLevel level, LogCat cat, string text)
         {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
             _ring[_ringHead] = new LogEntry(level, cat, text, Time.realtimeSinceStartup);
             _ringHead = (_ringHead + 1) % RingCapacity;
             if (_ringCount < RingCapacity)
                 _ringCount++;
-#endif
         }
     }
 }

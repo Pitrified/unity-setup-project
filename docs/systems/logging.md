@@ -32,6 +32,22 @@ Log.Error  (LogCat cat, string message, params object[] args)
 - `[Conditional("UNITY_EDITOR")]` and `[Conditional("DEVELOPMENT_BUILD")]` on
   `Verbose` and `Info` so they vanish from Release IL2CPP output.
 - `Warn`/`Error` always present.
+- The ring of the last 500 entries exists in every build; in Release it holds warnings and errors only.
+
+---
+
+## Diagnostics report
+
+What a person copies or shares off the phone with no adb (`plans/05_diagnostics/`), after abyss's log button: header lines, a blank line, then statistics, problems and log lines. Every build carries it.
+
+- **`DiagnosticsRecorder`** (in `Persistent.unity`) collects, with fixed buffers and no allocation per frame: frame times into a session histogram (0.5 ms bins) and a last-minute ring; memory and managed heap once a second into histograms and a 600-second series; exceptions, errors and asserts from `Application.logMessageReceived` into a `ProblemLog`, apart from the ring, so a busy log never pushes them out (distinct by message and first stack line, with count, first and last time, top 6 stack lines, at most 10).
+- **`DiagnosticsReport`** writes it on demand:
+  - header: product, version and version code, build kind, commit and time (`SO_BuildInfo`, stamped by `BuildPipeline` around each build and set back to "editor" after), development or release, Unity version; device, OS, CPU, memory; GPU and graphics API; screen, refresh rate, DPI, orientation; quality level, target frame rate, vsync; session time, game state, loaded scenes; battery;
+  - statistics for the session and the last 60 s: min, p05, median, mean, p95, max of frame time and frame rate (read off the frame times), memory and heap; GC collections and frames over 33 ms;
+  - problems; the log ring, `seconds level category text`;
+  - detailed only: the per-second series (frames, mean and max frame time, memory, heap) of the last 10 minutes.
+- Size: a few kB typical (a launch into play logs about 15 lines); the detailed series adds about 40 bytes a second.
+- Read one without a phone: `REPORT_OUT=<file>` with the PlayMode `DiagnosticsReportTests`.
 
 ---
 
@@ -44,7 +60,7 @@ Displays:
 - FPS (avg, 1% low over last 60 frames)
 - Frame time (main, render)
 - Current `GameManager` state
-- Last 20 log lines
+- The newest 20 log lines
 
 Buttons (dev builds only):
 
