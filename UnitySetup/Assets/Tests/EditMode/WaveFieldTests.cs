@@ -6,8 +6,8 @@ namespace Game.Tests.EditMode
 
     /// <summary>
     /// <see cref="WaveField"/>, the CPU side of the water's Gerstner waves: hand-computed values,
-    /// the height lookup agreeing with the forward displacement, travel at the deep-water speed,
-    /// and no allocation per query (it runs for every floating point every physics step).
+    /// the height lookup agreeing with the forward displacement, travel at the deep-water speed.
+    /// That a query allocates nothing is measured per frame in the PlayMode AllocationTests.
     /// </summary>
     public sealed class WaveFieldTests
     {
@@ -76,23 +76,6 @@ namespace Game.Tests.EditMode
             var field = new WaveField(0f, new GerstnerWave[0]);
             Vector3 n = field.NormalAtRest(3f, -2f, 5f);
             Assert.That((n - Vector3.up).magnitude, Is.LessThan(Tolerance));
-        }
-
-        [Test]
-        public void HeightAt_DoesNotAllocate()
-        {
-            var field = new WaveField(0f, new[] { Wave(0f, 10f, 0.2f), Wave(45f, 6f, 0.1f) });
-            field.HeightAt(0f, 0f, 0f); // warm up
-
-            long before = System.GC.GetAllocatedBytesForCurrentThread();
-            float sum = 0f;
-            for (int i = 0; i < 1000; i++)
-            {
-                sum += field.HeightAt(i * 0.1f, i * 0.2f, i * 0.01f);
-            }
-            long after = System.GC.GetAllocatedBytesForCurrentThread();
-
-            Assert.AreEqual(before, after, $"HeightAt allocated (checksum {sum})");
         }
     }
 }

@@ -97,6 +97,9 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 - **The Editor's render counters (`UnityStats`) stay at 0** for a render made from a script in batch mode; `SceneCapture -captureBudget` counts from the scene instead.
 - **A CustomRenderTexture's updates run during rendering**, at a point a script or a test does not control (a test saw it never step). Ping-pong two render textures with `Graphics.Blit` when the steps must happen on call, as `WaterRipples` does.
 - **Tests that build objects in code share the world with scenes an earlier test left loaded**: build them far from the scene's content (the water tests use 1 km out).
+- **Measuring managed allocation**: `GC.GetAllocatedBytesForCurrentThread` reads 0 in Unity's runtime and `GC.GetTotalMemory` only moves in blocks; the Profiler's "GC Allocated In Frame" (`ProfilerRecorder`) counts, per frame (`AllocationTests` checks it against a known allocation). And measure in a player, not the Editor: play mode allocates about 150 kB a frame by itself.
+- **A desktop player pauses without focus**, which a headless run never has: set `Application.runInBackground` for such runs (the allocation scan does).
+- **Building for another platform rewrites settings** (URP shader prefiltering, batching entries, a Connect flag); restore them with `git checkout` before committing.
 - **`WaitForEndOfFrame` never fires in batch mode**: a PlayMode test that yields it fails. Yield `null` and render the camera into a texture yourself.
 - **The first `Camera.Render()` after opening a scene** in an editor method comes out without its realtime light: surfaces show ambient only and look near black. Render twice and keep the second frame.
 - **`DISPLAY` set but not usable**: a session over SSH can inherit `DISPLAY=:0` from a desktop it cannot open, and Unity then fails with "Error opening default X display". Run under `xvfb-run` regardless, as `gates.sh` does.

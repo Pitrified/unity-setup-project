@@ -23,6 +23,11 @@ namespace Game.Systems
             sb.Append('\n');
             float now = Time.realtimeSinceStartup;
             AppendStats(sb, "session", recorder.FrameMs, recorder.MemoryMb, recorder.HeapMb, now);
+            Histogram gc = recorder.GcAllocKb;
+            if (gc.Count > 0)
+            {
+                Row(sb, "gc alloc kB", gc.Min, gc.Quantile(0.05f), gc.Quantile(0.5f), gc.Mean, gc.Quantile(0.95f), gc.Max);
+            }
             sb.Append("gc ").Append(recorder.GcCollections).Append(" collections | slow frames (over 33 ms) ")
               .Append(recorder.SlowFrames)
               .Append(" (").Append(Percent(recorder.SlowFrames, recorder.FrameMs.Count)).Append(")\n");

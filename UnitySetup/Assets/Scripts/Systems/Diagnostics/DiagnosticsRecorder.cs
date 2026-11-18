@@ -2,6 +2,7 @@ namespace Game.Systems
 {
     using System;
     using System.IO;
+    using Unity.Profiling;
     using UnityEngine;
     using UnityEngine.Profiling;
 
@@ -31,6 +32,8 @@ namespace Game.Systems
         private const int MemoryBins = 4096;   // 0 to 4 GB
         private const int HeapBins = 2048;     // 0 to 2 GB
         private const float BytesPerMb = 1024f * 1024f;
+        private const int GcAllocBins = 1024;    // 0 to 256 kB a frame
+        private const float GcAllocBinKb = 0.25f;
 
         /// <summary>Seconds between writes of the kept report.</summary>
         internal const float SaveInterval = 30f;
@@ -51,6 +54,7 @@ namespace Game.Systems
         private readonly Histogram _frameMs = new Histogram(FrameBins, FrameBinMs);
         private readonly Histogram _memoryMb = new Histogram(MemoryBins, 1f);
         private readonly Histogram _heapMb = new Histogram(HeapBins, 1f);
+        private readonly Histogram _gcAllocKb = new Histogram(GcAllocBins, GcAllocBinKb);
         private readonly float[] _recentMs = new float[RecentFrames];
         private readonly float[] _recentAt = new float[RecentFrames];
         private readonly Second[] _series = new Second[SeriesSeconds];
@@ -69,6 +73,7 @@ namespace Game.Systems
         private DiagnosticsFiles _files;
         private float _nextSave;
         private bool _skipNextFrame;
+        private ProfilerRecorder _gcAlloc;
 
         /// <summary>The build stamp this report names.</summary>
         public SO_BuildInfo Build => _build;
@@ -76,6 +81,9 @@ namespace Game.Systems
         internal Histogram FrameMs => _frameMs;
         internal Histogram MemoryMb => _memoryMb;
         internal Histogram HeapMb => _heapMb;
+
+        /// <summary>Managed allocation per frame in kB, from the Profiler's counter; empty where it is not available (Release).</summary>
+        internal Histogram GcAllocKb => _gcAllocKb;
         internal ProblemLog Problems => _problems;
         internal long SlowFrames => _slowFrames;
         internal int GcCollections => GC.CollectionCount(0) - _gcAtStart;
@@ -107,12 +115,14 @@ namespace Game.Systems
             _secondStart = Time.realtimeSinceStartup;
             _nextSave = Time.realtimeSinceStartup + SaveInterval;
             Application.logMessageReceived += OnLogMessage;
+            _gcAlloc = ProfilerRecorder.StartNew(ProfilerCategory.Memory, "GC Allocated In Frame");
             Guard(() => { Files.Rotate(); return string.Empty; }, "keeping the last session's report");
         }
 
         private void OnDisable()
         {
             Application.logMessageReceived -= OnLogMessage;
+            _gcAlloc.Dispose();
         }
 
         private void OnApplicationPause(bool paused)
@@ -166,6 +176,11 @@ namespace Game.Systems
             else
             {
                 RecordFrame(Time.unscaledDeltaTime * 1000f, now);
+                if (_gcAlloc.Valid)
+                {
+                    // LastValue is the frame before this one: the counter closes at the end of a frame.
+                    _gcAllocKb.Add(_gcAlloc.LastValue / 1024f);
+                }
             }
             if (now - _secondStart >= 1f)
             {
