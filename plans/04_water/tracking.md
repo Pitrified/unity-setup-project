@@ -13,7 +13,7 @@ A middle-ground water for the template: shared Gerstner waves, baked shore depth
 | #  | Phase                          | Plan                                       | Status  |
 | -- | ------------------------------ | ------------------------------------------ | ------- |
 | 01 | Research and choice            | [`00_start.md`](00_start.md)               | done    |
-| 02 | Capture over time              | [`02_sequence_capture.md`](02_sequence_capture.md) | planned |
+| 02 | Capture over time              | [`02_sequence_capture.md`](02_sequence_capture.md) | done    |
 | 03 | Waves, shading, island         | [`03_surface.md`](03_surface.md)           | planned |
 | 04 | Floating                       | [`04_buoyancy.md`](04_buoyancy.md)         | planned |
 | 05 | Ripples, splashes, shore       | [`05_interaction.md`](05_interaction.md)   | planned |
@@ -26,3 +26,4 @@ Status values: draft / planned / in progress / done / superseded / discarded.
 Append-only. Newest at the bottom.
 
 - 2026-11-18 : started unsupervised; research written and the middle ground chosen (Gerstner shared with C#, baked seabed depth, buoyancy, ripple render texture, shore foam). Six phases.
+- 2026-11-18 : phase 02 - sequence capture in Play mode (fixed steps, frames from a pose) and `measure.py sheet / gif / motion / track`; control measured still. In the docs and the skill.

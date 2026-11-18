@@ -69,7 +69,8 @@ One class of change per pass, numbered `r<N>` in a scratch folder, never over a 
    - `measure.py measure SPEC capture.png` prints each patch's ratio to the neutral and how far it is from the reference's (the spec format is in its docstring; the barrel's is `references/barrel/spec.json`);
    - ratios fix the colours' relation only: anchor one colour by hue and a plausible value for the material, derive the rest from the ratios;
    - `measure.py correct R G B --target ... --current ...` moves a colour by the measured factor in linear light; stop when the chosen patch is within a few hundredths. Two captures did it for the barrel.
-4. **Texture is a separate question.** Compare a patch's spread as well as its median; flat colours cannot carry a grain (the barrel's spread is 8 against the photograph's 30, the crate's about 1 against 87). A weathered board reads grey to the eye because of light and dark streaks around a warm median; a flat colour at that median reads browner. Say so rather than chase it; a small tiling texture is the upgrade.
+4. **Motion, in a sequence.** Anything that moves (a float bobbing, water, a flag) is judged over time: the sequence capture of `docs/headless-unity.md` §3 and `measure.py sheet / gif / motion / track`. A still of moving water says nothing about whether it moves right.
+5. **Texture is a separate question.** Compare a patch's spread as well as its median; flat colours cannot carry a grain (the barrel's spread is 8 against the photograph's 30, the crate's about 1 against 87). A weathered board reads grey to the eye because of light and dark streaks around a warm median; a flat colour at that median reads browner. Say so rather than chase it; a small tiling texture is the upgrade.
 
 ## 6. Budget
 

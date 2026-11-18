@@ -11,6 +11,13 @@ Run from this folder with `uv run --no-sync python measure.py ...`.
     crop OUT IMAGE:X0,Y0,X1,Y1 ...
                                   crops side by side at the same height, for a look
 
+For frame sequences (a folder of frame_NNN.png from the sequence capture):
+
+    sheet FOLDER OUT              all frames on one contact sheet
+    gif FOLDER OUT                an animated GIF to watch
+    motion FOLDER                 change between consecutive frames, overall and per grid cell
+    track FOLDER X0 Y0 X1 Y1      a box's brightness and bright centroid over time (bobbing, waves)
+
 SPEC is a JSON file:
 
     {"neutral": "hoop",
@@ -145,6 +152,79 @@ def crop(out: str, items: list[str], height: int = 400) -> None:
     print(f"crop: {out}")
 
 
+def _frames(folder: str) -> list[Path]:
+    frames = sorted(Path(folder).glob("frame_*.png"))
+    if not frames:
+        msg = f"no frame_*.png in {folder}"
+        raise FileNotFoundError(msg)
+    return frames
+
+
+def sheet(folder: str, out: str, columns: int, width: int) -> None:
+    """Every frame of a sequence on one image, in rows, each labelled with its index."""
+    from PIL import ImageDraw  # noqa: PLC0415 - only this command draws
+
+    frames = _frames(folder)
+    with Image.open(frames[0]) as first:
+        height = round(first.height * width / first.width)
+    rows = (len(frames) + columns - 1) // columns
+    board = Image.new("RGB", (columns * width, rows * height), "white")
+    draw = ImageDraw.Draw(board)
+    for i, path in enumerate(frames):
+        with Image.open(path) as im:
+            x, y = (i % columns) * width, (i // columns) * height
+            board.paste(im.convert("RGB").resize((width, height)), (x, y))
+            draw.text((x + 4, y + 4), str(i), fill="white")
+    board.save(out)
+    print(f"sheet: {out} ({len(frames)} frames)")
+
+
+def gif(folder: str, out: str, fps: float, width: int) -> None:
+    """The sequence as an animated GIF, to watch."""
+    images = []
+    for path in _frames(folder):
+        with Image.open(path) as im:
+            images.append(im.convert("RGB").resize((width, round(im.height * width / im.width))))
+    images[0].save(out, save_all=True, append_images=images[1:], duration=round(1000 / fps), loop=0)
+    print(f"gif: {out} ({len(images)} frames at {fps} fps)")
+
+
+def motion(folder: str, grid: int) -> None:
+    """Mean absolute change between consecutive frames, overall and per cell of a grid.
+
+    Near zero where nothing moves; a still scene is the control. The grid shows where it moves.
+    """
+    frames = [load(p) for p in _frames(folder)]
+    diffs = [np.abs(b - a).mean(axis=2) for a, b in zip(frames, frames[1:])]
+    total = [float(d.mean()) for d in diffs]
+    print(f"frames {len(frames)}  mean change per frame {np.mean(total):.2f} (min {min(total):.2f}, max {max(total):.2f})")
+    mean = np.mean(diffs, axis=0)
+    h, w = mean.shape
+    print(f"per cell ({grid}x{grid}, top row first):")
+    for r in range(grid):
+        cells = [mean[r * h // grid:(r + 1) * h // grid, c * w // grid:(c + 1) * w // grid].mean() for c in range(grid)]
+        print("  " + " ".join(f"{v:5.1f}" for v in cells))
+
+
+def track(folder: str, box: list[int]) -> None:
+    """A box's mean brightness and the centroid of its brightest tenth, frame by frame.
+
+    Brightness shows a wave or a ripple passing; the centroid shows something bobbing or drifting.
+    """
+    x0, y0, x1, y1 = box
+    rows = []
+    for i, path in enumerate(_frames(folder)):
+        region = load(path)[y0:y1, x0:x1].mean(axis=2)
+        cut = np.percentile(region, 90)
+        ys, xs = np.nonzero(region >= cut)
+        rows.append((i, float(region.mean()), x0 + float(xs.mean()), y0 + float(ys.mean())))
+    for i, lum, cx, cy in rows:
+        print(f"  {i:3}  lum {lum:6.1f}  bright centroid ({cx:6.1f}, {cy:6.1f})")
+    lums = np.array([r[1] for r in rows])
+    cys = np.array([r[3] for r in rows])
+    print(f"lum range {lums.min():.1f}..{lums.max():.1f}  centroid y range {cys.min():.1f}..{cys.max():.1f}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -161,6 +241,22 @@ def main() -> None:
     k = sub.add_parser("crop")
     k.add_argument("out")
     k.add_argument("items", nargs="+")
+    sh = sub.add_parser("sheet")
+    sh.add_argument("folder")
+    sh.add_argument("out")
+    sh.add_argument("--columns", type=int, default=8)
+    sh.add_argument("--width", type=int, default=240)
+    g = sub.add_parser("gif")
+    g.add_argument("folder")
+    g.add_argument("out")
+    g.add_argument("--fps", type=float, default=10)
+    g.add_argument("--width", type=int, default=480)
+    mo = sub.add_parser("motion")
+    mo.add_argument("folder")
+    mo.add_argument("--grid", type=int, default=4)
+    t = sub.add_parser("track")
+    t.add_argument("folder")
+    t.add_argument("box", type=int, nargs=4)
     args = parser.parse_args()
     if args.cmd == "measure":
         measure(args.spec, args.renders)
@@ -168,6 +264,14 @@ def main() -> None:
         correct(args.rgb, args.target, args.current)
     elif args.cmd == "profile":
         profile(args.image, args.box)
+    elif args.cmd == "sheet":
+        sheet(args.folder, args.out, args.columns, args.width)
+    elif args.cmd == "gif":
+        gif(args.folder, args.out, args.fps, args.width)
+    elif args.cmd == "motion":
+        motion(args.folder, args.grid)
+    elif args.cmd == "track":
+        track(args.folder, args.box)
     else:
         crop(args.out, args.items)
 

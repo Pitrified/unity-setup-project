@@ -54,10 +54,15 @@ xvfb-run -a -s "-screen 0 1280x1024x24" "$EDITOR" -batchmode -force-vulkan \
 | EditMode tests | `-runTests -testPlatform EditMode -testResults <xml>` | exit 0; the XML root has `failed="0"` |
 | PlayMode tests | `-runTests -testPlatform PlayMode -testResults <xml>` | exit 0; the XML root has `failed="0"` |
 | `dev` APK | `Tools/build-android.sh dev`, itself under `xvfb-run -a` | `Build SUCCEEDED`; the APK under `UnitySetup/Build/dev/` |
-| Capture | `-executeMethod <Class.Method>` of an editor script that renders a camera to a PNG | the PNG looks right, and measures right where the change is visual |
+| Capture | `-executeMethod Game.Editor.SceneCapture.CaptureFromCommandLine -captureOut shot.png [-captureEye x,y,z -captureTarget x,y,z]` | the PNG looks right, and measures right where the change is visual |
+| Sequence | `-runTests -testPlatform PlayMode -testFilter Game.Tests.PlayMode.SequenceCaptureTests` with `CAPTURE_SEQUENCE_DIR=<dir>` (and `CAPTURE_SECONDS`, `CAPTURE_FPS`, `CAPTURE_EYE`, `CAPTURE_TARGET`) | frames over time in Play mode, read with `measure.py sheet / gif / motion / track` |
 
 `Tools/gates.sh [compile|edit|play|all]` runs the first three gates this way and exits non-zero on any `error CS`, `warning CS` or failed test, naming the failed tests; logs and results go to `UnitySetup/Logs/gates/`.
 It uses the editor of the project's version and, on Linux, always `xvfb-run` when installed.
+
+**A still is not enough for anything that moves** (water, animation, physics, particles): the sequence capture plays the Game scene in fixed 1/30 s steps, real physics included, and writes `frame_NNN.png` from a pose, so the same frames come out however slow the machine is.
+In `Tools/asset_builders`: `measure.py sheet DIR out.png` (all frames on one image, to look at), `gif DIR out.gif` (to watch), `motion DIR` (change between frames, overall and per grid cell: is it moving, and where; a still scene measures about 0.02, the control), `track DIR X0 Y0 X1 Y1` (a box's brightness and bright centroid over time: something bobbing, a wave passing).
+Without `CAPTURE_SEQUENCE_DIR` the same test only checks that the scene plays through, so the gates run it at no cost.
 
 `-runTests` must not be combined with `-quit`. A failing test's message is in the XML's `failure/message`.
 
@@ -88,6 +93,7 @@ Scenes, prefabs, ScriptableObjects and project settings are YAML that Unity writ
 - **An interrupted build** leaves `Assets/Resources/PerformanceTestRun*.json` behind (the performance test package's build step). Delete it; a finished build removes it itself.
 - **PlayMode tests that boot the game** must destroy the `DontDestroyOnLoad` `GameManager` in teardown (`PlayModeTestReset`), or the next test waits on the old instance.
 - **Animated shaders** (anything using `_Time`, such as a water shader) make two captures differ even with no change. Compare a change against a control pair of captures, not against zero.
+- **`WaitForEndOfFrame` never fires in batch mode**: a PlayMode test that yields it fails. Yield `null` and render the camera into a texture yourself.
 - **The first `Camera.Render()` after opening a scene** in an editor method comes out without its realtime light: surfaces show ambient only and look near black. Render twice and keep the second frame.
 - **`DISPLAY` set but not usable**: a session over SSH can inherit `DISPLAY=:0` from a desktop it cannot open, and Unity then fails with "Error opening default X display". Run under `xvfb-run` regardless, as `gates.sh` does.
 - **A RAM-backed `/tmp`**: Ubuntu 25.10 and later mount `/tmp` as a tmpfs with a per-user quota. A project clone there fills RAM, and Unity's package import fails with error -122 (`EDQUOT`). Keep projects and their `Library/` on disk.

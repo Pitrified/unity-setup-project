@@ -34,6 +34,7 @@ One class of change per pass; scratch files `r<N>`, never over a kept file; look
 3. **Palette** in `SceneCapture` shots: a neutral patch in both pictures (white, grey, or a grey metal), `measure.py measure SPEC shot.png`, anchor one colour, derive the rest from the ratios, `measure.py correct`, set with `MaterialTuning.SetFromCommandLine`. Stop within a few hundredths.
    No shared neutral? `SceneCapture -captureGreyCard x,y,z` against something grey in the photograph gives hue only (compare chromaticity), not value. Match a median over the whole face, not a corner. Flat colour cannot carry grain: report the spread, do not chase it.
 4. **Budget**: `build.py` prints triangles and slots; check against `docs/performance-budget.md`.
+5. **Anything that moves** (water, a bobbing float, a flag, a particle effect) is judged in a **sequence**, not a still: the PlayMode `SequenceCaptureTests` with `CAPTURE_SEQUENCE_DIR` (`docs/headless-unity.md` §3), then `measure.py sheet` and `gif` to look, `motion` to see where it moves (capture a still control first: about 0.02), `track` on a box to read bobbing or a wave passing as numbers over time.
 
 Unity commands run in batch mode as `docs/headless-unity.md` says; `Tools/gates.sh all` before each commit.
 
