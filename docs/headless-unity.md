@@ -61,7 +61,7 @@ xvfb-run -a -s "-screen 0 1280x1024x24" "$EDITOR" -batchmode -force-vulkan \
 It uses the editor of the project's version and, on Linux, always `xvfb-run` when installed.
 
 **A still is not enough for anything that moves** (water, animation, physics, particles): the sequence capture plays the Game scene in fixed 1/30 s steps, real physics included, and writes `frame_NNN.png` from a pose, so the same frames come out however slow the machine is.
-In `Tools/asset_builders`: `measure.py sheet DIR out.png` (all frames on one image, to look at), `gif DIR out.gif` (to watch), `motion DIR` (change between frames, overall and per grid cell: is it moving, and where; a still scene measures about 0.02, the control), `track DIR X0 Y0 X1 Y1` (a box's brightness and bright centroid over time: something bobbing, a wave passing).
+In `Tools/asset_builders`: `measure.py sheet DIR out.png` (all frames on one image, to look at), `gif DIR out.gif` (to watch), `motion DIR` (change between frames, overall and per grid cell: is it moving, and where; a still scene measures about 0.02, the control), `track DIR X0 Y0 X1 Y1 [--colour R G B]` (a box's brightness and the centroid of its brightest pixels, or of pixels near a colour, over time: something bobbing, a wave passing).
 Without `CAPTURE_SEQUENCE_DIR` the same test only checks that the scene plays through, so the gates run it at no cost.
 
 `-runTests` must not be combined with `-quit`. A failing test's message is in the XML's `failure/message`.

@@ -206,23 +206,33 @@ def motion(folder: str, grid: int) -> None:
         print("  " + " ".join(f"{v:5.1f}" for v in cells))
 
 
-def track(folder: str, box: list[int]) -> None:
-    """A box's mean brightness and the centroid of its brightest tenth, frame by frame.
+def track(folder: str, box: list[int], colour: list[float] | None = None, tolerance: float = 40.0) -> None:
+    """A box's mean brightness and a centroid, frame by frame.
 
-    Brightness shows a wave or a ripple passing; the centroid shows something bobbing or drifting.
+    The centroid is of the box's brightest tenth, or with `colour` of the pixels within
+    `tolerance` of that sRGB colour (0-255): a green buoy on bright water is not the brightest
+    thing in the box. Brightness shows a wave or a ripple passing; the centroid, something
+    bobbing or drifting.
     """
     x0, y0, x1, y1 = box
     rows = []
     for i, path in enumerate(_frames(folder)):
-        region = load(path)[y0:y1, x0:x1].mean(axis=2)
-        cut = np.percentile(region, 90)
-        ys, xs = np.nonzero(region >= cut)
+        pixels = load(path)[y0:y1, x0:x1]
+        region = pixels.mean(axis=2)
+        if colour is None:
+            mask = region >= np.percentile(region, 90)
+        else:
+            mask = np.linalg.norm(pixels - np.array(colour), axis=2) <= tolerance
+        ys, xs = np.nonzero(mask)
+        if len(ys) == 0:
+            rows.append((i, float(region.mean()), float("nan"), float("nan")))
+            continue
         rows.append((i, float(region.mean()), x0 + float(xs.mean()), y0 + float(ys.mean())))
     for i, lum, cx, cy in rows:
         print(f"  {i:3}  lum {lum:6.1f}  bright centroid ({cx:6.1f}, {cy:6.1f})")
     lums = np.array([r[1] for r in rows])
     cys = np.array([r[3] for r in rows])
-    print(f"lum range {lums.min():.1f}..{lums.max():.1f}  centroid y range {cys.min():.1f}..{cys.max():.1f}")
+    print(f"lum range {lums.min():.1f}..{lums.max():.1f}  centroid y range {np.nanmin(cys):.1f}..{np.nanmax(cys):.1f}")
 
 
 def main() -> None:
@@ -257,6 +267,8 @@ def main() -> None:
     t = sub.add_parser("track")
     t.add_argument("folder")
     t.add_argument("box", type=int, nargs=4)
+    t.add_argument("--colour", type=float, nargs=3, metavar=("R", "G", "B"), help="follow pixels near this sRGB colour")
+    t.add_argument("--tolerance", type=float, default=40.0)
     args = parser.parse_args()
     if args.cmd == "measure":
         measure(args.spec, args.renders)
@@ -271,7 +283,7 @@ def main() -> None:
     elif args.cmd == "motion":
         motion(args.folder, args.grid)
     elif args.cmd == "track":
-        track(args.folder, args.box)
+        track(args.folder, args.box, args.colour, args.tolerance)
     else:
         crop(args.out, args.items)
 

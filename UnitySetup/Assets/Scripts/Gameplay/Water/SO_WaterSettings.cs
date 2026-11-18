@@ -95,5 +95,12 @@ namespace Game.Gameplay.Water
         /// flatten, so floaters in very shallow water ride slightly higher than the drawn surface.
         /// </summary>
         public float CalmDepth => _calmDepth;
+
+        /// <summary>Replaces the sea level and waves (tests build calm or simple water in code).</summary>
+        internal void SetWaves(float seaLevel, GerstnerWave[] waves)
+        {
+            _seaLevel = seaLevel;
+            _waves = waves;
+        }
     }
 }

@@ -72,6 +72,14 @@ namespace Game.Gameplay.Water
             Push();
         }
 
+        /// <summary>Uses <paramref name="settings"/> (water built in code: tests).</summary>
+        internal void UseSettings(SO_WaterSettings settings)
+        {
+            _settings = settings;
+            _field = new WaveField(settings);
+            Push();
+        }
+
         /// <summary>Points the depth map at a baked texture (the bake tool calls this).</summary>
         public void SetDepthMap(Texture2D map, Vector4 rect)
         {
