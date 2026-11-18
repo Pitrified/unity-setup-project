@@ -68,6 +68,7 @@ namespace Game.Systems
         private float _secondMaxMs;
         private DiagnosticsFiles _files;
         private float _nextSave;
+        private bool _skipNextFrame;
 
         /// <summary>The build stamp this report names.</summary>
         public SO_BuildInfo Build => _build;
@@ -120,6 +121,18 @@ namespace Game.Systems
             {
                 SaveNow(detailed: true);
             }
+            else
+            {
+                _skipNextFrame = true;
+            }
+        }
+
+        private void OnApplicationFocus(bool focused)
+        {
+            if (focused)
+            {
+                _skipNextFrame = true;
+            }
         }
 
         private void OnApplicationQuit()
@@ -144,7 +157,16 @@ namespace Game.Systems
         private void Update()
         {
             float now = Time.realtimeSinceStartup;
-            RecordFrame(Time.unscaledDeltaTime * 1000f, now);
+            if (_skipNextFrame)
+            {
+                // The first frame after the app comes back spans the time it was in the background
+                // (a share sheet, another app): not a frame the game took.
+                _skipNextFrame = false;
+            }
+            else
+            {
+                RecordFrame(Time.unscaledDeltaTime * 1000f, now);
+            }
             if (now - _secondStart >= 1f)
             {
                 RecordSecond(now, Profiler.GetTotalAllocatedMemoryLong() / BytesPerMb, GC.GetTotalMemory(false) / BytesPerMb);

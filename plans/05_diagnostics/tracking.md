@@ -32,3 +32,4 @@ Append-only. Newest at the bottom.
 - 2026-11-18 : phase 02 - copy, Android share intent, kept current and previous reports; files seen rotating on the box. Gates green.
 - 2026-11-18 : phase 03 - the Diagnostics panel on the menu and pause screens, tested with a fake exporter, pictured through a render-texture panel. Gates green.
 - 2026-11-18 : phase 04 - fresh clone green; the APK carries its commit and the build leaves git clean. Waiting on the phone: copy, share, previous session, a paste here.
+- 2026-11-18 : first report from the phone: 60 fps held with the water, 147 MB. Fixed: the frame spanning time in the background (share sheet) no longer counts. Found: 8 GC collections a minute, an allocation per frame somewhere; not chased yet. Previous session not yet tried.
