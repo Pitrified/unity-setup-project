@@ -7,8 +7,8 @@ Shader "unity-setup/Water"
     Properties
     {
         [NoScaleOffset] _NormalMap ("Detail normal map (tiling)", 2D) = "bump" {}
-        [NoScaleOffset] _WaterRipples ("Ripples (set by WaterRipples)", 2D) = "black" {}
-        _RippleStrength ("Ripple normal strength", Float) = 0
+        _RippleStrength ("Ripple normal strength", Float) = 0.6
+        _RippleFoam ("Ripple foam", Float) = 4
     }
 
     SubShader
@@ -37,6 +37,7 @@ Shader "unity-setup/Water"
 
             CBUFFER_START(UnityPerMaterial)
                 float _RippleStrength;
+                float _RippleFoam;
             CBUFFER_END
 
             // Globals from WaterSurface (and WaterRipples).
@@ -47,7 +48,7 @@ Shader "unity-setup/Water"
             float4 _WaterDetail;      // normal tiling, normal strength, normal scroll, deep at
             float4 _WaterFoamParams;  // shore foam depth, shore band speed, crest foam, calm depth
             float4 _WaterDepthRect;   // x min, z min, size, depth range
-            float4 _WaterRippleRect;  // x min, z min, size, 0 when no ripples
+            float4 _WaterRippleRect;  // x min, z min, size (0 when no ripples), texel size in uv
 
             static const float Gravity = 9.81;
 
@@ -142,10 +143,14 @@ Shader "unity-setup/Water"
                 if (_WaterRippleRect.z > 0)
                 {
                     float2 rippleUV = (i.positionWS.xz - _WaterRippleRect.xy) / _WaterRippleRect.z;
-                    float4 r = SAMPLE_TEXTURE2D(_WaterRipples, sampler_WaterRipples, rippleUV);
+                    float t = _WaterRippleRect.w;
+                    float h = SAMPLE_TEXTURE2D(_WaterRipples, sampler_WaterRipples, rippleUV).r;
+                    float hx = SAMPLE_TEXTURE2D(_WaterRipples, sampler_WaterRipples, rippleUV + float2(t, 0)).r;
+                    float hz = SAMPLE_TEXTURE2D(_WaterRipples, sampler_WaterRipples, rippleUV + float2(0, t)).r;
                     float edge = saturate(min(min(rippleUV.x, rippleUV.y), min(1 - rippleUV.x, 1 - rippleUV.y)) * 10);
-                    bend += r.yz * _RippleStrength * edge;
-                    ripple = abs(r.x) * edge;
+                    float texelWorld = t * _WaterRippleRect.z;
+                    bend -= float2(hx - h, hz - h) / texelWorld * _RippleStrength * edge;
+                    ripple = abs(h) * _RippleFoam * edge;
                 }
                 float3 n = normalize(float3(i.normalWS.x + bend.x, i.normalWS.y, i.normalWS.z + bend.y));
 
@@ -171,9 +176,11 @@ Shader "unity-setup/Water"
                 float breakup = n1.x * 0.5 + 0.5;
                 float band = frac(t * 2.5 + _WaterTime * _WaterFoamParams.y);
                 float bands = smoothstep(0.75, 0.95, band) * (1.0 - t) * smoothstep(0.25, 0.75, breakup);
-                float waterline = 1.0 - smoothstep(0.0, 0.12, depth);
+                // The waterline swashes up and down the beach, out of step along the shore.
+                float swash = 0.5 + 0.5 * sin(_WaterTime * 1.1 + i.restXZ.x * 0.15 + i.restXZ.y * 0.11);
+                float waterline = 1.0 - smoothstep(0.0, 0.08 + 0.14 * swash, depth);
                 float crestFoam = smoothstep(0.85, 1.0, i.crest) * _WaterFoamParams.z * smoothstep(0.55, 0.9, breakup);
-                float foam = saturate(max(max(bands, waterline), max(crestFoam, saturate(ripple * 2.0))));
+                float foam = saturate(max(max(bands, waterline), max(crestFoam, saturate(ripple))));
                 colour = lerp(colour, _WaterFoam.rgb * (0.6 + 0.4 * nl), foam);
 
                 // Shallow water is see-through to the sand; deep is nearly opaque; none over land.

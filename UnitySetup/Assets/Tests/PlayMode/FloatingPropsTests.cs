@@ -62,6 +62,10 @@ namespace Game.Tests.PlayMode
             int failures = 0;
             foreach (Buoyancy b in floaters)
             {
+                if (b.RelativeDensity >= 1f)
+                {
+                    continue; // cannonballs are meant to sink
+                }
                 Vector3 p = b.transform.position;
                 float surface = b.Water.HeightAt(p);
                 float off = p.y - surface;

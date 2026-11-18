@@ -35,6 +35,6 @@ MonoBehaviour:
   _normalStrength: 0.2
   _normalScroll: 0.03
   _shoreFoamDepth: 0.9
-  _shoreBandSpeed: 0.35
+  _shoreBandSpeed: 0.5
   _crestFoam: 0.4
   _calmDepth: 2

@@ -43,6 +43,9 @@ namespace Game.Gameplay.Water
         /// <summary>Fraction of the sample points under the surface at the last physics step, 0 to 1.</summary>
         public float WetFraction => _wetFraction;
 
+        /// <summary>Density relative to water: under 1 floats.</summary>
+        public float RelativeDensity => _relativeDensity;
+
         /// <summary>The water this body floats on.</summary>
         public WaterSurface Water => _water;
 

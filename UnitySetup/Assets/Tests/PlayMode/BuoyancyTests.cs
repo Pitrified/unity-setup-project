@@ -16,6 +16,9 @@ namespace Game.Tests.PlayMode
         private const float SettleSeconds = 12f;
         private const float DraftTolerance = 0.08f;
 
+        // Far from the Game scene's island, which an earlier test may have left loaded.
+        private static readonly Vector3 Origin = new Vector3(1000f, 0f, 1000f);
+
         private GameObject _waterObject;
         private SO_WaterSettings _settings;
         private WaterSurface _water;
@@ -85,7 +88,7 @@ namespace Game.Tests.PlayMode
         private GameObject MakeCube(float relativeDensity, float startHeight)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = new Vector3(0f, startHeight, 0f);
+            cube.transform.position = Origin + new Vector3(0f, startHeight, 0f);
             cube.AddComponent<Rigidbody>();
             var buoyancy = cube.AddComponent<Buoyancy>();
             buoyancy.Configure(relativeDensity, 1f, new[]
