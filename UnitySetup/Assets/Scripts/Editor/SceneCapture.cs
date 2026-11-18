@@ -13,13 +13,17 @@ namespace Game.Editor
     /// Batch mode, under xvfb-run on Linux, without -nographics:
     /// <c>-executeMethod Game.Editor.SceneCapture.CaptureFromCommandLine -captureOut shot.png
     /// [-captureScene Assets/Scenes/Game.unity] [-captureEye x,y,z -captureTarget x,y,z]
-    /// [-captureFov 50] [-captureSize 960x540]</c>.
+    /// [-captureFov 50] [-captureSize 960x540] [-captureGreyCard x,y,z]</c>.
+    /// A grey card is a temporary 50% grey square at a point, facing the camera, lit like the scene:
+    /// the neutral patch for measuring a palette when the scene has nothing white or grey.
     /// </summary>
     public static class SceneCapture
     {
         private const string DefaultScene = "Assets/Scenes/Game.unity";
         private const int DefaultWidth = 960;
         private const int DefaultHeight = 540;
+        private const float GreyCardSize = 0.12f;
+        private const float GreyCardValue = 0.5f;
 
         /// <summary>Entry point for -executeMethod; exits with 0 when the PNG is written.</summary>
         public static void CaptureFromCommandLine()
@@ -63,7 +67,19 @@ namespace Game.Editor
                 height = int.Parse(parts[1], CultureInfo.InvariantCulture);
             }
 
+            GameObject card = null;
+            string cardAt = CommandLine.Value("-captureGreyCard");
+            if (cardAt != null)
+            {
+                card = MakeGreyCard(ParseVector(cardAt), camera.transform.position);
+            }
+
             Render(camera, width, height, output);
+            if (card != null)
+            {
+                Object.DestroyImmediate(card.GetComponent<MeshRenderer>().sharedMaterial);
+                Object.DestroyImmediate(card);
+            }
             Debug.Log($"SceneCapture: {scene.path} through '{camera.name}' -> {output}");
             EditorApplication.Exit(0);
         }
@@ -92,6 +108,22 @@ namespace Game.Editor
             File.WriteAllBytes(output, image.EncodeToPNG());
             Object.DestroyImmediate(image);
             target.Release();
+        }
+
+        private static GameObject MakeGreyCard(Vector3 at, Vector3 eye)
+        {
+            GameObject card = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            card.name = "GreyCard";
+            Object.DestroyImmediate(card.GetComponent<Collider>());
+            card.transform.position = at;
+            card.transform.localScale = Vector3.one * GreyCardSize;
+            // A quad faces -Z; look away from the eye so its front faces the camera.
+            card.transform.rotation = Quaternion.LookRotation(at - eye);
+            var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            material.SetColor("_BaseColor", new Color(GreyCardValue, GreyCardValue, GreyCardValue));
+            material.SetFloat("_Smoothness", 0f);
+            card.GetComponent<MeshRenderer>().sharedMaterial = material;
+            return card;
         }
 
         private static Camera FindCamera(Scene scene)

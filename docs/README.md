@@ -29,6 +29,7 @@ What the repo is, and the patterns linked from other projects, are in the [root 
 - [git-workflow.md](git-workflow.md)
 - [testing-strategy.md](testing-strategy.md)
 - [performance-budget.md](performance-budget.md)
+- [building_assets.md](building_assets.md) - models from a reference photograph: Blender builders, FBX, passes
 
 ### AI workflow
 

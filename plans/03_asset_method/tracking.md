@@ -17,7 +17,7 @@ From `00_start.md` Q1 to Q6:
 | -- | ---------------------------- | -------------------------------------------- | ------- |
 | 01 | Pipeline spike               | [`01_spike.md`](01_spike.md)                 | done    |
 | 02 | Match the barrel to a photo  | [`02_barrel.md`](02_barrel.md)               | done    |
-| 03 | Method doc and skill         | [`03_method.md`](03_method.md)               | planned |
+| 03 | Method doc and skill         | [`03_method.md`](03_method.md)               | done    |
 | 04 | Verify                       | [`04_verify.md`](04_verify.md)               | planned |
 
 Status values: draft / planned / in progress / done / superseded / discarded.
@@ -31,3 +31,4 @@ Append-only. Newest at the bottom.
 - 2026-11-18 : picked up unsupervised on the user's go, after `02_guide_rebuild` closed. Four phases planned; branch `feat/03_asset_method` from `feat/02_guide_rebuild`.
 - 2026-11-18 : phase 01 - builder to FBX to Unity headless: `Tools/asset_builders`, deterministic FBX, `ModelSetup` and `SceneCapture` editor tools, `BarrelModelTests`, three barrels in the sample scene. Gates green.
 - 2026-11-18 : phase 02 - public-domain barrique photograph chosen from Commons; hoop layout measured from a chroma profile; two shape passes and two palette captures, wood-to-hoop within 0.01. Grain left unmatched (no texture). `MaterialTuning` and `measure.py` added.
+- 2026-11-18 : phase 03 - `docs/building_assets.md` and the `build-asset` skill; the crate through them found four gaps (grey card, hue vs value, tinted neutrals, patch choice), now in both. `BuiltModelTests` over every model. Gates green.

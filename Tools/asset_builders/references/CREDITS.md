@@ -6,3 +6,4 @@ Only photographs whose licence allows keeping them in a public repo: CC0, public
 | File | Source | Author | Licence | Changes |
 | ---- | ------ | ------ | ------- | ------- |
 | `barrel/barriques.jpg` | [Barrels. (52254707001).jpg](https://commons.wikimedia.org/wiki/File:Barrels._(52254707001).jpg), Wikimedia Commons | Bernard Spragg, Christchurch, New Zealand | Public domain | Downscaled to 960 px wide |
+| `crate/margarine_crate.jpg` | [Ca 1940s Husmodern margarine wooden shipping crate ...](https://commons.wikimedia.org/wiki/File:Ca_1940s_Husmodern_margarine_wooden_shipping_crate_by_Swedish_company_Margarinfabriken_Kaernan_AB_Helsingborg.jpg), Wikimedia Commons | R. Henrik Nilsson | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | Downscaled to 960 px wide |

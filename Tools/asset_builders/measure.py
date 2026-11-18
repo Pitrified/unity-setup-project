@@ -2,7 +2,9 @@
 
 Run from this folder with `uv run --no-sync python measure.py ...`.
 
-    measure SPEC [IMAGE ...]      each patch's median, its ratio to the neutral patch, its spread
+    measure SPEC [IMAGE ...]      each patch's median, its ratio to the neutral patch, its hue
+                                  (the ratio over its mean: what survives a neutral that is not
+                                  the same object in both pictures), its spread
     correct RGB --target R G B --current R G B
                                   move a colour (0-1 sRGB) by the ratio of two ratios, in linear
     profile IMAGE X0 Y0 X1 Y1     brightness and chroma along a box, column by column (bands, hoops)
@@ -14,6 +16,8 @@ SPEC is a JSON file:
     {"neutral": "hoop",
      "reference": {"path": "photo.jpg", "patches": {"hoop": [x0, y0, x1, y1], "wood": [...]}},
      "render":    {"patches": {"hoop": [...], "wood": [...]}}}
+
+Either side may add "neutral_mode": "luminance" when its neutral is not grey (see report()).
 
 Boxes are pixels, origin top left, x1 and y1 excluded; the reference and each render have
 their own boxes, paired by name. The neutral patch is something grey or white in both
@@ -53,9 +57,16 @@ def _fmt(rgb: np.ndarray) -> str:
     return "#" + "".join(f"{round(c):02x}" for c in np.clip(rgb, 0, 255))
 
 
-def report(tag: str, image: np.ndarray, patches: dict, neutral: str) -> dict:
-    """Print each patch's colour, ratio to the neutral patch and spread; return the ratios."""
+def report(tag: str, image: np.ndarray, patches: dict, neutral: str, mode: str = "rgb") -> dict:
+    """Print each patch's colour, ratio to the neutral patch and spread; return the ratios.
+
+    mode "rgb" divides channel by channel (the neutral is grey: its tint is the picture's cast);
+    "luminance" divides by its brightness only (the neutral is tinted itself: trust the picture's
+    white balance for hue).
+    """
     base, _ = patch(image, patches[neutral])
+    if mode == "luminance":
+        base = np.full(3, base.mean())
     print(f"{tag}\n  {neutral:10} {_fmt(base)} (neutral)")
     ratios = {}
     for name, box in patches.items():
@@ -64,7 +75,9 @@ def report(tag: str, image: np.ndarray, patches: dict, neutral: str) -> dict:
         rgb, spread = patch(image, box)
         ratio = rgb / np.maximum(base, 1.0)
         ratios[name] = ratio
-        print(f"  {name:10} {_fmt(rgb)}  ratio {ratio[0]:.3f} {ratio[1]:.3f} {ratio[2]:.3f}  spread {spread:.1f}")
+        hue = ratio / ratio.mean()
+        print(f"  {name:10} {_fmt(rgb)}  ratio {ratio[0]:.3f} {ratio[1]:.3f} {ratio[2]:.3f}"
+              f"  hue {hue[0]:.3f} {hue[1]:.3f} {hue[2]:.3f}  spread {spread:.1f}")
     return ratios
 
 
@@ -72,13 +85,17 @@ def measure(spec_path: str, renders: list[str]) -> None:
     spec = json.loads(Path(spec_path).read_text())
     neutral = spec["neutral"]
     ref = spec["reference"]
-    target = report(f"reference {ref['path']}", load(ref["path"]), ref["patches"], neutral)
+    target = report(f"reference {ref['path']}", load(ref["path"]), ref["patches"], neutral,
+                    ref.get("neutral_mode", "rgb"))
     for render in renders:
-        got = report(f"render {render}", load(render), spec["render"]["patches"], neutral)
+        got = report(f"render {render}", load(render), spec["render"]["patches"], neutral,
+                     spec["render"].get("neutral_mode", "rgb"))
         for name, ratio in got.items():
             if name in target:
                 off = ratio - target[name]
-                print(f"  {name:10} off by {off[0]:+.3f} {off[1]:+.3f} {off[2]:+.3f}")
+                hue_off = ratio / ratio.mean() - target[name] / target[name].mean()
+                print(f"  {name:10} off by {off[0]:+.3f} {off[1]:+.3f} {off[2]:+.3f}"
+                      f"  hue off by {hue_off[0]:+.3f} {hue_off[1]:+.3f} {hue_off[2]:+.3f}")
 
 
 def _to_linear(c: np.ndarray) -> np.ndarray:

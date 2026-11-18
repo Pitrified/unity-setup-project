@@ -1,0 +1,51 @@
+{
+ "neutral": "grey",
+ "reference": {
+  "path": "references/crate/margarine_crate.jpg",
+  "patches": {
+   "grey": [
+    8,
+    505,
+    60,
+    560
+   ],
+   "front": [
+    120,
+    420,
+    230,
+    480
+   ],
+   "lid": [
+    300,
+    110,
+    480,
+    150
+   ]
+  },
+  "neutral_mode": "luminance"
+ },
+ "render": {
+  "patches": {
+   "grey": [
+    75,
+    290,
+    160,
+    370
+   ],
+   "front": [
+    290,
+    300,
+    470,
+    380
+   ],
+   "lid": [
+    330,
+    150,
+    500,
+    175
+   ]
+  }
+ },
+ "capture": "-captureEye 1.45,0.45,5.15 -captureTarget 1.4,0.12,6.1 -captureFov 40 -captureGreyCard 1.0,0.12,5.9 (the crates in Game.unity)",
+ "note": "The rock is green with moss, so it gives brightness only and the photograph's white balance is trusted for hue; the grey card is grey. Hue is what to match; value is set by the material."
+}
