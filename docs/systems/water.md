@@ -38,7 +38,7 @@ The choice and the alternatives are in `plans/04_water/00_start.md`.
 
 1. A ground with colliders under the water (`ModelSetup -colliders` for a model), and a water grid mesh (`Tools/asset_builders`: `build.py water_grid`) with the `M_Water` material, at the origin.
 2. `WaterSurface` on the grid, with an `SO_WaterSettings`; set its depth rect to cover the area.
-3. Bake: `-executeMethod Game.Editor.WaterDepthBake.BakeFromCommandLine` (`docs/headless-unity.md`); bake again when the shore changes.
+3. Bake: `-executeMethod Game.Editor.WaterDepthBake.BakeFromCommandLine` (`docs/headless-unity.md`); bake again when the shore changes. Colliders on a Rigidbody (floating props, a kinematic ship) are passed through, so only the ground counts.
 4. Optional: `WaterRipples` on the same object with `M_WaterRippleSim`, centred where things happen.
 5. A procedural sky whose ground colour is the far water's, or the horizon shows a band past the grid's edge.
 

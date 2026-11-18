@@ -35,6 +35,7 @@ namespace Game.Gameplay.Water
         [SerializeField] private float _splashStrength = 0.012f;
 
         private Vector3 _last;
+        private bool _hasLast;
         private bool _wasIn;
         private float _timer;
 
@@ -46,12 +47,15 @@ namespace Game.Gameplay.Water
             _reach = reach;
             _ringRadius = ringRadius;
             _last = transform.position;
+            _hasLast = true;
             _wasIn = false;
         }
 
         private void OnEnable()
         {
-            _last = transform.position;
+            // The first position is taken in the first Update: something placed in Start (a hull
+            // put on the water) is not a movement.
+            _hasLast = false;
             _wasIn = false;
             _timer = 0f;
         }
@@ -63,6 +67,12 @@ namespace Game.Gameplay.Water
                 return;
             }
             Vector3 position = transform.position;
+            if (!_hasLast)
+            {
+                _last = position;
+                _hasLast = true;
+                return;
+            }
             Vector3 velocity = (position - _last) / Time.deltaTime;
             _last = position;
 

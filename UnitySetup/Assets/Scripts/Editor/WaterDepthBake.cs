@@ -12,7 +12,9 @@ namespace Game.Editor
     /// Bakes the seabed depth under a scene's water into a greyscale map the water shader reads
     /// for its colour, shore foam and edge fade: 0 at the still surface (or above it), 1 at the
     /// depth range or deeper. Rays are cast down against the scene's colliders, so the ground
-    /// needs colliders (ModelSetup -colliders). Bake again when the shore changes.
+    /// needs colliders (ModelSetup -colliders); colliders on a Rigidbody (things that float or
+    /// move, a kinematic ship included) are not ground and are passed through. Bake again when
+    /// the shore changes.
     /// See docs/systems/water.md.
     /// Batch mode: <c>-executeMethod Game.Editor.WaterDepthBake.BakeFromCommandLine
     /// [-scene Assets/Scenes/Game.unity] [-size 512] [-out Assets/Art/Textures/T_WaterDepth.png]</c>.
@@ -57,6 +59,21 @@ namespace Game.Editor
             EditorApplication.Exit(saved ? 0 : 3);
         }
 
+        /// <summary>The highest hit below <paramref name="origin"/> on a collider with no Rigidbody.</summary>
+        private static bool GroundBelow(Vector3 origin, out float groundY)
+        {
+            groundY = float.NegativeInfinity;
+            foreach (RaycastHit hit in Physics.RaycastAll(origin, Vector3.down, RayLength,
+                         Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.collider.attachedRigidbody == null && hit.point.y > groundY)
+                {
+                    groundY = hit.point.y;
+                }
+            }
+            return !float.IsNegativeInfinity(groundY);
+        }
+
         /// <summary>Casts a ray per texel over the water's depth rect and writes the map to <paramref name="output"/>.</summary>
         public static void Bake(WaterSurface water, int size, string output)
         {
@@ -73,10 +90,9 @@ namespace Game.Editor
                     float wx = rect.x + (x + 0.5f) / size * rect.z;
                     float wz = rect.y + (y + 0.5f) / size * rect.z;
                     float depth01 = 1f;
-                    if (Physics.Raycast(new Vector3(wx, RayStart, wz), Vector3.down, out RaycastHit hit, RayLength,
-                            Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    if (GroundBelow(new Vector3(wx, RayStart, wz), out float groundY))
                     {
-                        depth01 = Mathf.Clamp01((seaLevel - hit.point.y) / rect.w);
+                        depth01 = Mathf.Clamp01((seaLevel - groundY) / rect.w);
                         hits++;
                     }
                     byte v = (byte)Mathf.RoundToInt(depth01 * 255f);
